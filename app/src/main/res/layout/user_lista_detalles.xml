@@ -1,0 +1,59 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:socialsinch="http://schemas.android.com/apk/res-auto"
+    			android:id="@+id/userElement"                
+    			android:layout_width="fill_parent"
+    			android:layout_height="fill_parent" >
+
+    <TextView
+        android:id="@+id/txtNombre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/imgUser"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/imgUser"
+        android:layout_marginLeft="10dp"
+        android:paddingTop="10dp"
+        android:layout_toRightOf="@+id/imgUser"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <com.makeramen.RoundedImageView
+        android:id="@+id/imgUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="31dp"
+        android:layout_marginTop="29dp"
+        android:src="@drawable/user_picture_list"
+        android:scaleType="fitCenter"  
+        socialsinch:riv_corner_radius="100dip"/>
+
+    <ImageView
+        android:id="@+id/imgStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignTop="@+id/imgUser"
+        android:layout_marginLeft="20dp"
+        android:src="@drawable/disconnected" />
+
+    <ImageView
+        android:id="@+id/imgArrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/imgStatus"
+        android:layout_marginRight="18dp"
+        android:src="@drawable/arrow_right" />
+
+    <TextView
+        android:id="@+id/txtSubtitled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/txtNombre"
+        android:layout_below="@+id/imgArrow"
+        android:text="Colombia"
+        android:textColor="@android:color/darker_gray" />
+
+</RelativeLayout>

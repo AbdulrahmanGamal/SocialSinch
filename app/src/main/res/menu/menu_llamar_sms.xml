@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item android:id="@+id/action_llamar"
+          android:title="@string/llamar"
+          android:orderInCategory="100"
+          android:icon="@drawable/ic_action_call" 
+          android:showAsAction="ifRoom"         
+    />
+
+    <item android:id="@+id/action_sms"
+          android:title="@string/sms"
+          android:orderInCategory="200"
+          android:icon="@drawable/ic_action_chat" 
+          android:showAsAction="ifRoom"         
+    />
+        
+</menu>

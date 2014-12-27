@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">SocialSinchParse</string>
+    <string name="login_activity_label">Sinch Social</string>
+    <string name="login">Usuario</string>
+    <string name="password">Contraseña</string>
+    <string name="password_confirmacion">Confirmar Contraseña</string>
+    <string name="ingresar">Ingresar</string>
+    <string name="registrar">Registrar</string>
+    <string name="salir">Salir</string>
+    <string name="salir_msj">¿Esta seguro que desea salir de la aplicacion?</string>
+    <string name="aceptar">Aceptar</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="llamar">Llamar</string>
+    <string name="sms">SMS</string>
+    <string name="usuarios">Usuarios</string>
+    <string name="numero_telefono">Nùmero de Telefono:</string>
+    <string name="message_elipses">Message...</string>
+    <string name="forget_password">¿Olvidó su Contraseña?</string>
+    <string name="label_login">LOGIN</string>
+    <string name="label_register">REGISTRO</string>
+    <string name="button_login">Entrar</string>
+    <string name="button_register">Registrar</string>
+    <string name="chat">Chats</string>
+    <string name="user_name">Nombres</string>
+    <string name="user_lastname">Apellidos</string>
+    <string name="user_phone">+(codP)(codC)(numero)</string>
+    <string name="call_hang_up">Colgar</string>
+    <string name="call_pick_up">Atender</string>
+     <string name="call_reject">Rechazar</string>
+    <string name="call_speakers">Altavoz</string>
+    <string name="error_title">Error</string>
+    <string name="accept">Aceptar</string>
+    
+    <string name="pick_image">Seleccione una Imagen</string>
+    <string name="option_take_photo">Tomar Fotografia</string>
+    <string name="option_gallery">Seleccionar de Galeria</string>
+    <string name="select_photo_source">Seleccionar Origen</string>
+	<string name="photo_directory">SocialSinch</string>	
+	<string name="profile_picture_name">socialsinch_picture.jpeg</string>
+
+</resources>
