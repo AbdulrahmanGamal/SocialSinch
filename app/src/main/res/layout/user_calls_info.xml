@@ -1,0 +1,84 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:socialsinch="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="viewModel" type="com.parse.sinch.social.viewmodel.UserCallsItemViewModel" />
+    </data>
+
+    <RelativeLayout android:id="@+id/userElement"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="@{viewModel.onClickUserCall()}">
+
+        <TextView
+            android:id="@+id/txtNombre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/imgPanel"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@+id/imgPanel"
+            android:textSize="14sp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@{viewModel.fullName}"/>
+
+        <!--<TextView-->
+            <!--android:id="@+id/txtLastname"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@+id/txtNombre"-->
+            <!--android:layout_marginStart="10dp"-->
+            <!--android:layout_toEndOf="@+id/imgPanel"-->
+            <!--android:textSize="14sp"-->
+            <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
+
+        <LinearLayout
+            android:id="@+id/imgPanel"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="15dp"
+            android:layout_marginStart="31dp"
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical" >
+
+        <com.makeramen.RoundedImageView
+            android:id="@+id/imgUser"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            socialsinch:riv_corner_radius="150dip"
+            socialsinch:avatarUrl="@{viewModel.userAvatar}"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/imgStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignTop="@+id/imgPanel"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/disconnected" />
+
+        <ImageView
+            android:id="@+id/imgArrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/imgStatus"
+            android:layout_marginEnd="18dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/arrow_right" />
+
+        <TextView
+            android:id="@+id/txtSubtitled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/txtNombre"
+            android:layout_below="@+id/txtNombre"
+            android:paddingTop="2dp"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"
+            android:text="@{viewModel.phoneNumber}"/>
+
+    </RelativeLayout>
+</layout>

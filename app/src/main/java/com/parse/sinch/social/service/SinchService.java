@@ -1,6 +1,6 @@
 package com.parse.sinch.social.service;
 
-import com.parse.ParseUser;
+import com.backendless.Backendless;
 import com.sinch.android.rtc.ClientRegistration;
 import com.sinch.android.rtc.Sinch;
 import com.sinch.android.rtc.SinchClient;
@@ -15,9 +15,9 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 public class SinchService extends Service implements SinchClientListener {
-
 		private static final String APP_KEY = "1449b242-7764-4e78-9866-34b50bb52dba";
 		private static final String APP_SECRET = "PAlx4YPGrky4iS3eD3Wnag==";
 		private static final String ENVIRONMENT = "sandbox.sinch.com";
@@ -26,15 +26,16 @@ public class SinchService extends Service implements SinchClientListener {
 		private MessageClient messageClient = null;
 		private String currentUserId;
 		
-		private Intent broadcastIntent = new Intent("com.parse.sinch.social.ListaUseriosActivity");
+		private Intent broadcastIntent = new Intent("com.parse.sinch.social.TabActivity");
 		private LocalBroadcastManager broadcaster;
-		
+
+		private static final String TAG = "SinchService";
+
 		@Override
 		public int onStartCommand(Intent intent, int flags, int startId) {
-			
 			broadcaster = LocalBroadcastManager.getInstance(this);
 			//get the current user id from Parse
-			currentUserId = ParseUser.getCurrentUser().getObjectId();
+			currentUserId = Backendless.UserService.loggedInUser();
 			if (currentUserId != null && !isSinchClientStarted()) {
 				startSinchClient(currentUserId);
 			}
@@ -52,7 +53,6 @@ public class SinchService extends Service implements SinchClientListener {
 			//this client listener requires that you define
 			//a few methods below
 			sinchClient.addSinchClientListener(this);
-			//messaging is "turned-on", but calling is not
 			sinchClient.setSupportMessaging(true);
 			sinchClient.setSupportActiveConnectionInBackground(true);
 			sinchClient.checkManifest();
@@ -83,14 +83,19 @@ public class SinchService extends Service implements SinchClientListener {
 		
 		@Override
 		public void onClientStopped(SinchClient client) {
+			Log.e(TAG, "onClientStopped called");
 			sinchClient = null;
 		}
 		
 		@Override
-		public void onRegistrationCredentialsRequired(SinchClient client, ClientRegistration clientRegistration) {}
+		public void onRegistrationCredentialsRequired(SinchClient client, ClientRegistration clientRegistration) {
+			Log.e(TAG, "onRegistrationCredentialsRequired called");
+		}
 		
 		@Override
-		public void onLogMessage(int level, String area, String message) {}
+		public void onLogMessage(int level, String area, String message) {
+			Log.d("SinchService", "Level: " + level + " area: " + area + " message: " + message);
+		}
 		
 		@Override
 		public IBinder onBind(Intent intent) {

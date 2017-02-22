@@ -16,6 +16,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -24,7 +25,7 @@ public class Utils {
 	@SuppressLint("NewApi")
 	public static String getRealPathFromURI_API19(Context context, Uri uri){
 		String filePath = "";
-		String wholeID = null;//DocumentsContract.getDocumentId(uri);
+		String wholeID = DocumentsContract.getDocumentId(uri);
 
 		// Split at colon, use second item in the array
 		String id = wholeID.split(":")[1];

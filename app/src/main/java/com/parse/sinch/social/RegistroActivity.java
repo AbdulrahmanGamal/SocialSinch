@@ -1,16 +1,21 @@
 package com.parse.sinch.social;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
@@ -20,19 +25,22 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.androidquery.AQuery;
-import com.parse.ParseUser;
-import com.parse.SignUpCallback;
+import com.makeramen.RoundedDrawable;
+import com.makeramen.RoundedImageView;
 import com.parse.sinch.social.utils.Utils;
 
 public class RegistroActivity extends Activity {
 
 	private AQuery aq;
 	private Uri pictureTakenUri;
-	private Dialog progressDialog;
+	private ProgressDialog progressDialog;
 	private Context context;
+    private Bitmap profiePictureResized;
+    //private ParseFile profilePictureFile;
 	
 	private static final String TAG = RegistroActivity.class.getName();
 	
@@ -59,41 +67,142 @@ public class RegistroActivity extends Activity {
 		});
         
         aq.id(R.id.btnSignUp).clicked(new OnClickListener() {
-			
-			@Override
-			public void onClick(View arg0) {
-				 String name = aq.id(R.id.editUserName).getEditText().getText().toString();
-				 String lastname = aq.id(R.id.editUserLastname).getEditText().getText().toString();
-				 String username = aq.id(R.id.editUSer).getEditText().getText().toString();
-				 String password = aq.id(R.id.editPassword).getEditText().getText().toString();
-				 String number = aq.id(R.id.editUserPhone).getEditText().getText().toString();
-				 
 
-				 ParseUser user = new ParseUser();
-				 user.setUsername(username);
-				 user.setPassword(password);
-				 user.put("NAME", name);
-				 user.put("LASTNAME", lastname);
-				 user.put("NUMBER", number);
-				 
-				 user.signUpInBackground(new SignUpCallback() {
-					 public void done(com.parse.ParseException e) {
-						 if (e == null) {
-							 //start sinch service
-							 //start next activity
-							 startActivity(new Intent(RegistroActivity.this, ListaUsuariosActivity.class));
-						 } else {
-							 Toast.makeText(getApplicationContext(),
-									 "Error al registrar:" + e.getMessage()
-									 , Toast.LENGTH_LONG).show();
-						 }
-					 }
-				 });
-			}
+            @Override
+            public void onClick(View arg0) {
+
+                if (profiePictureResized != null) {
+
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+                    profiePictureResized.compress(Bitmap.CompressFormat.PNG, 0, bos);
+                    byte[] bitmapdata = bos.toByteArray();
+
+//                    profilePictureFile = new ParseFile(context.getResources().getString(R.string.profile_picture_name), bitmapdata);
+//
+//                    progressDialog = new ProgressDialog(RegistroActivity.this);
+//                    progressDialog.setTitle(getResources().getString(R.string.loading));
+//                    progressDialog.setMessage(getResources().getString(R.string.loading_msj));
+//                    progressDialog.show();
+//
+//                    profilePictureFile.saveInBackground(new SaveCallback() {
+//
+//                        public void done(ParseException e) {
+//                            if (e != null) {
+//                                progressDialog.dismiss();
+//                                new AlertDialog.Builder(RegistroActivity.this)
+//                                        .setIcon(android.R.drawable.ic_dialog_alert)
+//                                        .setTitle(R.string.error_title)
+//                                        .setMessage(R.string.error_save_picture_msj + " " + e.getMessage())
+//                                        .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
+//
+//                                            @Override
+//                                            public void onClick(DialogInterface dialog, int which) {
+//                                            }
+//                                        })
+//                                        .show();
+//
+//                            } else {
+//
+//                                savePersonalInformation();
+//                            }
+//                        }
+//                    });
+//
+                }else{
+                    savePersonalInformation();
+                }
+            }
+
 		});
     }
     
-    
+    private void savePersonalInformation(){
+
+        //Toast.makeText(((OutsideNavigationActivity)ctx),
+        //	"Picture Sucessfully Saved ", Toast.LENGTH_LONG).show();
+        // other fields can be set just like with ParseObject
+        String name = aq.id(R.id.editUserName).getEditText().getText().toString();
+        String lastname = aq.id(R.id.editUserLastname).getEditText().getText().toString();
+        final String username = aq.id(R.id.editUSer).getEditText().getText().toString();
+        final String password = aq.id(R.id.editPassword).getEditText().getText().toString();
+        String number = aq.id(R.id.editUserPhone).getEditText().getText().toString();
+
+//        ParseUser user = new ParseUser();
+//        user.setUsername(username);
+//        user.setPassword(password);
+//        user.put("NAME", name);
+//        user.put("LASTNAME", lastname);
+//        user.put("NUMBER", number);
+//
+//        if(profilePictureFile != null) {
+//            user.put("PICTURE", profilePictureFile);
+//        }
+//
+//        user.signUpInBackground(new SignUpCallback() {
+//            @Override
+//            public void done(ParseException e) {
+//                progressDialog.dismiss();
+//                if (e == null) {
+//                    new AlertDialog.Builder(RegistroActivity.this)
+//                            .setIcon(android.R.drawable.ic_dialog_info)
+//                            .setTitle(R.string.success)
+//                            .setMessage(R.string.success_registered)
+//                            .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
+//
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    dialog.dismiss();
+//                                    progressDialog = new ProgressDialog(RegistroActivity.this);
+//                                    progressDialog.setTitle(getResources().getString(R.string.loading));
+//                                    progressDialog.setMessage(getResources().getString(R.string.loading_msj));
+//                                    progressDialog.show();
+//
+//                                    ParseUser.logInInBackground(username, password, new LogInCallback() {
+//                                        public void done(ParseUser user, ParseException e) {
+//                                            progressDialog.dismiss();
+//                                            if (user != null) {
+//                                                startActivity(new Intent(RegistroActivity.this, TabActivity.class));
+//                                            } else {
+//                                                new AlertDialog.Builder(RegistroActivity.this)
+//                                                        .setIcon(android.R.drawable.ic_dialog_alert)
+//                                                        .setTitle(R.string.error_title)
+//                                                        .setMessage(R.string.error_login_msj + " " + e.getMessage())
+//                                                        .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
+//
+//                                                            @Override
+//                                                            public void onClick(DialogInterface dialog, int which) {
+//                                                            }
+//                                                        })
+//                                                        .show();
+//                                            }
+//                                        }
+//                                    });
+//                                }
+//
+//                            })
+//                            .show();
+//
+//                } else {
+//                    progressDialog.dismiss();
+//                    new AlertDialog.Builder(RegistroActivity.this)
+//                            .setIcon(android.R.drawable.ic_dialog_alert)
+//                            .setTitle(R.string.error_title)
+//                            .setMessage(R.string.error_sign_up_msj + " " + e.getMessage())
+//                            .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
+//
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    dialog.dismiss();
+//                                }
+//                            })
+//                            .show();
+//                }
+//            }
+//        });
+
+    }
+
     private void selectProfilePicture(){
 
     	CharSequence photoOptions[] = new CharSequence[] {getResources().getString(R.string.option_take_photo), getResources().getString(R.string.option_gallery)};
@@ -198,7 +307,6 @@ public class RegistroActivity extends Activity {
 		
 		try{
 			    File f = null;
-			    Bitmap bitmap = null;
 			    String filepath = null;
 			    
 			    if(isFromGallery){	
@@ -213,7 +321,7 @@ public class RegistroActivity extends Activity {
 			    	filepath = picture.getPath();
 			    }
 
-			    bitmap = Utils.getResizedBitmap(this, filepath, 120);
+                profiePictureResized = Utils.getResizedBitmap(this, filepath, 100);
 			    f = new File(filepath);
 				ExifInterface exif = new ExifInterface(f.getPath());
 				int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
@@ -237,10 +345,10 @@ public class RegistroActivity extends Activity {
 					Matrix mat = new Matrix();
 					mat.postRotate(angle);
 
-					bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), mat, true);
+                    profiePictureResized = Bitmap.createBitmap(profiePictureResized, 0, 0, profiePictureResized.getWidth(), profiePictureResized.getHeight(), mat, true);
 				}
 
-				aq.id(R.id.imgProfile).image(bitmap, AQuery.RATIO_PRESERVE);
+				aq.id(R.id.imgProfile).image(profiePictureResized);
 				aq.id(R.id.imgProfile).getView().invalidate();
 				
 				

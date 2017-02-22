@@ -1,6 +1,56 @@
-.gradle
+
+#build application files
+*.apk
+*.ap_
+
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# Generated Files
+bin/
+gen/
+
+# Local configuration file
 /local.properties
-/.idea/workspace.xml
-/.idea/libraries
-.DS_Store
-/build
+
+# OSX files
+*.DS_Store
+
+# Android Studio files
+.idea/
+.gitignore
+build/
+.gradle/
+*.iml
+app/*.iml
+app/app.iml
+SocialSinch.iml
+
+
+#Crashlytics Files
+app/src/main/res/values/com_crashlytics_export_strings.xml
+.sonar/checkstyle.xml
+.sonar/dryRun.json
+.sonar/findbugs-include.xml
+.sonar/findbugs-result.xml
+.sonar/issues-report.html
+.sonar/issuesreport_files/BLOCKER.png
+.sonar/issuesreport_files/CLA.png
+.sonar/issuesreport_files/CRITICAL.png
+.sonar/issuesreport_files/INFO.png
+.sonar/issuesreport_files/MAJOR.png
+.sonar/issuesreport_files/MINOR.png
+.sonar/issuesreport_files/favicon.ico
+.sonar/issuesreport_files/prototypejs.js
+.sonar/issuesreport_files/sep12.png
+.sonar/issuesreport_files/sonar.css
+.sonar/issuesreport_files/sonar.png
+.sonar/pmd.xml
+.sonar/sonar-report.json
+crashlytics-build.properties
+
+# Fastlane files
+fastlane/report.xml

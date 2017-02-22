@@ -28,16 +28,30 @@
     <string name="user_phone">+(codP)(codC)(numero)</string>
     <string name="call_hang_up">Colgar</string>
     <string name="call_pick_up">Atender</string>
-     <string name="call_reject">Rechazar</string>
+    <string name="call_reject">Rechazar</string>
     <string name="call_speakers">Altavoz</string>
     <string name="error_title">Error</string>
     <string name="accept">Aceptar</string>
-    
     <string name="pick_image">Seleccione una Imagen</string>
     <string name="option_take_photo">Tomar Fotografia</string>
     <string name="option_gallery">Seleccionar de Galeria</string>
     <string name="select_photo_source">Seleccionar Origen</string>
-	<string name="photo_directory">SocialSinch</string>	
-	<string name="profile_picture_name">socialsinch_picture.jpeg</string>
+    <string name="photo_directory">SocialSinch</string>
+    <string name="profile_picture_name">socialsinch_picture.jpeg</string>
+    <string name="loading">Cargando</string>
+    <string name="loading_msj">Estableciendo conexion...</string>
+    <string name="error_save_picture_msj">Error al Guardar Imagen de Perfil:</string>
+    <string name="error_login_msj">Error al Iniciar Sesion:</string>
+    <string name="error_sign_up_msj">Error al Realizar Registro:</string>
+    <string name="success">Exito</string>
+    <string name="success_registered">Registro Exitoso!</string>
+    <string name="title_activity_tab">Sinch Login</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="getting_users">Obteniendo Lista de Usuarios...</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="invalid_email">Email INvalid</string>
+    <string name="invalid_password">Password must be at least 6 Characters</string>
 
 </resources>

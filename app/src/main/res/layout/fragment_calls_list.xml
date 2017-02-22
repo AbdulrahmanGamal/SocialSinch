@@ -1,0 +1,57 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="viewModel"
+            type="com.parse.sinch.social.viewmodel.ListUserCallViewModel"/>
+    </data>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/panelConnection"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:background="@android:color/holo_green_light"
+            android:layout_alignParentTop="true"
+            android:gravity="center_horizontal"
+            android:padding="3dp"
+            android:layout_alignParentStart="true"
+            android:visibility="@{viewModel.showPanel ? View.VISIBLE : View.INVISIBLE}">
+
+            <ProgressBar
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:id="@+id/progressBar"
+                android:paddingEnd="5dp"
+                android:paddingStart="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/getting_users"
+                android:paddingTop="5dp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:id="@+id/textView" />
+
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/listUsers"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="0dip"
+            android:divider="@color/greyish"
+            android:dividerHeight="1dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:stackFromBottom="true"
+            app:userCallViewModel="@{viewModel}"/>
+
+    </RelativeLayout>
+</layout>
+
+

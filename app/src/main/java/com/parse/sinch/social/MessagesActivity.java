@@ -1,77 +1,59 @@
 package com.parse.sinch.social;
 
-import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.os.IBinder;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
+import com.backendless.Backendless;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.ViewTarget;
+import com.parse.sinch.social.databinding.ActivityChatMainBinding;
+import com.parse.sinch.social.utils.Constants;
+import com.parse.sinch.social.viewmodel.MessageViewModel;
 
-import com.androidquery.AQuery;
-import com.parse.ParseUser;
-import com.parse.sinch.social.service.SinchService;
-
-public class MessagesActivity extends Activity {
-
-	private String recipientId;
-	private String messageBody;
-	private SinchService.MessageServiceInterface messageService;
-	private String currentUserId;
-	private ServiceConnection serviceConnection = new SinchServiceConnection();
-	
-	private AQuery aq;
-
+public class MessagesActivity extends AppCompatActivity {
+    private  MessageViewModel messageViewModel;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.messaging);
+		ActivityChatMainBinding activityChatMainBinding =
+                DataBindingUtil.setContentView(this, R.layout.activity_chat_main);
+        //get recipient information from the intent
+        Intent intent = getIntent();
+        String recipientId = intent.getStringExtra(Constants.RECIPIENT_ID);
+        String currentUserId = Backendless.UserService.loggedInUser();
+        //create the view model
+        messageViewModel = new MessageViewModel(this, recipientId, currentUserId);
+        activityChatMainBinding.setViewModel(messageViewModel);
 
-		aq = new AQuery(this);
-		
-		getActionBar().setTitle(R.string.chat);
-
-		bindService(new Intent(this, SinchService.class), serviceConnection, BIND_AUTO_CREATE);
-		//get recipientId from the intent
-		Intent intent = getIntent();
-		recipientId = intent.getStringExtra("RECIPIENT_ID");
-		currentUserId = ParseUser.getCurrentUser().getObjectId();
-		//messageBodyField = (EditText) findViewById(R.id.messageBodyField);
-		//listen for a click on the send button
-		findViewById(R.id.sendButton).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				//send the message!
-				messageBody = aq.id(R.id.messageBodyField).getEditText().getText().toString();
-				if (messageBody.isEmpty()) {
-					Toast.makeText(getApplicationContext(), "Please enter a message", Toast.LENGTH_LONG).show();
-					return;
-				}
-				messageService.sendMessage(recipientId, messageBody);
-				aq.id(R.id.messageBodyField).getEditText().setText("");
-			}
-		});
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(intent.getStringExtra(Constants.RECIPIENT_NAME));
+        Glide.with(getApplicationContext()).
+                load(intent.getStringExtra(Constants.RECIPIENT_AVATAR)).
+                into(new ViewTarget<Toolbar, GlideDrawable>(toolbar) {
+                    @Override
+                    public void onResourceReady(GlideDrawable resource, GlideAnimation anim) {
+                        Toolbar toolbar = this.view;
+                        toolbar.setNavigationIcon(resource);
+                        // Set your resource on myView and/or start your animation here.
+                    }
+                });
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 	}
 
-	private class SinchServiceConnection implements ServiceConnection {
-		@Override
-		public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-			messageService = (SinchService.MessageServiceInterface) iBinder;
-		}
-		@Override
-		public void onServiceDisconnected(ComponentName componentName) {
-			messageService = null;
-		}
-	}
-
-	//unbind the service when the activity is destroyed
+     //unbind the service when the activity is destroyed
 	@Override
 	public void onDestroy() {
-		unbindService(serviceConnection);
+        messageViewModel.removeMessageClientListener();
 		super.onDestroy();
 	}
 
