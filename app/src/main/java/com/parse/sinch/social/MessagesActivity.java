@@ -3,12 +3,12 @@ package com.parse.sinch.social;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import com.backendless.Backendless;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -19,6 +19,7 @@ import com.parse.sinch.social.viewmodel.MessageViewModel;
 
 public class MessagesActivity extends AppCompatActivity {
     private  MessageViewModel messageViewModel;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -27,10 +28,11 @@ public class MessagesActivity extends AppCompatActivity {
         //get recipient information from the intent
         Intent intent = getIntent();
         String recipientId = intent.getStringExtra(Constants.RECIPIENT_ID);
-        String currentUserId = Backendless.UserService.loggedInUser();
         //create the view model
-        messageViewModel = new MessageViewModel(this, recipientId, currentUserId);
+        messageViewModel = new MessageViewModel(this, recipientId);
         activityChatMainBinding.setViewModel(messageViewModel);
+
+		getWindow().setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.background));
 
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(intent.getStringExtra(Constants.RECIPIENT_NAME));
@@ -53,8 +55,8 @@ public class MessagesActivity extends AppCompatActivity {
      //unbind the service when the activity is destroyed
 	@Override
 	public void onDestroy() {
-        messageViewModel.removeMessageClientListener();
 		super.onDestroy();
+		messageViewModel.removeMessageClientListener();
 	}
 
 	@Override

@@ -8,11 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.parse.sinch.social.R;
-import com.parse.sinch.social.databinding.ChatMessageLeftBinding;
-import com.parse.sinch.social.databinding.ChatMessageRightBinding;
-import com.parse.sinch.social.model.ChatInfo;
-import com.parse.sinch.social.model.RxMessageBus;
-import com.parse.sinch.social.viewmodel.ChatItemListViewModel;
+import com.parse.sinch.social.databinding.IncomingChatMessageBinding;
+import com.parse.sinch.social.databinding.OutgoingChatMessageBinding;
+import com.parse.sinch.social.model.ChatMessage;
+import com.parse.sinch.social.model.RxOutgoingMessageBus;
+import com.parse.sinch.social.service.ServiceConnectionManager;
+import com.parse.sinch.social.viewmodel.ChatIncomingViewModel;
+import com.parse.sinch.social.viewmodel.ChatOutgoingViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,71 +22,84 @@ import java.util.List;
 import io.reactivex.functions.Consumer;
 
 /**
- * Created by valgood on 2/20/2017.
+ * Adapter in charge of adding the views with the incoming/outgoing chat messages in the mmain
+ * recycler view.
  */
 
 public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.BindingHolder> {
 
     private Context mContext;
-    private List<ChatInfo> mMessages;
+    private List<ChatMessage> mMessages;
+    private ServiceConnectionManager mServiceConnection;
 
-    private static final int MESSAGE_SENT = 1;
-    private static final int MESSAGE_RECEIVED = 2;
+    private static final int MESSAGE_OUTGOING = 1;
+    private static final int MESSAGE_INCOMING = 2;
 
     public ChatMessageAdapter(Context context) {
         this.mContext = context;
         this.mMessages = new ArrayList<>();
-        //attach this class with the bus so it can receive notification about the
-        //messsages sent ans received
-        attachMessageBus();
-    }
+        this.mServiceConnection = new ServiceConnectionManager(context);
 
-    private void attachMessageBus() {
-        RxMessageBus.getInstance().getMessageObservable().subscribe(new Consumer<ChatInfo>() {
+        //attach this class with the bus so it can receive notification about the
+        //messages sent and received
+        RxOutgoingMessageBus.getInstance().getMessageObservable().subscribe(new Consumer<ChatMessage>() {
             @Override
-            public void accept(ChatInfo chatInfo) throws Exception {
-                addMessage(chatInfo);
+            public void accept(ChatMessage chatInfo) throws Exception {
+                for (int i = mMessages.size() -1; i >=0; i--){
+                    ChatMessage chatInList = mMessages.get(i);
+                    if (chatInList.getTextBody().equals(chatInfo.getTextBody())) {
+                        switch (chatInfo.getStatus()) {
+                            case SENT:
+                                chatInList.setResourceId(R.drawable.message_got_receipt_from_server);
+                                break;
+                            case DELIVERED:
+                                chatInList.setResourceId(R.drawable.message_got_receipt_from_target);
+                        }
+                    }
+                }
+                notifyDataSetChanged();
             }
         });
     }
+
     @Override
     public BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == MESSAGE_SENT) {
-            ChatMessageRightBinding chatMessageRightBinding = DataBindingUtil.inflate(
-                    LayoutInflater.from(parent.getContext()), R.layout.chat_message_right, parent, false);
-            return new SentBindingHolder(chatMessageRightBinding);
+        if (viewType == MESSAGE_INCOMING) {
+            IncomingChatMessageBinding incomingChatMessageBinding = DataBindingUtil.inflate(
+                    LayoutInflater.from(parent.getContext()), R.layout.incoming_chat_message, parent, false);
+            return new IncomingBindingHolder(incomingChatMessageBinding);
         } else {
-            ChatMessageLeftBinding chatMessageLeftBinding = DataBindingUtil.inflate(
-                    LayoutInflater.from(parent.getContext()), R.layout.chat_message_left, parent, false);
-            return new ReceivedBindingHolder(chatMessageLeftBinding);
+            OutgoingChatMessageBinding outgoingChatMessageBinding = DataBindingUtil.inflate(
+                    LayoutInflater.from(parent.getContext()), R.layout.outgoing_chat_message, parent, false);
+            return new OutgoingBindingHolder(outgoingChatMessageBinding);
         }
 
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (mMessages.get(position).getStatus().equals(ChatInfo.ChatStatus.RECEIVED)) {
-            return MESSAGE_RECEIVED;
+        if (mMessages.get(position).getStatus().equals(ChatMessage.ChatStatus.RECEIVED)) {
+            return MESSAGE_INCOMING;
         }
-
-        return MESSAGE_SENT;
+        return MESSAGE_OUTGOING;
     }
     @Override
     public void onBindViewHolder(BindingHolder holder, int position) {
-        if (holder instanceof ReceivedBindingHolder) {
-            ChatMessageLeftBinding binding =
-                    ((ReceivedBindingHolder) holder).getChatMessageLeftBinding();
-            binding.setViewModel(new ChatItemListViewModel(mContext, mMessages.get(position)));
+        if (holder instanceof IncomingBindingHolder) {
+            IncomingChatMessageBinding binding =
+                    ((IncomingBindingHolder) holder).getIncomingChatMessageBinding();
+            binding.setViewModel(new ChatIncomingViewModel(mContext, mMessages.get(position)));
         } else {
-            ChatMessageRightBinding binding =
-                    ((SentBindingHolder) holder).getChatMessageRightBinding();
-            binding.setViewModel(new ChatItemListViewModel(mContext, mMessages.get(position)));
+            OutgoingChatMessageBinding binding =
+                    ((OutgoingBindingHolder) holder).getOutgoingChatMessageBinding();
+            binding.setViewModel(new ChatOutgoingViewModel(mMessages.get(position)));
         }
     }
 
-    public void addMessage(ChatInfo chatMessage) {
+    public void addMessage(ChatMessage chatMessage) {
         mMessages.add(chatMessage);
         notifyDataSetChanged();
+        mServiceConnection.sendMessage(chatMessage.getRecipientIds(), chatMessage.getTextBody());
     }
 
     @Override
@@ -92,34 +107,38 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         return mMessages.size();
     }
 
+    public void removeMessageClientListener() {
+        mServiceConnection.removeMessageClientListener(mContext);
+    }
+
     public class BindingHolder extends RecyclerView.ViewHolder {
         public BindingHolder(View itemView) {
             super(itemView);
         }
     }
-    private class ReceivedBindingHolder extends BindingHolder {
-        private ChatMessageLeftBinding mChatMessageLeftBinding;
+    private class IncomingBindingHolder extends BindingHolder {
+        private IncomingChatMessageBinding mIncomingChatMessageBinding;
 
-        public ReceivedBindingHolder(ChatMessageLeftBinding chatMessageLeftBinding) {
-            super(chatMessageLeftBinding.getRoot());
-            this.mChatMessageLeftBinding = chatMessageLeftBinding;
+        public IncomingBindingHolder(IncomingChatMessageBinding incomingChatMessageBinding) {
+            super(incomingChatMessageBinding.getRoot());
+            this.mIncomingChatMessageBinding = incomingChatMessageBinding;
         }
 
-        public ChatMessageLeftBinding getChatMessageLeftBinding() {
-            return mChatMessageLeftBinding;
+        public IncomingChatMessageBinding getIncomingChatMessageBinding() {
+            return mIncomingChatMessageBinding;
         }
     }
 
-    private class SentBindingHolder extends BindingHolder {
-        private ChatMessageRightBinding mChatMessageRightBinding;
+    private class OutgoingBindingHolder extends BindingHolder {
+        private OutgoingChatMessageBinding mOutgoingChatMessageBinding;
 
-        public SentBindingHolder(ChatMessageRightBinding chatMessageRightBinding) {
-            super(chatMessageRightBinding.getRoot());
-            this.mChatMessageRightBinding = chatMessageRightBinding;
+        public OutgoingBindingHolder(OutgoingChatMessageBinding outgoingChatMessageBinding) {
+            super(outgoingChatMessageBinding.getRoot());
+            this.mOutgoingChatMessageBinding = outgoingChatMessageBinding;
         }
 
-        public ChatMessageRightBinding getChatMessageRightBinding() {
-            return mChatMessageRightBinding;
+        public OutgoingChatMessageBinding getOutgoingChatMessageBinding() {
+            return mOutgoingChatMessageBinding;
         }
     }
 }

@@ -11,6 +11,8 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewTreeObserver;
+
+import com.backendless.Backendless;
 import com.parse.sinch.social.databinding.ActivityLoginBinding;
 import com.parse.sinch.social.service.SinchService;
 import com.parse.sinch.social.viewmodel.LoginViewViewModel;
@@ -33,6 +35,12 @@ public class LoginActivity extends AppCompatActivity
                         loginViewViewModel.hookObservables();
                     }
                 });
+
+        String userLogged = Backendless.UserService.loggedInUser();
+        if (userLogged != null && !userLogged.isEmpty()) {
+            loginViewViewModel.loadMainUserList();
+            finish();
+        }
 //		RxView.clicks(mSignUp)
 //				.subscribe(new Action1<Void>() {
 //					@Override
@@ -47,12 +55,6 @@ public class LoginActivity extends AppCompatActivity
 //			//startService(new Intent(LoginActivity.this, SinchService.class));
 //            finish();
 //        }
-    }
-
-    @Override
-    public void onDestroy() {
-    	stopService(new Intent(this, SinchService.class));
-    	super.onDestroy();
     }
 
     @Override
@@ -72,6 +74,7 @@ public class LoginActivity extends AppCompatActivity
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
+                stopService(new Intent(LoginActivity.this, SinchService.class));
 				finish(); 
 			}
 

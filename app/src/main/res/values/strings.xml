@@ -51,7 +51,8 @@
     <string name="getting_users">Obteniendo Lista de Usuarios...</string>
     <string name="hint_email">Email</string>
     <string name="hint_password">Password</string>
-    <string name="invalid_email">Email INvalid</string>
+    <string name="invalid_email">Email Invalid</string>
     <string name="invalid_password">Password must be at least 6 Characters</string>
+    <string name="type_your_message">Type a message</string>
 
 </resources>

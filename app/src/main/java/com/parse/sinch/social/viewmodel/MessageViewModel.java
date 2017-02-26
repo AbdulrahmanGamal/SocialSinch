@@ -8,28 +8,27 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.backendless.Backendless;
 import com.parse.sinch.social.adapter.ChatMessageAdapter;
-import com.parse.sinch.social.service.SinchServiceConnection;
+import com.parse.sinch.social.model.ChatMessage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Created by valgood on 2/19/2017.
+ * Model View attached to the Incoming/outgoing chat messages
  */
 
 public class MessageViewModel {
     private Context mContext;
     private String mRecipientId;
-    private String mCurrentUserId;
     private ChatMessageAdapter mChatMessageAdapter;
-    private SinchServiceConnection mConnection;
-
     private EditText mMessage;
 
-    public MessageViewModel(Context context, String recipientId, String currentUserId) {
+    public MessageViewModel(Context context, String recipientId) {
         this.mContext = context;
         this.mRecipientId = recipientId;
-        this.mCurrentUserId = currentUserId;
         this.mChatMessageAdapter = new ChatMessageAdapter(context);
-        this.mConnection = new SinchServiceConnection(context);
     }
 
     public View.OnClickListener onClickSend() {
@@ -40,10 +39,29 @@ public class MessageViewModel {
                     Toast.makeText(mContext, "Please enter a message", Toast.LENGTH_LONG).show();
                     return;
                 }
-                mConnection.sendMessage(mRecipientId, mMessage.getText().toString());
-                mMessage.setText("");;
+
+                mChatMessageAdapter.addMessage(assembleChatToSend());
+                mMessage.setText("");
             }
         };
+    }
+
+    /**
+     * Method to wrap the information into a Chat Message
+     * @return
+     */
+    private ChatMessage assembleChatToSend() {
+        ChatMessage chatToSend = new ChatMessage();
+        String currentUserId = Backendless.UserService.loggedInUser();
+        chatToSend.setStatus(ChatMessage.ChatStatus.WAITING);
+        chatToSend.setMessageId(currentUserId);
+        chatToSend.setTextBody(mMessage.getText().toString());
+        chatToSend.setSenderId(currentUserId);
+        List<String> recipientIds = new ArrayList<>();
+        recipientIds.add(mRecipientId);
+        chatToSend.setResourceId(android.R.drawable.ic_menu_compass);
+        chatToSend.setRecipientIds(recipientIds);
+        return chatToSend;
     }
 
     public void setMessage(EditText message) {
@@ -58,18 +76,19 @@ public class MessageViewModel {
     @BindingAdapter("chatViewModel")
     public static void setUserCallViewModel(RecyclerView recyclerView,
                                             MessageViewModel viewModel) {
-        //viewModel.getUserCalls(recyclerView);
         recyclerView.setAdapter(viewModel.getAdapter());
         recyclerView.setLayoutManager(viewModel.createLayoutManager());
     }
     private RecyclerView.LayoutManager createLayoutManager() {
-        return new LinearLayoutManager(mContext);
+        LinearLayoutManager manager = new LinearLayoutManager(mContext);
+        manager.setStackFromEnd(true);
+        return manager;
     }
-    public ChatMessageAdapter getAdapter() {
+    private ChatMessageAdapter getAdapter() {
         return mChatMessageAdapter;
     }
 
     public void removeMessageClientListener() {
-        mConnection.removeMessageClientListener();
+        mChatMessageAdapter.removeMessageClientListener();
     }
 }

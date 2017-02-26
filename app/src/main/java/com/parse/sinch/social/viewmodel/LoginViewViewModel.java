@@ -56,10 +56,6 @@ public class LoginViewViewModel {
 
     public LoginViewViewModel(Context context) {
         this.mContext = context;
-        if (Backendless.UserService.loggedInUser() != null) {
-            loadMainUserList();
-            ((Activity)context).finish();
-        }
     }
 
     @BindingAdapter("email")
@@ -87,7 +83,7 @@ public class LoginViewViewModel {
         };
     }
 
-    private void loadMainUserList() {
+    public void loadMainUserList() {
         mContext.startActivity(new Intent(mContext, TabActivity.class));
         mContext.startService(new Intent(mContext, SinchService.class));
     }

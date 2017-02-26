@@ -22,6 +22,7 @@ import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
 import com.parse.sinch.social.databinding.ActivityOptionsTabBinding;
+import com.parse.sinch.social.service.SinchService;
 import com.parse.sinch.social.viewmodel.TabOptionsViewModel;
 
 public class TabActivity extends AppCompatActivity {
@@ -171,6 +172,7 @@ public class TabActivity extends AppCompatActivity {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        stopService(new Intent(TabActivity.this, SinchService.class));
                         finish();
                     }
 
