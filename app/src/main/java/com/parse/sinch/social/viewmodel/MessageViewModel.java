@@ -9,26 +9,26 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.backendless.Backendless;
+import com.parse.sinch.social.R;
 import com.parse.sinch.social.adapter.ChatMessageAdapter;
 import com.parse.sinch.social.model.ChatMessage;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Model View attached to the Incoming/outgoing chat messages
  */
 
-public class MessageViewModel {
+public class MessageViewModel implements ChatMessageAdapter.NewItemInserted{
     private Context mContext;
-    private String mRecipientId;
     private ChatMessageAdapter mChatMessageAdapter;
     private EditText mMessage;
+    private RecyclerView mChatRecyclerView;
+    private List<String> mRecipientsId;
 
-    public MessageViewModel(Context context, String recipientId) {
+    public MessageViewModel(Context context, String senderId, List<String> recipientsInfo) {
         this.mContext = context;
-        this.mRecipientId = recipientId;
-        this.mChatMessageAdapter = new ChatMessageAdapter(context);
+        this.mRecipientsId = recipientsInfo;
+        this.mChatMessageAdapter = new ChatMessageAdapter(context, senderId, recipientsInfo, this);
     }
 
     public View.OnClickListener onClickSend() {
@@ -39,7 +39,6 @@ public class MessageViewModel {
                     Toast.makeText(mContext, "Please enter a message", Toast.LENGTH_LONG).show();
                     return;
                 }
-
                 mChatMessageAdapter.addMessage(assembleChatToSend());
                 mMessage.setText("");
             }
@@ -54,13 +53,10 @@ public class MessageViewModel {
         ChatMessage chatToSend = new ChatMessage();
         String currentUserId = Backendless.UserService.loggedInUser();
         chatToSend.setStatus(ChatMessage.ChatStatus.WAITING);
-        chatToSend.setMessageId(currentUserId);
         chatToSend.setTextBody(mMessage.getText().toString());
         chatToSend.setSenderId(currentUserId);
-        List<String> recipientIds = new ArrayList<>();
-        recipientIds.add(mRecipientId);
-        chatToSend.setResourceId(android.R.drawable.ic_menu_compass);
-        chatToSend.setRecipientIds(recipientIds);
+        chatToSend.setResourceId(R.drawable.message_waiting);
+        chatToSend.setRecipientIds(mRecipientsId);
         return chatToSend;
     }
 
@@ -74,10 +70,21 @@ public class MessageViewModel {
     }
 
     @BindingAdapter("chatViewModel")
-    public static void setUserCallViewModel(RecyclerView recyclerView,
-                                            MessageViewModel viewModel) {
+    public static void setUserCallViewModel(final RecyclerView recyclerView,
+                                            final MessageViewModel viewModel) {
+        viewModel.setChatRecyclerView(recyclerView);
         recyclerView.setAdapter(viewModel.getAdapter());
         recyclerView.setLayoutManager(viewModel.createLayoutManager());
+        recyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v,
+                                       int left, int top, int right, int bottom,
+                                       int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                if (bottom < oldBottom) {
+                    viewModel.onItemInserted();
+                }
+            }
+        });
     }
     private RecyclerView.LayoutManager createLayoutManager() {
         LinearLayoutManager manager = new LinearLayoutManager(mContext);
@@ -88,7 +95,24 @@ public class MessageViewModel {
         return mChatMessageAdapter;
     }
 
+    public void setChatRecyclerView(RecyclerView recyclerView) {
+        this.mChatRecyclerView = recyclerView;
+    }
+
     public void removeMessageClientListener() {
         mChatMessageAdapter.removeMessageClientListener();
+    }
+
+    @Override
+    public void onItemInserted() {
+        mChatRecyclerView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mChatRecyclerView.getAdapter().getItemCount() > 0) {
+                    mChatRecyclerView.smoothScrollToPosition(
+                            mChatRecyclerView.getAdapter().getItemCount() - 1);
+                }
+            }
+        }, 100);
     }
 }

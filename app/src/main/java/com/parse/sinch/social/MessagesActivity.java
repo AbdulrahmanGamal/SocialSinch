@@ -5,17 +5,21 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.backendless.Backendless;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.ViewTarget;
 import com.parse.sinch.social.databinding.ActivityChatMainBinding;
+import com.parse.sinch.social.model.UserInfo;
 import com.parse.sinch.social.utils.Constants;
 import com.parse.sinch.social.viewmodel.MessageViewModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MessagesActivity extends AppCompatActivity {
     private  MessageViewModel messageViewModel;
@@ -27,26 +31,29 @@ public class MessagesActivity extends AppCompatActivity {
                 DataBindingUtil.setContentView(this, R.layout.activity_chat_main);
         //get recipient information from the intent
         Intent intent = getIntent();
-        String recipientId = intent.getStringExtra(Constants.RECIPIENT_ID);
         //create the view model
-        messageViewModel = new MessageViewModel(this, recipientId);
+        final UserInfo recipientInfo = new UserInfo();
+        recipientInfo.setObjectId(intent.getStringExtra(Constants.RECIPIENT_ID));
+        recipientInfo.setFullName(intent.getStringExtra(Constants.RECIPIENT_NAME));
+        recipientInfo.setProfilePicture(intent.getStringExtra(Constants.RECIPIENT_AVATAR));
+        List<String> recipientsInfo = new ArrayList<>();
+        recipientsInfo.add(recipientInfo.getObjectId());
+        messageViewModel = new MessageViewModel(this, Backendless.UserService.loggedInUser(),
+											    recipientsInfo);
         activityChatMainBinding.setViewModel(messageViewModel);
 
 		getWindow().setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.background));
+		//toolbar settings
+        final ImageView profilePic = (ImageView) activityChatMainBinding.
+                toolbarChats.findViewById(R.id.conversation_contact_photo);
 
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(intent.getStringExtra(Constants.RECIPIENT_NAME));
-        Glide.with(getApplicationContext()).
-                load(intent.getStringExtra(Constants.RECIPIENT_AVATAR)).
-                into(new ViewTarget<Toolbar, GlideDrawable>(toolbar) {
-                    @Override
-                    public void onResourceReady(GlideDrawable resource, GlideAnimation anim) {
-                        Toolbar toolbar = this.view;
-                        toolbar.setNavigationIcon(resource);
-                        // Set your resource on myView and/or start your animation here.
-                    }
-                });
-        setSupportActionBar(toolbar);
+        Glide.with(this).load(recipientInfo.getProfilePicture()).into(profilePic);
+        ((TextView)activityChatMainBinding.toolbarChats.findViewById(R.id.action_bar_title_1)).
+                setText(recipientInfo.getFullName());
+        ((TextView)activityChatMainBinding.toolbarChats.findViewById(R.id.action_bar_title_2)).
+                setText("an hour ago");
+
+        setSupportActionBar(activityChatMainBinding.toolbarChats);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }

@@ -17,8 +17,8 @@ public class SinchServiceConnection implements ServiceConnection {
     private SinchService.MessageServiceInterface mMessageService;
     private MessageClientListener mMessageClientListener;
 
-    public SinchServiceConnection() {
-        this.mMessageClientListener = new SinchMessageClientListener();
+    public SinchServiceConnection(Context context) {
+        this.mMessageClientListener = new SinchMessageClientListener(context);
 
     }
 

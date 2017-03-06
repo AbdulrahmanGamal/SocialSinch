@@ -1,9 +1,13 @@
 package com.parse.sinch.social.service;
 
+import android.content.Context;
+import android.database.SQLException;
 import android.util.Log;
 
+import com.backendless.Backendless;
+import com.parse.sinch.social.database.ChatBriteDataSource;
 import com.parse.sinch.social.model.ChatMessage;
-import com.parse.sinch.social.model.RxOutgoingMessageBus;
+import com.parse.sinch.social.bus.RxOutgoingMessageBus;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.messaging.Message;
 import com.sinch.android.rtc.messaging.MessageClient;
@@ -23,7 +27,12 @@ import java.util.Map;
 class SinchMessageClientListener implements MessageClientListener {
 
     private static final String TAG = "SinchMsgClientListener";
+    private ChatBriteDataSource mChatDataSource;
     private RxOutgoingMessageBus mMessageBus = RxOutgoingMessageBus.getInstance();
+
+    public SinchMessageClientListener(Context context) {
+        mChatDataSource = new ChatBriteDataSource(context);
+    }
 
     @Override
     public void onMessageFailed(MessageClient client, Message message,
@@ -61,13 +70,13 @@ class SinchMessageClientListener implements MessageClientListener {
 
     private void processMessage(Message message, ChatMessage.ChatStatus status) {
         ChatMessage chatMessageInfo = new ChatMessage();
-        chatMessageInfo.setMessageId(message.getMessageId());
         chatMessageInfo.setRecipientIds(message.getRecipientIds());
         chatMessageInfo.setSenderId(message.getSenderId());
         chatMessageInfo.setTextBody(message.getTextBody());
         chatMessageInfo.setTimestamp(message.getTimestamp());
         chatMessageInfo.setStatus(status);
-        mMessageBus.setMessage(chatMessageInfo);
+        chatMessageInfo.setSentId(message.getMessageId());
+        addMessageToDB(chatMessageInfo);
     }
 
     private Message createDeliveryMessage(final MessageDeliveryInfo deliveryInfo) {
@@ -96,7 +105,7 @@ class SinchMessageClientListener implements MessageClientListener {
 
             @Override
             public String getSenderId() {
-                return null;
+                return Backendless.UserService.loggedInUser();
             }
 
             @Override
@@ -104,5 +113,67 @@ class SinchMessageClientListener implements MessageClientListener {
                 return deliveryInfo.getTimestamp();
             }
         };
+    }
+
+    /**
+     * Save the message in the local DB
+     * @param chatMessage
+     */
+    private synchronized void addMessageToDB(final ChatMessage chatMessage) {
+        //in case of RECEIVED we have to swap the send id and recipient id because the saving in the
+        //database is user1:user2:totalmessage even of user1 is receiving the message
+        Log.e(TAG, "ADDING MESSAGE: " + chatMessage);
+        Long messageId;
+
+        try {
+            switch (chatMessage.getStatus()) {
+                case SENT:
+                    messageId = mChatDataSource.verifyMessage(chatMessage.getSenderId(),
+                            chatMessage.getRecipientIds().get(0),
+                            chatMessage.getTextBody());
+                    if (messageId == -1) {
+                        messageId = mChatDataSource.addNewMessage(chatMessage.getSenderId(),
+                                chatMessage.getRecipientIds().get(0),
+                                chatMessage.getTextBody(),
+                                chatMessage.getStatus(),
+                                chatMessage.getSentId());
+
+                        chatMessage.setMessageId(messageId);
+                        mMessageBus.setMessage(chatMessage);
+                    } else {
+                        Log.e(TAG, "SKIPPING ALREADY SAVED MESSAGE!!!");
+                    }
+                    break;
+                case DELIVERED:
+                    //update the status in DB
+                    messageId = mChatDataSource.verifySentMessage(chatMessage.getSentId());
+                    if (messageId != -1) {
+                        mChatDataSource.updateMessageStatus(messageId, ChatMessage.ChatStatus.DELIVERED);
+                    } else {
+                        Log.e(TAG, "DELIVERED BUT MESSAGE NOT IN DB!!!");
+                    }
+                    break;
+                case RECEIVED:
+                    messageId = mChatDataSource.verifyMessage(chatMessage.getRecipientIds().get(0),
+                            chatMessage.getSenderId(),
+                            chatMessage.getTextBody());
+                    if (messageId == -1) {
+                        messageId = mChatDataSource.addNewMessage(chatMessage.getSenderId(),
+                                chatMessage.getRecipientIds().get(0),
+                                chatMessage.getTextBody(),
+                                chatMessage.getStatus(), null);
+                        chatMessage.setMessageId(messageId);
+                        mMessageBus.setMessage(chatMessage);
+                    } else {
+                        Log.e(TAG, "SKIPPING ALREADY RECEIVED SAVED MESSAGE!!!");
+                    }
+                    break;
+
+            }
+
+        } catch (SQLException ex) {
+            Log.e(TAG, "Error adding the new Message: " + ex.getMessage());
+        }
+
     }
 }

@@ -8,12 +8,13 @@ import java.util.List;
  */
 
 public class ChatMessage {
-    private String mMessageId;
+    private Long mMessageId;
     private String mTextBody;
     private List<String> mRecipientIds;
     private String mSenderId;
     private Date mTimestamp;
     private ChatStatus mStatus;
+    private String mSentId;
     private int mResourceId;
 
 
@@ -33,11 +34,11 @@ public class ChatMessage {
         this.mStatus = status;
     }
 
-    public String getMessageId() {
+    public Long getMessageId() {
         return mMessageId;
     }
 
-    public void setMessageId(String mMessageId) {
+    public void setMessageId(Long mMessageId) {
         this.mMessageId = mMessageId;
     }
 
@@ -79,5 +80,27 @@ public class ChatMessage {
 
     public void setResourceId(int resourceId) {
         this.mResourceId = resourceId;
+    }
+
+    public String getSentId() {
+        return mSentId;
+    }
+
+    public void setSentId(String sentId) {
+        this.mSentId = sentId;
+    }
+
+    @Override
+    public String toString() {
+        return "ChatMessage{" +
+                "mMessageId=" + mMessageId +
+                ", mTextBody='" + mTextBody + '\'' +
+                ", mRecipientIds=" + mRecipientIds +
+                ", mSenderId='" + mSenderId + '\'' +
+                ", mTimestamp=" + mTimestamp +
+                ", mStatus=" + mStatus +
+                ", mSentId='" + mSentId + '\'' +
+                ", mResourceId=" + mResourceId +
+                '}';
     }
 }

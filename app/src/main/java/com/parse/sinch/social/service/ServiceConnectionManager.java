@@ -12,7 +12,7 @@ public class ServiceConnectionManager {
     private SinchServiceConnection mConnection;
 
     public ServiceConnectionManager(Context context) {
-        this.mConnection = new SinchServiceConnection();
+        this.mConnection = new SinchServiceConnection(context);
         context.bindService(new Intent(context, SinchService.class),
                 mConnection, Context.BIND_AUTO_CREATE);
     }
