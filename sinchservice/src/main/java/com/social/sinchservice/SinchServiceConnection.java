@@ -1,10 +1,10 @@
-package com.parse.sinch.social.service;
+package com.social.sinchservice;
 
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import com.sinch.android.rtc.messaging.MessageClientListener;
+import com.social.sinchservice.model.ChatMessage;
 
 import java.util.List;
 
@@ -15,10 +15,10 @@ import java.util.List;
 
 public class SinchServiceConnection implements ServiceConnection {
     private SinchService.MessageServiceInterface mMessageService;
-    private MessageClientListener mMessageClientListener;
+    private SinchMessageClientListener mMessageClientListener;
 
-    public SinchServiceConnection(Context context) {
-        this.mMessageClientListener = new SinchMessageClientListener(context);
+    public SinchServiceConnection(Context context, String currentUser) {
+        this.mMessageClientListener = new SinchMessageClientListener(context, currentUser);
 
     }
 
@@ -47,5 +47,11 @@ public class SinchServiceConnection implements ServiceConnection {
     public void removeMessageClientListener(Context context) {
         mMessageService.removeMessageClientListener(mMessageClientListener);
         context.unbindService(this);
+    }
+
+    public List<ChatMessage> retrieveLastMessages(String senderId,
+                                                  String recipientId,
+                                                  int max) {
+        return mMessageClientListener.retrieveLastMessages(senderId, recipientId, max);
     }
 }

@@ -22,8 +22,8 @@ import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
 import com.parse.sinch.social.databinding.ActivityOptionsTabBinding;
-import com.parse.sinch.social.service.SinchService;
 import com.parse.sinch.social.viewmodel.TabOptionsViewModel;
+import com.social.sinchservice.SinchService;
 
 public class TabActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
@@ -59,6 +59,7 @@ public class TabActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 Boolean success = intent.getBooleanExtra("success", false);
                 progressDialog.dismiss();
+//                ServiceConnectionManager mServiceConnection = new ServiceConnectionManager(context);
                 //show a toast message if the Sinch
                 //service failed to start
                 if (!success) {

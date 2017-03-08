@@ -1,6 +1,5 @@
-package com.parse.sinch.social.service;
+package com.social.sinchservice;
 
-import com.backendless.Backendless;
 import com.sinch.android.rtc.ClientRegistration;
 import com.sinch.android.rtc.Sinch;
 import com.sinch.android.rtc.SinchClient;
@@ -31,11 +30,12 @@ public class SinchService extends Service implements SinchClientListener {
 
 		private static final String TAG = "SinchService";
 
+		public static final String CURRENT_USER_KEY = "com.social.sinchservice.current.user.key";
 		@Override
 		public int onStartCommand(Intent intent, int flags, int startId) {
 			broadcaster = LocalBroadcastManager.getInstance(this);
 			//get the current user id from Parse
-			currentUserId = Backendless.UserService.loggedInUser();
+			currentUserId = intent.getStringExtra(CURRENT_USER_KEY);
 			if (currentUserId != null && !isSinchClientStarted()) {
 				startSinchClient(currentUserId);
 			}

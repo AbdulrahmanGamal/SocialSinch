@@ -1,6 +1,6 @@
-package com.parse.sinch.social.bus;
+package com.social.sinchservice.bus;
 
-import com.parse.sinch.social.model.ChatMessage;
+import com.social.sinchservice.model.ChatMessage;
 
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;

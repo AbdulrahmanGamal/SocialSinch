@@ -11,7 +11,9 @@ import android.widget.Toast;
 import com.backendless.Backendless;
 import com.parse.sinch.social.R;
 import com.parse.sinch.social.adapter.ChatMessageAdapter;
-import com.parse.sinch.social.model.ChatMessage;
+import com.social.sinchservice.model.ChatMessage;
+import com.social.sinchservice.model.ChatStatus;
+
 import java.util.List;
 
 /**
@@ -52,7 +54,7 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted{
     private ChatMessage assembleChatToSend() {
         ChatMessage chatToSend = new ChatMessage();
         String currentUserId = Backendless.UserService.loggedInUser();
-        chatToSend.setStatus(ChatMessage.ChatStatus.WAITING);
+        chatToSend.setStatus(ChatStatus.WAITING);
         chatToSend.setTextBody(mMessage.getText().toString());
         chatToSend.setSenderId(currentUserId);
         chatToSend.setResourceId(R.drawable.message_waiting);

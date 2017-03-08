@@ -1,4 +1,4 @@
-package com.parse.sinch.social.database;
+package com.social.sinchservice.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -6,8 +6,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import java.util.concurrent.Callable;
-import rx.Observable;
-import rx.Subscriber;
 
 /**
  * Class to handle the internal DB where the messages are stored
@@ -34,6 +32,7 @@ public class ChatSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_MESSAGE = "message";
     public static final String COLUMN_FROM = "sender";
     public static final String COLUMN_SENT_ID = "sentId";
+    public static final String COLUMN_DATE = "timestamp";
     public static final String COLUMN_STATUS = "status";
 
     //SQL statement to create table TOTAL_MESSAGES
@@ -49,7 +48,9 @@ public class ChatSQLiteHelper extends SQLiteOpenHelper {
             + " text not null, " + COLUMN_MESSAGE
             + " text not null, " + COLUMN_FROM
             + " text not null, " + COLUMN_SENT_ID
-            + " text null, " + COLUMN_STATUS + " text not null );";
+            + " text null, " + COLUMN_DATE
+            + " text not null, " + COLUMN_STATUS
+            + " text not null );";
 
     private static final String TAG = "ChatSQLiteHelper";
 
@@ -73,17 +74,17 @@ public class ChatSQLiteHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public static <T> Observable<T> makeObservable(final Callable<T> func) {
-        return Observable.create(
-                new Observable.OnSubscribe<T>() {
-                    @Override
-                    public void call(Subscriber<? super T> subscriber) {
-                        try {
-                            subscriber.onNext(func.call());
-                        } catch(Exception ex) {
-                            Log.e(TAG, "Error reading from the database", ex);
-                        }
-                    }
-                });
-    }
+//    public static <T> Observable<T> makeObservable(final Callable<T> func) {
+//        return Observable.create(
+//                new Observable.OnSubscribe<T>() {
+//                    @Override
+//                    public void call(Subscriber<? super T> subscriber) {
+//                        try {
+//                            subscriber.onNext(func.call());
+//                        } catch(Exception ex) {
+//                            Log.e(TAG, "Error reading from the database", ex);
+//                        }
+//                    }
+//                });
+//    }
 }

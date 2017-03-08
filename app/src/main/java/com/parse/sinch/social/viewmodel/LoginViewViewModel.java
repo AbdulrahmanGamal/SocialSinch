@@ -1,6 +1,5 @@
 package com.parse.sinch.social.viewmodel;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.BindingAdapter;
@@ -19,7 +18,7 @@ import com.jakewharton.rxbinding.widget.RxTextView;
 import com.parse.sinch.social.R;
 import com.parse.sinch.social.TabActivity;
 import com.parse.sinch.social.data.DataManager;
-import com.parse.sinch.social.service.SinchService;
+import com.social.sinchservice.SinchService;
 
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -85,7 +84,9 @@ public class LoginViewViewModel {
 
     public void loadMainUserList() {
         mContext.startActivity(new Intent(mContext, TabActivity.class));
-        mContext.startService(new Intent(mContext, SinchService.class));
+        Intent intent = new Intent(mContext, SinchService.class);
+        intent.putExtra(SinchService.CURRENT_USER_KEY, Backendless.UserService.loggedInUser());
+        mContext.startService(intent);
     }
 
     private void initEmailSubscription(Observable<CharSequence> emailChangeObservable) {

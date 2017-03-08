@@ -1,19 +1,19 @@
-package com.parse.sinch.social.service;
+package com.social.sinchservice;
 
 import android.content.Context;
 import android.database.SQLException;
 import android.util.Log;
 
-import com.backendless.Backendless;
-import com.parse.sinch.social.database.ChatBriteDataSource;
-import com.parse.sinch.social.model.ChatMessage;
-import com.parse.sinch.social.bus.RxOutgoingMessageBus;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.messaging.Message;
 import com.sinch.android.rtc.messaging.MessageClient;
 import com.sinch.android.rtc.messaging.MessageClientListener;
 import com.sinch.android.rtc.messaging.MessageDeliveryInfo;
 import com.sinch.android.rtc.messaging.MessageFailureInfo;
+import com.social.sinchservice.bus.RxOutgoingMessageBus;
+import com.social.sinchservice.database.ChatBriteDataSource;
+import com.social.sinchservice.model.ChatMessage;
+import com.social.sinchservice.model.ChatStatus;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,36 +29,39 @@ class SinchMessageClientListener implements MessageClientListener {
     private static final String TAG = "SinchMsgClientListener";
     private ChatBriteDataSource mChatDataSource;
     private RxOutgoingMessageBus mMessageBus = RxOutgoingMessageBus.getInstance();
+    private String mCurrentUser;
 
-    public SinchMessageClientListener(Context context) {
-        mChatDataSource = new ChatBriteDataSource(context);
+    public SinchMessageClientListener(Context context, String currentUser) {
+        this.mChatDataSource = new ChatBriteDataSource(context);
+        this.mCurrentUser = currentUser;
     }
 
     @Override
     public void onMessageFailed(MessageClient client, Message message,
                                 MessageFailureInfo failureInfo) {
-        processMessage(message, ChatMessage.ChatStatus.FAILED);
+        processMessage(message, ChatStatus.FAILED);
         Log.d(TAG, "Msg failed: " + failureInfo.toString());
     }
 
     @Override
     public void onIncomingMessage(MessageClient client, Message message) {
         // Display an incoming message
-        processMessage(message, ChatMessage.ChatStatus.RECEIVED);
+        processMessage(message, ChatStatus.RECEIVED);
     }
 
     @Override
     public void onMessageSent(MessageClient client, Message message,
                               String recipientId) {
         // Display the message that was just sent
-        processMessage(message, ChatMessage.ChatStatus.SENT);
+        Log.e(TAG, "onMessageSEnt CALLED: " + recipientId + " - " + message.getTextBody());
+        processMessage(message, ChatStatus.SENT);
 
     }
 
     @Override
     public void onMessageDelivered(MessageClient client,
                                    MessageDeliveryInfo deliveryInfo) {
-        processMessage(createDeliveryMessage(deliveryInfo), ChatMessage.ChatStatus.DELIVERED);
+        processMessage(createDeliveryMessage(deliveryInfo), ChatStatus.DELIVERED);
     }
 
     // Don't worry about this right now
@@ -68,7 +71,7 @@ class SinchMessageClientListener implements MessageClientListener {
         Log.e(TAG, "onShouldSendPushData");
     }
 
-    private void processMessage(Message message, ChatMessage.ChatStatus status) {
+    private void processMessage(Message message, ChatStatus status) {
         ChatMessage chatMessageInfo = new ChatMessage();
         chatMessageInfo.setRecipientIds(message.getRecipientIds());
         chatMessageInfo.setSenderId(message.getSenderId());
@@ -105,7 +108,7 @@ class SinchMessageClientListener implements MessageClientListener {
 
             @Override
             public String getSenderId() {
-                return Backendless.UserService.loggedInUser();
+                return mCurrentUser;
             }
 
             @Override
@@ -120,48 +123,40 @@ class SinchMessageClientListener implements MessageClientListener {
      * @param chatMessage
      */
     private synchronized void addMessageToDB(final ChatMessage chatMessage) {
-        //in case of RECEIVED we have to swap the send id and recipient id because the saving in the
-        //database is user1:user2:totalmessage even of user1 is receiving the message
-        Log.e(TAG, "ADDING MESSAGE: " + chatMessage);
         Long messageId;
-
         try {
             switch (chatMessage.getStatus()) {
                 case SENT:
-                    messageId = mChatDataSource.verifyMessage(chatMessage.getSenderId(),
+                    messageId = mChatDataSource.verifyMessageBySentID(chatMessage.getSenderId(),
                             chatMessage.getRecipientIds().get(0),
-                            chatMessage.getTextBody());
+                            chatMessage.getSentId());
                     if (messageId == -1) {
-                        messageId = mChatDataSource.addNewMessage(chatMessage.getSenderId(),
-                                chatMessage.getRecipientIds().get(0),
-                                chatMessage.getTextBody(),
-                                chatMessage.getStatus(),
-                                chatMessage.getSentId());
-
+                        messageId = mChatDataSource.addNewMessage(chatMessage);
                         chatMessage.setMessageId(messageId);
                         mMessageBus.setMessage(chatMessage);
                     } else {
-                        Log.e(TAG, "SKIPPING ALREADY SAVED MESSAGE!!!");
+                        //Log.e(TAG, "SKIPPING " + chatMessage.getTextBody());
                     }
                     break;
                 case DELIVERED:
                     //update the status in DB
-                    messageId = mChatDataSource.verifySentMessage(chatMessage.getSentId());
+                    messageId = mChatDataSource.verifyMessageBySentID(chatMessage.getSenderId(),
+                            chatMessage.getRecipientIds().get(0),
+                            chatMessage.getSentId());
                     if (messageId != -1) {
-                        mChatDataSource.updateMessageStatus(messageId, ChatMessage.ChatStatus.DELIVERED);
+                        mChatDataSource.updateMessageStatus(messageId, ChatStatus.DELIVERED);
                     } else {
-                        Log.e(TAG, "DELIVERED BUT MESSAGE NOT IN DB!!!");
+                        Log.e(TAG, "GOT DELIVERED BUT MESSAGE NOT IN DB!!! " + chatMessage.getTextBody());
                     }
                     break;
                 case RECEIVED:
-                    messageId = mChatDataSource.verifyMessage(chatMessage.getRecipientIds().get(0),
+                    messageId = mChatDataSource.verifyMessageByDate(chatMessage.getRecipientIds().get(0),
                             chatMessage.getSenderId(),
-                            chatMessage.getTextBody());
+                            chatMessage.getTimestamp(), chatMessage.getTextBody());
                     if (messageId == -1) {
-                        messageId = mChatDataSource.addNewMessage(chatMessage.getSenderId(),
-                                chatMessage.getRecipientIds().get(0),
-                                chatMessage.getTextBody(),
-                                chatMessage.getStatus(), null);
+                        Log.e(TAG, "ADDING RECEIVED MESSAGE: " + chatMessage.getTimestamp()
+                                + " - " + chatMessage.getTextBody());
+                        messageId = mChatDataSource.addNewMessage(chatMessage);
                         chatMessage.setMessageId(messageId);
                         mMessageBus.setMessage(chatMessage);
                     } else {
@@ -175,5 +170,18 @@ class SinchMessageClientListener implements MessageClientListener {
             Log.e(TAG, "Error adding the new Message: " + ex.getMessage());
         }
 
+    }
+
+    /**
+     * Exposed the retrieve message method to the outside classes
+     * @param senderId
+     * @param recipientId
+     * @param max
+     * @return
+     */
+    public List<ChatMessage> retrieveLastMessages(String senderId,
+                                                  String recipientId,
+                                                  int max) {
+        return mChatDataSource.retrieveLastMessages(senderId, recipientId, max);
     }
 }

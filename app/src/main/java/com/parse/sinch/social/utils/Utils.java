@@ -3,26 +3,29 @@ package com.parse.sinch.social.utils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.CursorLoader;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 public class Utils {
 
-	@SuppressLint("NewApi")
+    private static final String TAG = "Utils";
+
+    @SuppressLint("NewApi")
 	public static String getRealPathFromURI_API19(Context context, Uri uri){
 		String filePath = "";
 		String wholeID = DocumentsContract.getDocumentId(uri);
@@ -95,4 +98,22 @@ public class Utils {
 
 		return null;
 	}
+
+//	public static String convertDateToString(@NonNull Date messageDate) {
+//        final SimpleDateFormat dateFormat = new SimpleDateFormat(
+//                "EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+//        return dateFormat.format(messageDate);
+//	}
+//
+//    public static Date convertStringToDate(@NonNull String messageDate) {
+//        try {
+//            final SimpleDateFormat dateFormat = new SimpleDateFormat(
+//                    "EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+//            return dateFormat.parse(messageDate);
+//        } catch (final ParseException e) {
+//            Log.e(TAG, "Parsing exception: " + e.getMessage());
+//        }
+//
+//        return null;
+//    }
 }

@@ -1,4 +1,4 @@
-package com.parse.sinch.social.model;
+package com.social.sinchservice.model;
 
 import java.util.Date;
 import java.util.List;
@@ -16,15 +16,6 @@ public class ChatMessage {
     private ChatStatus mStatus;
     private String mSentId;
     private int mResourceId;
-
-
-    public enum ChatStatus {
-        FAILED,
-        WAITING,
-        SENT,
-        DELIVERED,
-        RECEIVED
-    }
 
     public ChatStatus getStatus() {
         return mStatus;

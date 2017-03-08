@@ -14,8 +14,8 @@ import android.view.ViewTreeObserver;
 
 import com.backendless.Backendless;
 import com.parse.sinch.social.databinding.ActivityLoginBinding;
-import com.parse.sinch.social.service.SinchService;
 import com.parse.sinch.social.viewmodel.LoginViewViewModel;
+import com.social.sinchservice.SinchService;
 
 public class LoginActivity extends AppCompatActivity
 {
