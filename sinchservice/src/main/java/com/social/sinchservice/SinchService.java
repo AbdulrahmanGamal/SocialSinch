@@ -142,5 +142,10 @@ public class SinchService extends Service implements SinchClientListener {
 			public boolean isSinchClientStarted() {
 				return SinchService.this.isSinchClientStarted();
 			}
+
+			public SinchService getService() {
+				// Return this instance of LocalService so clients can call public methods.
+				return SinchService.this;
+			}
 		}
 }

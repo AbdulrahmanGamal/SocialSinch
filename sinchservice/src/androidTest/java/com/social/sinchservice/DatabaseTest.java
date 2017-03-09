@@ -1,7 +1,9 @@
 package com.social.sinchservice;
 
 import android.content.Context;
-import android.os.Build;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.AndroidJUnit4;
+
 import com.social.sinchservice.database.ChatBriteDataSource;
 import com.social.sinchservice.model.ChatMessage;
 import com.social.sinchservice.model.ChatStatus;
@@ -11,9 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
-import org.robolectric.shadows.ShadowApplication;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,17 +23,13 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by valgood on 3/5/2017.
  */
-@RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class,
-        sdk = Build.VERSION_CODES.LOLLIPOP,
-        manifest = "src/main/AndroidManifest.xml",
-        packageName = "com.social.sinchservice")
+@RunWith(AndroidJUnit4.class)
 public class DatabaseTest {
     private Context mMockContext;
 
     @Before
     public void setUp() {
-        mMockContext = ShadowApplication.getInstance().getApplicationContext();
+        mMockContext = InstrumentationRegistry.getTargetContext();
     }
 
     @After

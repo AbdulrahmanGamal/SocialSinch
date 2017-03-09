@@ -31,6 +31,7 @@ public class ChatBriteDataSource {
         //create and configure sqlbrite
         SqlBrite sqlBrite = new SqlBrite.Builder().build();
         mChatBriteDB = sqlBrite.wrapDatabaseHelper(mChatDbHelper, Schedulers.io());
+        mChatBriteDB.setLoggingEnabled(true);
     }
 
     /**
