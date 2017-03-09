@@ -13,8 +13,15 @@ import java.util.List;
 
 public class ServiceConnectionManager {
     private SinchServiceConnection mConnection;
+    private static ServiceConnectionManager mServiceConnectionManager;
 
-    public ServiceConnectionManager(Context context, String currentUser) {
+    public static ServiceConnectionManager getInstance(Context context, String currentUser) {
+        if (mServiceConnectionManager == null) {
+            mServiceConnectionManager = new ServiceConnectionManager(context, currentUser);
+        }
+        return mServiceConnectionManager;
+    }
+    private ServiceConnectionManager(Context context, String currentUser) {
         this.mConnection = new SinchServiceConnection(context, currentUser);
         Intent intent = new Intent(context, SinchService.class);
         intent.putExtra(SinchService.CURRENT_USER_KEY, currentUser);

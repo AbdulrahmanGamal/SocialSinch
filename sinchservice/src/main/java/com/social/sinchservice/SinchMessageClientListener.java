@@ -19,6 +19,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * Handles the incoming/outgoing messages
@@ -35,6 +42,7 @@ class SinchMessageClientListener implements MessageClientListener {
         this.mChatDataSource = new ChatBriteDataSource(context);
         this.mCurrentUser = currentUser;
     }
+
 
     @Override
     public void onMessageFailed(MessageClient client, Message message,
@@ -53,7 +61,6 @@ class SinchMessageClientListener implements MessageClientListener {
     public void onMessageSent(MessageClient client, Message message,
                               String recipientId) {
         // Display the message that was just sent
-        Log.e(TAG, "onMessageSEnt CALLED: " + recipientId + " - " + message.getTextBody());
         processMessage(message, ChatStatus.SENT);
 
     }
@@ -72,7 +79,7 @@ class SinchMessageClientListener implements MessageClientListener {
     }
 
     private void processMessage(Message message, ChatStatus status) {
-        ChatMessage chatMessageInfo = new ChatMessage();
+        final ChatMessage chatMessageInfo = new ChatMessage();
         chatMessageInfo.setRecipientIds(message.getRecipientIds());
         chatMessageInfo.setSenderId(message.getSenderId());
         chatMessageInfo.setTextBody(message.getTextBody());
@@ -122,21 +129,64 @@ class SinchMessageClientListener implements MessageClientListener {
      * Save the message in the local DB
      * @param chatMessage
      */
-    private synchronized void addMessageToDB(final ChatMessage chatMessage) {
-        Long messageId;
+    private Long addMessageToDB(final ChatMessage chatMessage) {
+        Long messageId = -1L;
         try {
             switch (chatMessage.getStatus()) {
                 case SENT:
-                    messageId = mChatDataSource.verifyMessageBySentID(chatMessage.getSenderId(),
-                            chatMessage.getRecipientIds().get(0),
-                            chatMessage.getSentId());
-                    if (messageId == -1) {
-                        messageId = mChatDataSource.addNewMessage(chatMessage);
-                        chatMessage.setMessageId(messageId);
-                        mMessageBus.setMessage(chatMessage);
-                    } else {
-                        //Log.e(TAG, "SKIPPING " + chatMessage.getTextBody());
-                    }
+                    Observable.fromCallable(new Callable<Long>() {
+                        @Override
+                        public Long call() throws Exception {
+                            return mChatDataSource.verifyMessageBySentID(chatMessage.getSenderId(),
+                                    chatMessage.getRecipientIds().get(0),
+                                    chatMessage.getSentId());
+                        }
+                    }).subscribeOn(Schedulers.io())
+                      .filter(new Func1<Long, Boolean>() {
+                          @Override
+                          public Boolean call(Long messageId) {
+                              return messageId == -1;
+                          }
+                      }).map(new Func1<Long, Long>() {
+                        @Override
+                        public Long call(Long messageId) {
+                            return mChatDataSource.addNewMessage(chatMessage);
+                        }
+                    }).subscribeOn(Schedulers.io())
+                        .subscribe(new Subscriber<Long>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Log.e(TAG, "Error: " + e.getMessage());
+                            }
+
+                            @Override
+                            public void onNext(Long messageId) {
+                                if (mMessageBus.hasObservers()) {
+                                    Log.e(TAG, "Added Message # " + messageId);
+                                    chatMessage.setMessageId(messageId);
+                                    mMessageBus.setMessage(chatMessage);
+                                } else {
+                                    Log.e(TAG, "Saved Message # " + messageId);
+                                }
+                            }
+                        });
+//                    messageId = mChatDataSource.verifyMessageBySentID(chatMessage.getSenderId(),
+//                            chatMessage.getRecipientIds().get(0),
+//                            chatMessage.getSentId());
+//                    if (messageId == -1) {
+//                        messageId = mChatDataSource.addNewMessage(chatMessage);
+//                        chatMessage.setMessageId(messageId);
+//                        if (mMessageBus.hasObservers()) {
+//                            mMessageBus.setMessage(chatMessage);
+//                        }
+//                    } else {
+//                        //Log.e(TAG, "SKIPPING " + chatMessage.getTextBody());
+//                    }
                     break;
                 case DELIVERED:
                     //update the status in DB
@@ -158,7 +208,9 @@ class SinchMessageClientListener implements MessageClientListener {
                                 + " - " + chatMessage.getTextBody());
                         messageId = mChatDataSource.addNewMessage(chatMessage);
                         chatMessage.setMessageId(messageId);
-                        mMessageBus.setMessage(chatMessage);
+                        if (mMessageBus.hasObservers()) {
+                            mMessageBus.setMessage(chatMessage);
+                        }
                     } else {
                         Log.e(TAG, "SKIPPING ALREADY RECEIVED SAVED MESSAGE!!!");
                     }
@@ -170,6 +222,7 @@ class SinchMessageClientListener implements MessageClientListener {
             Log.e(TAG, "Error adding the new Message: " + ex.getMessage());
         }
 
+        return messageId;
     }
 
     /**

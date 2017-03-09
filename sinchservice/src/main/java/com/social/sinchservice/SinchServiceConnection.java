@@ -8,6 +8,11 @@ import com.social.sinchservice.model.ChatMessage;
 
 import java.util.List;
 
+import rx.Observable;
+import rx.functions.Action1;
+import rx.functions.Func0;
+import rx.schedulers.Schedulers;
+
 /**
  * Class that encapsulates all the connection with the Sinch service to send and receive
  * chat messages. It posts messages to the RxBus to notify observers
@@ -17,9 +22,8 @@ public class SinchServiceConnection implements ServiceConnection {
     private SinchService.MessageServiceInterface mMessageService;
     private SinchMessageClientListener mMessageClientListener;
 
-    public SinchServiceConnection(Context context, String currentUser) {
+    public SinchServiceConnection(final Context context, final String currentUser) {
         this.mMessageClientListener = new SinchMessageClientListener(context, currentUser);
-
     }
 
     @Override

@@ -47,7 +47,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
                               NewItemInserted itemInsertedListener) {
         this.mContext = context;
         this.mMessages = new ArrayList<>();
-        this.mServiceConnection = new ServiceConnectionManager(context,
+        this.mServiceConnection = ServiceConnectionManager.getInstance(context,
                 Backendless.UserService.loggedInUser());
         this.mItemInsertedListener = itemInsertedListener;
 

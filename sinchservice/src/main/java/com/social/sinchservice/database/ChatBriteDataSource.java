@@ -3,6 +3,7 @@ package com.social.sinchservice.database;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.util.Log;
 
 import com.social.sinchservice.model.ChatMessage;
 import com.social.sinchservice.model.ChatStatus;
@@ -165,6 +166,7 @@ public class ChatBriteDataSource {
         increaseTotalMessage(identifier);
         //get the new total message
         Long totalMessages = getTotalMessage(identifier);
+        Log.e(TAG, "Before adding the Message TOTAL_MESSAGES IS: " + totalMessages);
         mChatBriteDB.execute(
                 "INSERT INTO " + ChatSQLiteHelper.TABLE_MESSAGES +
                         " ( " + ChatSQLiteHelper.COLUMN_ID_MSG + ", " +
