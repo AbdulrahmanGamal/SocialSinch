@@ -16,6 +16,9 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import rx.Observable;
+import rx.functions.Func1;
+
 public class SinchService extends Service implements SinchClientListener {
 		private static final String APP_KEY = "1449b242-7764-4e78-9866-34b50bb52dba";
 		private static final String APP_SECRET = "PAlx4YPGrky4iS3eD3Wnag==";
@@ -37,11 +40,22 @@ public class SinchService extends Service implements SinchClientListener {
 			//get the current user id from Parse
 			currentUserId = intent.getStringExtra(CURRENT_USER_KEY);
 			if (currentUserId != null && !isSinchClientStarted()) {
-				startSinchClient(currentUserId);
+				//startSinchClient(currentUserId);
+				startSinch2(currentUserId);
 			}
 			return super.onStartCommand(intent, flags, startId);
 		}
-		
+
+		public void startSinch2(String username) {
+			final SinchClientHandler sinchClientHandler = new SinchClientHandler(this);
+			sinchClientHandler.startSinchClient(this, username).concatMap(new Func1<SinchClient, Observable<String>>() {
+				@Override
+				public Observable<String> call(SinchClient sinchClient) {
+					Log.e(TAG, "adding MessageListener to Message CLIENT!! : ");
+					return sinchClientHandler.observableMessageClientListenerWrapper(sinchClient.getMessageClient());
+				}
+			}).subscribe();
+		}
 		public void startSinchClient(String username) {
 			sinchClient = Sinch.getSinchClientBuilder()
 					.context(this)
