@@ -101,9 +101,9 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted{
         this.mChatRecyclerView = recyclerView;
     }
 
-    public void removeMessageClientListener() {
-        mChatMessageAdapter.removeMessageClientListener();
-    }
+//    public void removeMessageClientListener() {
+//        mChatMessageAdapter.removeMessageClientListener();
+//    }
 
     @Override
     public void onItemInserted() {

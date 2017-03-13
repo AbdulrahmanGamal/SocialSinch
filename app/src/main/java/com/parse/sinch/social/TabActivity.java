@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -24,8 +25,8 @@ import android.widget.Toast;
 import com.backendless.Backendless;
 import com.parse.sinch.social.databinding.ActivityOptionsTabBinding;
 import com.parse.sinch.social.viewmodel.TabOptionsViewModel;
-import com.social.sinchservice.ServiceConnectionManager;
 import com.social.sinchservice.SinchService;
+import com.social.sinchservice.SinchServiceConnection;
 
 public class TabActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
@@ -61,7 +62,7 @@ public class TabActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 Boolean success = intent.getBooleanExtra("success", false);
                 progressDialog.dismiss();
-                 ServiceConnectionManager.getInstance(getApplicationContext(), Backendless.UserService.loggedInUser());
+                // ServiceConnectionManager.getInstance(getApplicationContext(), Backendless.UserService.loggedInUser());
                 //show a toast message if the Sinch
                 //service failed to start
                 if (!success) {

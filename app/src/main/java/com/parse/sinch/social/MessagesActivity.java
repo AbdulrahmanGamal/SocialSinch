@@ -63,7 +63,7 @@ public class MessagesActivity extends AppCompatActivity {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		messageViewModel.removeMessageClientListener();
+		//messageViewModel.removeMessageClientListener();
 	}
 
 	@Override

@@ -62,7 +62,7 @@ public class SinchServiceTest {
         IBinder binder = mServiceRule.bindService(serviceIntent);
 
         // Get the reference to the service, or you can call public methods on the binder directly.
-        SinchService service = ((SinchService.MessageServiceInterface) binder).getService();
+        SinchService.MessageServiceInterface service = ((SinchService.MessageServiceInterface) binder);
 
         // Verify that the service is working correctly.
         Assert.assertNotNull(service);

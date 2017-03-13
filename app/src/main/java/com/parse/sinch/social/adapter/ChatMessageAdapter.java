@@ -14,7 +14,7 @@ import com.parse.sinch.social.databinding.IncomingChatMessageBinding;
 import com.parse.sinch.social.databinding.OutgoingChatMessageBinding;
 import com.parse.sinch.social.viewmodel.ChatIncomingViewModel;
 import com.parse.sinch.social.viewmodel.ChatOutgoingViewModel;
-import com.social.sinchservice.ServiceConnectionManager;
+import com.social.sinchservice.SinchServiceConnection;
 import com.social.sinchservice.bus.RxOutgoingMessageBus;
 import com.social.sinchservice.model.ChatMessage;
 import com.social.sinchservice.model.ChatStatus;
@@ -22,6 +22,7 @@ import com.social.sinchservice.model.ChatStatus;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 
 /**
@@ -33,8 +34,8 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
 
     private Context mContext;
     private List<ChatMessage> mMessages;
-    private ServiceConnectionManager mServiceConnection;
     private NewItemInserted mItemInsertedListener;
+    private SinchServiceConnection mServiceConnection;
 
     private static final String TAG = "ChatMessageAdapter";
 
@@ -47,9 +48,8 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
                               NewItemInserted itemInsertedListener) {
         this.mContext = context;
         this.mMessages = new ArrayList<>();
-        this.mServiceConnection = ServiceConnectionManager.getInstance(context,
-                Backendless.UserService.loggedInUser());
         this.mItemInsertedListener = itemInsertedListener;
+        this.mServiceConnection = SinchServiceConnection.getInstance(context, senderId);
 
         setHasStableIds(true);
         configureMessageBus();
@@ -61,7 +61,9 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
      * messages sent and received
      */
     private void configureMessageBus() {
-        RxOutgoingMessageBus.getInstance().getMessageObservable().subscribe(new Consumer<ChatMessage>() {
+        RxOutgoingMessageBus.getInstance().getMessageObservable()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<ChatMessage>() {
             @Override
             public void accept(ChatMessage chatInfo) throws Exception {
                 if (chatInfo.getStatus().equals(ChatStatus.RECEIVED)) {
@@ -163,7 +165,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         if (chatMessage.getStatus().equals(ChatStatus.WAITING)) {
             chatMessage.setMessageId((long)(getItemCount() + 1));
             Log.e(TAG, "SENDING MESSAGE TO SINCH");
-            //mServiceConnection.sendMessage(chatMessage.getRecipientIds(), chatMessage.getTextBody());
+            mServiceConnection.sendMessage(chatMessage.getRecipientIds(), chatMessage.getTextBody());
         }
 
         mMessages.add(chatMessage);
@@ -183,7 +185,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     }
 
     public void removeMessageClientListener() {
-        mServiceConnection.removeMessageClientListener(mContext);
+        mServiceConnection.unbindService(mContext);
     }
 
     public class BindingHolder extends RecyclerView.ViewHolder {
