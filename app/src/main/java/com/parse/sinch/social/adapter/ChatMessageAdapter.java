@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.backendless.Backendless;
 import com.parse.sinch.social.R;
 import com.parse.sinch.social.databinding.IncomingChatMessageBinding;
 import com.parse.sinch.social.databinding.OutgoingChatMessageBinding;
@@ -16,6 +15,7 @@ import com.parse.sinch.social.viewmodel.ChatIncomingViewModel;
 import com.parse.sinch.social.viewmodel.ChatOutgoingViewModel;
 import com.social.sinchservice.SinchServiceConnection;
 import com.social.sinchservice.bus.RxOutgoingMessageBus;
+import com.social.sinchservice.database.ChatBriteDataSource;
 import com.social.sinchservice.model.ChatMessage;
 import com.social.sinchservice.model.ChatStatus;
 
@@ -36,6 +36,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     private List<ChatMessage> mMessages;
     private NewItemInserted mItemInsertedListener;
     private SinchServiceConnection mServiceConnection;
+    private ChatBriteDataSource mDateSource;
 
     private static final String TAG = "ChatMessageAdapter";
 
@@ -49,11 +50,13 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         this.mContext = context;
         this.mMessages = new ArrayList<>();
         this.mItemInsertedListener = itemInsertedListener;
-        this.mServiceConnection = SinchServiceConnection.getInstance(context, senderId);
+        this.mServiceConnection = SinchServiceConnection.getInstance();
+        this.mDateSource = ChatBriteDataSource.getInstance(context);
 
         setHasStableIds(true);
-        configureMessageBus();
         retrieveOldMessages(senderId, recipientIds);
+        configureMessageBus();
+
     }
 
     /**
@@ -115,8 +118,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
      */
     private synchronized void retrieveOldMessages(final String senderId, List<String> recipientIds) {
         String recipientId = recipientIds.get(0);
-        List<ChatMessage> chatMessages = mServiceConnection.retrieveLastMessages(senderId,
-                                                                                recipientId, 100);
+        List<ChatMessage> chatMessages = mDateSource.retrieveLastMessages(senderId, recipientId, 100);
         for (ChatMessage oldChatMessages : chatMessages) {
             if (oldChatMessages.getSenderId().equals(senderId)) {
                 oldChatMessages.setStatus(ChatStatus.DELIVERED);

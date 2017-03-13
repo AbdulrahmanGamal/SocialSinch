@@ -26,8 +26,16 @@ public class ChatBriteDataSource {
 
     private static final String TAG = "ChatBriteDataSource";
     private static final Object mObjectLock = new Object();
+    private static ChatBriteDataSource sChatBriteDataSource;
 
-    public ChatBriteDataSource(Context context) {
+    public static ChatBriteDataSource getInstance(Context context) {
+        if (sChatBriteDataSource == null) {
+            sChatBriteDataSource = new ChatBriteDataSource(context);
+        }
+        return sChatBriteDataSource;
+    }
+
+    private ChatBriteDataSource(Context context) {
         ChatSQLiteHelper mChatDbHelper = new ChatSQLiteHelper(context);
         //create and configure sqlbrite
         SqlBrite sqlBrite = new SqlBrite.Builder().build();
@@ -200,39 +208,42 @@ public class ChatBriteDataSource {
     public List<ChatMessage> retrieveLastMessages(final String user1,
                                                   final String user2,
                                                   final int max) throws SQLException{
-        List<ChatMessage> listConversations = new ArrayList<>();
-        String participants = String.valueOf(user1 + ":" + user2);
-        Long totalMessages = getTotalMessage(participants);
-        String query = "SELECT * FROM " +
-                "( SELECT * FROM " +
+        synchronized (mObjectLock) {
+            List<ChatMessage> listConversations = new ArrayList<>();
+            String participants = String.valueOf(user1 + ":" + user2);
+            Long totalMessages = getTotalMessage(participants);
+            String query = "SELECT * FROM " +
+                    "( SELECT * FROM " +
                     ChatSQLiteHelper.TABLE_MESSAGES + " WHERE " +
                     ChatSQLiteHelper.COLUMN_PARTICIPANTS + " = ? ORDER BY " +
                     ChatSQLiteHelper.COLUMN_ID_MSG + " ASC " +
-                " ) ORDER BY " + ChatSQLiteHelper.COLUMN_ID_MSG + " ASC LIMIT ?";
-        Cursor cursor = mChatBriteDB.query(query, participants,
-                                           totalMessages.toString());
-        if (cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            while (!cursor.isAfterLast()) {
-                Long id = cursor.getLong(0);
-                String fromUser = cursor.getString(3);
-                ChatMessage chatMessage = new ChatMessage();
-                chatMessage.setMessageId(id);
-                chatMessage.setSenderId(fromUser);
-                List<String> recipientIds = new ArrayList<>();
-                if (fromUser.equals(user1)) {
-                    recipientIds.add(user2);
-                } else {
-                    recipientIds.add(user1);
+                    " ) ORDER BY " + ChatSQLiteHelper.COLUMN_ID_MSG + " ASC LIMIT ?";
+            Cursor cursor = mChatBriteDB.query(query, participants,
+                    totalMessages.toString());
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                while (!cursor.isAfterLast()) {
+                    Long id = cursor.getLong(0);
+                    String fromUser = cursor.getString(3);
+                    ChatMessage chatMessage = new ChatMessage();
+                    chatMessage.setMessageId(id);
+                    chatMessage.setSenderId(fromUser);
+                    List<String> recipientIds = new ArrayList<>();
+                    if (fromUser.equals(user1)) {
+                        recipientIds.add(user2);
+                    } else {
+                        recipientIds.add(user1);
+                    }
+                    chatMessage.setRecipientIds(recipientIds);
+                    chatMessage.setTextBody(cursor.getString(2));
+                    listConversations.add(chatMessage);
+                    cursor.moveToNext();
                 }
-                chatMessage.setRecipientIds(recipientIds);
-                chatMessage.setTextBody(cursor.getString(2));
-                listConversations.add(chatMessage);
-                cursor.moveToNext();
+
             }
             cursor.close();
+            return listConversations;
         }
-        return listConversations;
     }
 
     public Long verifyMessageDelivered(String sentId, Date timestamp) {

@@ -1,15 +1,11 @@
 package com.social;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.IBinder;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ServiceTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.support.v4.content.LocalBroadcastManager;
-import android.widget.Toast;
 
 import com.social.sinchservice.SinchService;
 
@@ -22,8 +18,6 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import static org.hamcrest.core.Is.is;
 
 /**
  * Created by jorgevalbuena on 3/9/17.
@@ -66,37 +60,5 @@ public class SinchServiceTest {
 
         // Verify that the service is working correctly.
         Assert.assertNotNull(service);
-
-//        Intent intent = new Intent(mMockContext, SinchService.class);
-//        intent.putExtra(SinchService.CURRENT_USER_KEY, userLogged);
-//        mMockContext.startService(intent);
-//
-        //broadcast receiver to listen for the broadcast
-        //from MessageService
-//        BroadcastReceiver receiver = new BroadcastReceiver() {
-//            @Override
-//            public void onReceive(Context context, Intent intent) {
-//                Boolean success = intent.getBooleanExtra("success", false);
-//                //ServiceConnectionManager.getInstance(mMockContext, userLogged);
-//                // Bind the service and grab a reference to the binder.
-//                IBinder binder = null;
-//                try {
-//                    binder = mServiceRule.bindService(serviceIntent);
-//                    // Get the reference to the service, or you can call
-//                    // public methods on the binder directly.
-//                    SinchService.MessageServiceInterface service =
-//                            ((SinchService.MessageServiceInterface) binder);
-//
-//                    // Verify that the service is working correctly.
-//                    Assert.assertThat(service.isSinchClientStarted(), is(true));
-//                    //show a toast message if the Sinch
-//                    //service failed to start
-//                } catch (TimeoutException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        };
-//
-//        LocalBroadcastManager.getInstance(mMockContext).registerReceiver(receiver, new IntentFilter("com.parse.sinch.social.TabActivity"));
     }
 }

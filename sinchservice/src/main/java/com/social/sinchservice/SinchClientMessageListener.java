@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import rx.Emitter;
 import rx.Observable;
 import rx.functions.Action1;
@@ -34,11 +36,11 @@ public class SinchClientMessageListener {
     private String mCurrentUser;
 
     public SinchClientMessageListener(Context context, String currentUser) {
-        this.mChatDataSource = new ChatBriteDataSource(context);
+        this.mChatDataSource = ChatBriteDataSource.getInstance(context);
         this.mCurrentUser = currentUser;
     }
 
-    public void observableMessageClientListenerWrapper(final MessageClient messageClient) {
+    public void addMessageClientListenerWrapper(final MessageClient messageClient) {
         Observable.fromEmitter(new Action1<Emitter<ChatMessage>>() {
             @Override
             public void call(final Emitter<ChatMessage> emitter) {
@@ -178,10 +180,8 @@ public class SinchClientMessageListener {
         if (mMessageBus.hasObservers()) {
             chatMessage.setMessageId(messageId);
             mMessageBus.setMessage(chatMessage);
+        } else {
+            Log.e(TAG, "No Observers!!!!");
         }
-    }
-
-    public List<ChatMessage> retrieveLastMessages(String senderId, String recipientId, int max) {
-       return mChatDataSource.retrieveLastMessages(senderId, recipientId, max);
     }
 }

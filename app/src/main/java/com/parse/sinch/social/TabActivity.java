@@ -71,7 +71,8 @@ public class TabActivity extends AppCompatActivity {
             }
         };
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter("com.parse.sinch.social.TabActivity"));
+        IntentFilter statusConnection = new IntentFilter("com.parse.sinch.social.SinchStatus");
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, statusConnection);
 
 //        mViewPager.setOnPageChangeListener(
 //                new ViewPager.SimpleOnPageChangeListener() {

@@ -5,6 +5,7 @@ import com.backendless.BackendlessCollection;
 import com.backendless.BackendlessUser;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
+import com.backendless.persistence.BackendlessDataQuery;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -53,7 +54,10 @@ public class DataManager {
         return Observable.create(new Observable.OnSubscribe<Object>() {
             @Override
             public void call(final Subscriber<? super Object> subscriber) {
-                Backendless.Data.of(BackendlessUser.class).find(new AsyncCallback<BackendlessCollection<BackendlessUser>>() {
+                String whereClause = "objectId != '" + Backendless.UserService.loggedInUser() + "'";
+                BackendlessDataQuery dataQuery = new BackendlessDataQuery();
+                dataQuery.setWhereClause( whereClause );
+                Backendless.Data.of(BackendlessUser.class).find(dataQuery, new AsyncCallback<BackendlessCollection<BackendlessUser>>() {
                     @Override
                     public void handleResponse(BackendlessCollection<BackendlessUser> backendlessUserBackendlessCollection) {
                         subscriber.onNext(backendlessUserBackendlessCollection);

@@ -11,51 +11,39 @@ import com.social.sinchservice.model.ChatMessage;
 
 import java.util.List;
 
-import rx.Observable;
-import rx.functions.Action1;
-import rx.functions.Func0;
-import rx.schedulers.Schedulers;
-
 /**
  * Class that encapsulates all the connection with the Sinch service to send and receive
- * chat messages. It posts messages to the RxBus to notify observers
+ * chat messages.
  */
 
 public class SinchServiceConnection implements ServiceConnection {
     private SinchService.MessageServiceInterface mMessageService;
     private static SinchServiceConnection mSinchServiceConnection;
-    private Intent broadcastIntent = new Intent("com.parse.sinch.social.TabActivity");
-    private LocalBroadcastManager broadcaster;
 
-    public static SinchServiceConnection getInstance(final Context context, final String currentUser) {
+    public static SinchServiceConnection getInstance() {
         if (mSinchServiceConnection == null) {
-            mSinchServiceConnection = new SinchServiceConnection(context, currentUser);
+            mSinchServiceConnection = new SinchServiceConnection();
         }
         return mSinchServiceConnection;
     }
 
-    private SinchServiceConnection(final Context context, final String currentUser) {
-        this.broadcaster = LocalBroadcastManager.getInstance(context);
+    /**
+     * Bind to the service to send and receive information
+     */
+    public void bindToService(Context context) {
         Intent intent = new Intent(context, SinchService.class);
-        intent.putExtra(SinchService.CURRENT_USER_KEY, currentUser);
         context.bindService(intent, this, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
         mMessageService = (SinchService.MessageServiceInterface) iBinder;
-        broadcastIntent.putExtra("success", true);
-        broadcaster.sendBroadcast(broadcastIntent);
-
     }
 
     @Override
     public void onServiceDisconnected(ComponentName componentName) {
         mMessageService = null;
-        broadcastIntent.putExtra("success", false);
-        broadcaster.sendBroadcast(broadcastIntent);
     }
-
     /**
      * send message to recipient
      */
@@ -71,9 +59,9 @@ public class SinchServiceConnection implements ServiceConnection {
         context.unbindService(this);
     }
 
-    public List<ChatMessage> retrieveLastMessages(String senderId,
-                                                  String recipientId,
-                                                  int max) {
-        return mMessageService.retrieveLastMessages(senderId, recipientId, max);
-    }
+//    public List<ChatMessage> retrieveLastMessages(String senderId,
+//                                                  String recipientId,
+//                                                  int max) {
+//        return mMessageService.retrieveLastMessages(senderId, recipientId, max);
+//    }
 }
