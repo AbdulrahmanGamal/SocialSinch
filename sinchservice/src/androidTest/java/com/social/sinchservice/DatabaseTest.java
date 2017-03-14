@@ -39,7 +39,7 @@ public class DatabaseTest {
 
     @Test
     public void increaseTotalMessage() {
-        ChatBriteDataSource dataSource = new ChatBriteDataSource(mMockContext);
+        ChatBriteDataSource dataSource = ChatBriteDataSource.getInstance(mMockContext);
         String senderId = "0280CFFE-6C36-D6F2-FFF1-6BF559C87900";
         String recipientId = "8E4B12A7-2B39-778B-FF00-9715DF18DA00";
         String identifier = String.valueOf(senderId + ":" + recipientId);
@@ -52,7 +52,7 @@ public class DatabaseTest {
 
     @Test
     public void addMessage() {
-        ChatBriteDataSource dataSource = new ChatBriteDataSource(mMockContext);
+        ChatBriteDataSource dataSource = ChatBriteDataSource.getInstance(mMockContext);
         ChatMessage chatMessageSend = new ChatMessage();
         chatMessageSend.setSenderId("0280CFFE-6C36-D6F2-FFF1-6BF559C87900");
         List<String> recipientIds = new ArrayList<>();

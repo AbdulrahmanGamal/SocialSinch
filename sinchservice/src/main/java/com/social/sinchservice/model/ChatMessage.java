@@ -1,5 +1,6 @@
 package com.social.sinchservice.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -7,7 +8,7 @@ import java.util.List;
  * Chat Message model to store the information exchange between users
  */
 
-public class ChatMessage {
+public class ChatMessage implements Serializable{
     private Long mMessageId;
     private String mTextBody;
     private List<String> mRecipientIds;

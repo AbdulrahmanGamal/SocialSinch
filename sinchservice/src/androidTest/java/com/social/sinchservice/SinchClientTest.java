@@ -34,7 +34,7 @@ public class SinchClientTest {
     @Test
     public void connectClient() throws TimeoutException {
         final String userLogged = "0280CFFE-6C36-D6F2-FFF1-6BF559C87900";
-        final SinchClientHandler sinchClientHandler = new SinchClientHandler();
+        final SinchClientHandler sinchClientHandler = new SinchClientHandler(mMockContext);
         sinchClientHandler.startSinchClient(mMockContext, userLogged).toBlocking().first();
     }
 }
