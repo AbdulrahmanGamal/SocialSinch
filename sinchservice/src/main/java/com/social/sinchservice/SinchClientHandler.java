@@ -6,13 +6,13 @@ import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.backendless.Backendless;
 import com.sinch.android.rtc.ClientRegistration;
 import com.sinch.android.rtc.Sinch;
 import com.sinch.android.rtc.SinchClient;
 import com.sinch.android.rtc.SinchClientListener;
 import com.sinch.android.rtc.SinchError;
 import com.sinch.android.rtc.messaging.WritableMessage;
+
 import java.util.concurrent.Callable;
 
 import rx.Emitter;
@@ -35,13 +35,10 @@ public class SinchClientHandler {
     private Intent broadcastIntent = new Intent("com.parse.sinch.social.SinchStatus");
     private LocalBroadcastManager broadcaster;
 
-    private PublishMessage mPublishMessage;
-
     public SinchClientHandler(Context context) {
         //bound to the service to have the singleton always bound for all views
         SinchServiceConnection.getInstance().bindToService(context);
         this.broadcaster = LocalBroadcastManager.getInstance(context);
-        this.mPublishMessage = new PublishMessage();
     }
     /**
      * Initiates the sinch client to start listening for messages, calls, etc
@@ -89,7 +86,10 @@ public class SinchClientHandler {
      * @param textBody
      */
     public void sendMessage(String recipientUserId, String textBody) {
-        mPublishMessage.sendMessage(recipientUserId, textBody);
+        WritableMessage message = new WritableMessage();
+        message.setTextBody(textBody);
+        message.addRecipient(recipientUserId);
+        mSinchClient.getMessageClient().send(message);
     }
     /**
      * Stop listening for messages and terminates the sinch client

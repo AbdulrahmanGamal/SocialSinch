@@ -1,16 +1,10 @@
 package com.parse.sinch.social;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
@@ -20,18 +14,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.Toast;
-
-import com.backendless.Backendless;
 import com.parse.sinch.social.databinding.ActivityOptionsTabBinding;
 import com.parse.sinch.social.viewmodel.TabOptionsViewModel;
-import com.social.sinchservice.SinchService;
-import com.social.sinchservice.SinchServiceConnection;
 
 public class TabActivity extends AppCompatActivity {
-    private ProgressDialog progressDialog;
-    private BroadcastReceiver receiver;
-
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final TabOptionsViewModel tabOptionsViewModel = new TabOptionsViewModel(this,
@@ -49,40 +35,6 @@ public class TabActivity extends AppCompatActivity {
                         tabOptionsViewModel.setupWithViewPager();
                     }
                 });
-
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle(getResources().getString(R.string.loading));
-        progressDialog.setMessage(getResources().getString(R.string.loading_msj));
-        progressDialog.show();
-
-        //broadcast receiver to listen for the broadcast
-        //from MessageService
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Boolean success = intent.getBooleanExtra("success", false);
-                progressDialog.dismiss();
-                // ServiceConnectionManager.getInstance(getApplicationContext(), Backendless.UserService.loggedInUser());
-                //show a toast message if the Sinch
-                //service failed to start
-                if (!success) {
-                    Toast.makeText(getApplicationContext(), "Failed to Start Sinch", Toast.LENGTH_LONG).show();
-                }
-            }
-        };
-
-        IntentFilter statusConnection = new IntentFilter("com.parse.sinch.social.SinchStatus");
-        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, statusConnection);
-
-//        mViewPager.setOnPageChangeListener(
-//                new ViewPager.SimpleOnPageChangeListener() {
-//                    @Override
-//                    public void onPageSelected(int position) {
-//                        // When swiping between pages, select the
-//                        // corresponding tab.
-//                        getActionBar().setSelectedNavigationItem(position);
-//                    }
-//                });
 
         // Create a tab listener that is called when the user changes tabs.
 //        ActionBar.TabListener tabListener = new ActionBar.TabListener() {
@@ -177,7 +129,6 @@ public class TabActivity extends AppCompatActivity {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        stopService(new Intent(TabActivity.this, SinchService.class));
                         finish();
                     }
 

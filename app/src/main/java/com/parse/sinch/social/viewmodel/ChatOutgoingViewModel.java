@@ -3,7 +3,7 @@ package com.parse.sinch.social.viewmodel;
 import android.databinding.BindingAdapter;
 import android.widget.ImageView;
 
-import com.social.sinchservice.model.ChatMessage;
+import com.social.backendless.model.ChatMessage;
 
 /**
  * Created by valgood on 2/20/2017.

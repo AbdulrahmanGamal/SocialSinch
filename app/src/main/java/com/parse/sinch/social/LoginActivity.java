@@ -2,7 +2,6 @@ package com.parse.sinch.social;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +14,6 @@ import android.view.ViewTreeObserver;
 import com.backendless.Backendless;
 import com.parse.sinch.social.databinding.ActivityLoginBinding;
 import com.parse.sinch.social.viewmodel.LoginViewViewModel;
-import com.social.sinchservice.SinchService;
 
 public class LoginActivity extends AppCompatActivity
 {
@@ -74,7 +72,7 @@ public class LoginActivity extends AppCompatActivity
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-                stopService(new Intent(LoginActivity.this, SinchService.class));
+                //stopService(new Intent(LoginActivity.this, SinchService.class));
 				finish(); 
 			}
 

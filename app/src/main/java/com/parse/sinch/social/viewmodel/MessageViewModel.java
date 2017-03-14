@@ -9,12 +9,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.backendless.Backendless;
+import com.social.backendless.model.ChatMessage;
+import com.social.backendless.model.ChatStatus;
 import com.parse.sinch.social.R;
 import com.parse.sinch.social.adapter.ChatMessageAdapter;
-import com.social.sinchservice.model.ChatMessage;
-import com.social.sinchservice.model.ChatStatus;
-
-import java.util.List;
 
 /**
  * Model View attached to the Incoming/outgoing chat messages
@@ -25,12 +23,12 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted{
     private ChatMessageAdapter mChatMessageAdapter;
     private EditText mMessage;
     private RecyclerView mChatRecyclerView;
-    private List<String> mRecipientsId;
+    private String mRecipientId;
 
-    public MessageViewModel(Context context, String senderId, List<String> recipientsInfo) {
+    public MessageViewModel(Context context, String senderId, String recipientInfo) {
         this.mContext = context;
-        this.mRecipientsId = recipientsInfo;
-        this.mChatMessageAdapter = new ChatMessageAdapter(context, senderId, recipientsInfo, this);
+        this.mRecipientId = recipientInfo;
+        this.mChatMessageAdapter = new ChatMessageAdapter(context, senderId, recipientInfo, this);
     }
 
     public View.OnClickListener onClickSend() {
@@ -41,7 +39,7 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted{
                     Toast.makeText(mContext, "Please enter a message", Toast.LENGTH_LONG).show();
                     return;
                 }
-                mChatMessageAdapter.addMessage(assembleChatToSend());
+                mChatMessageAdapter.sendMessage(mRecipientId, mMessage.getText().toString());
                 mMessage.setText("");
             }
         };
@@ -58,7 +56,7 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted{
         chatToSend.setTextBody(mMessage.getText().toString());
         chatToSend.setSenderId(currentUserId);
         chatToSend.setResourceId(R.drawable.message_waiting);
-        chatToSend.setRecipientIds(mRecipientsId);
+        chatToSend.setRecipientIds(mRecipientId);
         return chatToSend;
     }
 
@@ -101,20 +99,18 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted{
         this.mChatRecyclerView = recyclerView;
     }
 
-//    public void removeMessageClientListener() {
-//        mChatMessageAdapter.removeMessageClientListener();
-//    }
-
     @Override
     public void onItemInserted() {
-        mChatRecyclerView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (mChatRecyclerView.getAdapter().getItemCount() > 0) {
-                    mChatRecyclerView.smoothScrollToPosition(
-                            mChatRecyclerView.getAdapter().getItemCount() - 1);
+        if (mChatRecyclerView != null) {
+            mChatRecyclerView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (mChatRecyclerView.getAdapter().getItemCount() > 0) {
+                        mChatRecyclerView.smoothScrollToPosition(
+                                mChatRecyclerView.getAdapter().getItemCount() - 1);
+                    }
                 }
-            }
-        }, 100);
+            }, 100);
+        }
     }
 }

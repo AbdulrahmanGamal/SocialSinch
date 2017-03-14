@@ -5,7 +5,7 @@ import android.databinding.BindingAdapter;
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
-import com.social.sinchservice.model.ChatMessage;
+import com.social.backendless.model.ChatMessage;
 
 /**
  * Created by valgood on 2/20/2017.

@@ -36,10 +36,8 @@ public class MessagesActivity extends AppCompatActivity {
         recipientInfo.setObjectId(intent.getStringExtra(Constants.RECIPIENT_ID));
         recipientInfo.setFullName(intent.getStringExtra(Constants.RECIPIENT_NAME));
         recipientInfo.setProfilePicture(intent.getStringExtra(Constants.RECIPIENT_AVATAR));
-        List<String> recipientsInfo = new ArrayList<>();
-        recipientsInfo.add(recipientInfo.getObjectId());
         messageViewModel = new MessageViewModel(this, Backendless.UserService.loggedInUser(),
-											    recipientsInfo);
+												recipientInfo.getObjectId());
         activityChatMainBinding.setViewModel(messageViewModel);
 
 		getWindow().setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.background));

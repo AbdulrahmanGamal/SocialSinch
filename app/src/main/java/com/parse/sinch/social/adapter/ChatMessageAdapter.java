@@ -8,16 +8,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.social.backendless.PublishSubscribeHandler;
+import com.social.backendless.bus.RxOutgoingMessageBus;
+import com.social.backendless.model.ChatMessage;
+import com.social.backendless.model.ChatStatus;
 import com.parse.sinch.social.R;
 import com.parse.sinch.social.databinding.IncomingChatMessageBinding;
 import com.parse.sinch.social.databinding.OutgoingChatMessageBinding;
 import com.parse.sinch.social.viewmodel.ChatIncomingViewModel;
 import com.parse.sinch.social.viewmodel.ChatOutgoingViewModel;
-import com.social.sinchservice.SinchServiceConnection;
-import com.social.sinchservice.bus.RxOutgoingMessageBus;
-import com.social.sinchservice.database.ChatBriteDataSource;
-import com.social.sinchservice.model.ChatMessage;
-import com.social.sinchservice.model.ChatStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,14 +28,12 @@ import io.reactivex.functions.Consumer;
  * Adapter in charge of adding the views with the incoming/outgoing chat messages in the mmain
  * recycler view.
  */
-
 public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.BindingHolder> {
 
     private Context mContext;
     private List<ChatMessage> mMessages;
     private NewItemInserted mItemInsertedListener;
-    private SinchServiceConnection mServiceConnection;
-    private ChatBriteDataSource mDateSource;
+    private PublishSubscribeHandler mPublisherSubHandler;
 
     private static final String TAG = "ChatMessageAdapter";
 
@@ -45,16 +42,15 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
 
     public ChatMessageAdapter(Context context,
                               String senderId,
-                              List<String> recipientIds,
+                              String recipientId,
                               NewItemInserted itemInsertedListener) {
         this.mContext = context;
         this.mMessages = new ArrayList<>();
         this.mItemInsertedListener = itemInsertedListener;
-        this.mServiceConnection = SinchServiceConnection.getInstance();
-        this.mDateSource = ChatBriteDataSource.getInstance(context);
-
+        this.mPublisherSubHandler = PublishSubscribeHandler.getInstance(context);
+        this.mPublisherSubHandler.attachToChannel();
         setHasStableIds(true);
-        retrieveOldMessages(senderId, recipientIds);
+        retrieveOldMessages(senderId, recipientId);
         configureMessageBus();
 
     }
@@ -69,42 +65,13 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
                 .subscribe(new Consumer<ChatMessage>() {
             @Override
             public void accept(ChatMessage chatInfo) throws Exception {
-                if (chatInfo.getStatus().equals(ChatStatus.RECEIVED)) {
+                if (chatInfo.getStatus().equals(ChatStatus.RECEIVED) || chatInfo.getStatus().equals(ChatStatus.SENT)) {
                     Log.e(TAG, "RECEIVED MESSAGE FROM BUS!!!");
                     addMessage(chatInfo);
                 } else if (!mMessages.isEmpty()) {
-                       boolean found = false;
-                        for (int i = mMessages.size() -1; i >=0; i--) {
-                            ChatMessage chatInList = mMessages.get(i);
-                            if (chatInList.getTextBody().equals(chatInfo.getTextBody())) {
-                                switch (chatInfo.getStatus()) {
-                                    case SENT:
-                                        chatInList.setResourceId(R.drawable.message_got_receipt_from_server);
-                                        notifyItemChanged(i);
-                                        break;
-                                    case DELIVERED:
-                                        chatInList.setResourceId(R.drawable.message_got_receipt_from_target);
-                                        notifyItemChanged(i);
-                                    default:
-                                        break;
-                                }
-                                found = true;
-                                break;
-                            }
-                        }
-                    if (!found) {
-                        Log.e(TAG, "MESSAGE NOT IN LIST BUT RSEND OR DELIVERED WAS EMITTED");
-                        switch (chatInfo.getStatus()) {
-                            case SENT:
-                                chatInfo.setResourceId(R.drawable.message_got_receipt_from_server);
-                                addMessage(chatInfo);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
+                    findMessagePosition(chatInfo);
                 } else {
-                    Log.e(TAG, "chat list EMPY, ADDING MESSAGE");
+                    Log.e(TAG, "chat list EMPTY, ADDING MESSAGE");
                     addMessage(chatInfo);
                 }
             }
@@ -112,21 +79,50 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     }
 
     /**
+     * Find the message in the current message list and modify the icon
+     * @param message
+     */
+    private void findMessagePosition(ChatMessage message) {
+        if (mMessages.contains(message)) {
+            int position = mMessages.indexOf(message);
+            changeStatusIcon(mMessages.get(position));
+            notifyItemChanged(position);
+        } else {
+            //new message, add it
+            addMessage(message);
+        }
+    }
+
+    /**
+     * Change the resource icon based on the message's status
+     * @param message
+     */
+    private void changeStatusIcon(ChatMessage message) {
+        switch (message.getStatus()) {
+            case SENT:
+                message.setResourceId(R.drawable.message_got_receipt_from_server);
+                break;
+            case DELIVERED:
+                message.setResourceId(R.drawable.message_got_receipt_from_target);
+                break;
+            case READ:
+                message.setResourceId(R.drawable.message_got_read_receipt_from_target);
+                break;
+            case FAILED:
+                default:
+                message.setResourceId(R.drawable.message_waiting);
+                break;
+        }
+    }
+    /**
      * Onece the adapter is intantiate, it has to retrieve the old messages saved in DB
      * @param senderId
-     * @param recipientIds
+     * @param recipientId
      */
-    private synchronized void retrieveOldMessages(final String senderId, List<String> recipientIds) {
-        String recipientId = recipientIds.get(0);
-        List<ChatMessage> chatMessages = mDateSource.retrieveLastMessages(senderId, recipientId, 100);
-        for (ChatMessage oldChatMessages : chatMessages) {
-            if (oldChatMessages.getSenderId().equals(senderId)) {
-                oldChatMessages.setStatus(ChatStatus.DELIVERED);
-                oldChatMessages.setResourceId(R.drawable.message_got_read_receipt_from_target);
-            } else {
-                oldChatMessages.setStatus(ChatStatus.RECEIVED);
-            }
-            mMessages.add(oldChatMessages);
+    private void retrieveOldMessages(final String senderId, String recipientId) {
+        List<ChatMessage> chatMessages = mPublisherSubHandler.retrieveLastMessages(senderId, recipientId, 100);
+        for (ChatMessage oldChatMessage : chatMessages) {
+            addMessage(oldChatMessage);
         }
     }
     @Override
@@ -163,13 +159,21 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         }
     }
 
-    public synchronized void addMessage(final ChatMessage chatMessage) {
-        if (chatMessage.getStatus().equals(ChatStatus.WAITING)) {
-            chatMessage.setMessageId((long)(getItemCount() + 1));
-            Log.e(TAG, "SENDING MESSAGE TO SINCH");
-            mServiceConnection.sendMessage(chatMessage.getRecipientIds(), chatMessage.getTextBody());
-        }
+    /**
+     * Sends a private message
+     * @param recipientId
+     * @param textBody
+     */
+    public void sendMessage(String recipientId, String textBody) {
+        mPublisherSubHandler.sendPrivateMessage(recipientId, textBody);
+    }
 
+    /**
+     * Add a message to the recyclerView
+     * @param chatMessage
+     */
+    public void addMessage(final ChatMessage chatMessage) {
+        changeStatusIcon(chatMessage);
         mMessages.add(chatMessage);
         notifyItemInserted(mMessages.size());
         //notify the recycler view to scroll up the recycler view
@@ -184,10 +188,6 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     @Override
     public long getItemId(int position) {
         return mMessages.get(position).getMessageId();
-    }
-
-    public void removeMessageClientListener() {
-        mServiceConnection.unbindService(mContext);
     }
 
     public class BindingHolder extends RecyclerView.ViewHolder {
