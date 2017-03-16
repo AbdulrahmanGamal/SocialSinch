@@ -14,8 +14,12 @@ public class ChatMessage implements Serializable{
     private String mSenderId;
     private Date mTimestamp;
     private ChatStatus mStatus;
-    private String mSentId;
-    private int mResourceId;
+
+
+    public ChatMessage(String recipientId, String textBody) {
+        this.mRecipientId = recipientId;
+        this.mTextBody = textBody;
+    }
 
     public ChatStatus getStatus() {
         return mStatus;
@@ -65,22 +69,6 @@ public class ChatMessage implements Serializable{
         this.mTimestamp = mTimestamp;
     }
 
-    public int getResourceId() {
-        return mResourceId;
-    }
-
-    public void setResourceId(int resourceId) {
-        this.mResourceId = resourceId;
-    }
-
-    public String getSentId() {
-        return mSentId;
-    }
-
-    public void setSentId(String sentId) {
-        this.mSentId = sentId;
-    }
-
     @Override
     public String toString() {
         return "ChatMessage{" +
@@ -90,8 +78,6 @@ public class ChatMessage implements Serializable{
                 ", mSenderId='" + mSenderId + '\'' +
                 ", mTimestamp=" + mTimestamp +
                 ", mStatus=" + mStatus +
-                ", mSentId='" + mSentId + '\'' +
-                ", mResourceId=" + mResourceId +
                 '}';
     }
 

@@ -3,17 +3,17 @@ package com.parse.sinch.social.viewmodel;
 import android.databinding.BindingAdapter;
 import android.widget.ImageView;
 
-import com.social.backendless.model.ChatMessage;
+import com.parse.sinch.social.model.ViewMessage;
 
 /**
  * Created by valgood on 2/20/2017.
  */
 
 public class ChatOutgoingViewModel {
-    private ChatMessage mChatMessage;
+    private ViewMessage mViewChatMessage;
 
-    public ChatOutgoingViewModel(final ChatMessage chatMessage){
-        this.mChatMessage = chatMessage;
+    public ChatOutgoingViewModel(final ViewMessage chatMessage){
+        this.mViewChatMessage = chatMessage;
     }
 
     @BindingAdapter("android:src")
@@ -21,10 +21,10 @@ public class ChatOutgoingViewModel {
         indicatorImgView.setImageResource(viewModel.getIconStatus());
     }
     public int getIconStatus() {
-        return mChatMessage.getResourceId();
+        return mViewChatMessage.getResourceId();
     }
 
-    public ChatMessage getChatMessage() {
-        return mChatMessage;
+    public ViewMessage getViewChatMessage() {
+        return mViewChatMessage;
     }
 }

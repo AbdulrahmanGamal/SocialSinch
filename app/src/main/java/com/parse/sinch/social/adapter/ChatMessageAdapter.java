@@ -2,12 +2,14 @@ package com.parse.sinch.social.adapter;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.databinding.ViewDataBinding;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.parse.sinch.social.model.ViewMessage;
 import com.social.backendless.PublishSubscribeHandler;
 import com.social.backendless.bus.RxOutgoingMessageBus;
 import com.social.backendless.model.ChatMessage;
@@ -25,13 +27,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 
 /**
- * Adapter in charge of adding the views with the incoming/outgoing chat messages in the mmain
+ * Adapter in charge of adding the views with the incoming/outgoing chat messages in the main
  * recycler view.
  */
 public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.BindingHolder> {
-
     private Context mContext;
-    private List<ChatMessage> mMessages;
+    private List<ViewMessage> mViewMessages;
     private NewItemInserted mItemInsertedListener;
     private PublishSubscribeHandler mPublisherSubHandler;
 
@@ -45,7 +46,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
                               String recipientId,
                               NewItemInserted itemInsertedListener) {
         this.mContext = context;
-        this.mMessages = new ArrayList<>();
+        this.mViewMessages = new ArrayList<>();
         this.mItemInsertedListener = itemInsertedListener;
         this.mPublisherSubHandler = PublishSubscribeHandler.getInstance(context);
         this.mPublisherSubHandler.attachToChannel();
@@ -64,15 +65,17 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<ChatMessage>() {
             @Override
-            public void accept(ChatMessage chatInfo) throws Exception {
-                if (chatInfo.getStatus().equals(ChatStatus.RECEIVED) || chatInfo.getStatus().equals(ChatStatus.SENT)) {
-                    Log.e(TAG, "RECEIVED MESSAGE FROM BUS!!!");
-                    addMessage(chatInfo);
-                } else if (!mMessages.isEmpty()) {
-                    findMessagePosition(chatInfo);
+            public void accept(ChatMessage chatMessage) throws Exception {
+                Log.e(TAG, "RECEIVED MESSAGE FROM BUS!!!: " + chatMessage);
+                ViewMessage viewMessage = new ViewMessage(chatMessage);
+                if (chatMessage.getStatus().equals(ChatStatus.RECEIVED)) {
+                    viewMessage.setViewMessageId((long) mViewMessages.size() + 1);
+                    addMessage(viewMessage);
+                } else if (!mViewMessages.isEmpty()) {
+                    findMessagePosition(viewMessage);
                 } else {
                     Log.e(TAG, "chat list EMPTY, ADDING MESSAGE");
-                    addMessage(chatInfo);
+                    addMessage(viewMessage);
                 }
             }
         });
@@ -80,15 +83,14 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
 
     /**
      * Find the message in the current message list and modify the icon
-     * @param message
+     * @param viewMessage
      */
-    private void findMessagePosition(ChatMessage message) {
+    private void findMessagePosition(ViewMessage viewMessage) {
         boolean found = false;
-        for (int i = mMessages.size() -1; i > 0; i--) {
-            if (mMessages.get(i).getMessageId().equals(Long.valueOf(message.getSentId()))) {
-                //change to the new status
-                mMessages.get(i).setStatus(message.getStatus());
-                changeStatusIcon(mMessages.get(i));
+        for (int i = mViewMessages.size() -1; i > 0; i--) {
+            if (mViewMessages.get(i).getChatMessage().getMessageId().equals(
+                                                                        viewMessage.getChatMessage().getMessageId())) {
+                changeStatusIcon(mViewMessages.get(i), viewMessage.getChatMessage().getStatus());
                 notifyItemChanged(i);
                 found = true;
                 break;
@@ -96,59 +98,63 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         }
         if (!found) {
             //new message, add it
-            addMessage(message);
+            addMessage(viewMessage);
         }
     }
 
     /**
      * Change the resource icon based on the message's status
-     * @param message
+     * @param viewMessage
      */
-    private void changeStatusIcon(ChatMessage message) {
-        switch (message.getStatus()) {
+    private void changeStatusIcon(ViewMessage viewMessage, ChatStatus status) {
+        switch (status) {
             case SENT:
-                message.setResourceId(R.drawable.message_got_receipt_from_server);
+                viewMessage.setResourceId(R.drawable.message_got_receipt_from_server);
                 break;
             case DELIVERED:
-                message.setResourceId(R.drawable.message_got_receipt_from_target);
+                viewMessage.setResourceId(R.drawable.message_got_receipt_from_target);
                 break;
             case READ:
-                message.setResourceId(R.drawable.message_got_read_receipt_from_target);
+                viewMessage.setResourceId(R.drawable.message_got_read_receipt_from_target);
                 break;
+            case WAITING:
             case FAILED:
                 default:
-                message.setResourceId(R.drawable.message_waiting);
+                viewMessage.setResourceId(R.drawable.message_waiting);
                 break;
         }
     }
     /**
-     * Onece the adapter is intantiate, it has to retrieve the old messages saved in DB
+     * Once the adapter is instantiate, it has to retrieve the old messages saved in DB
      * @param senderId
      * @param recipientId
      */
     private void retrieveOldMessages(final String senderId, String recipientId) {
         List<ChatMessage> chatMessages = mPublisherSubHandler.retrieveLastMessages(senderId, recipientId, 100);
         for (ChatMessage oldChatMessage : chatMessages) {
-            addMessage(oldChatMessage);
+            ViewMessage viewMessage = new ViewMessage(oldChatMessage);
+            changeStatusIcon(viewMessage, oldChatMessage.getStatus());
+            viewMessage.setViewMessageId((long) mViewMessages.size() + 1);
+            addMessage(viewMessage);
         }
     }
     @Override
     public BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == MESSAGE_INCOMING) {
-            IncomingChatMessageBinding incomingChatMessageBinding = DataBindingUtil.inflate(
+            ViewDataBinding incomingChatMessageBinding = DataBindingUtil.inflate(
                     LayoutInflater.from(parent.getContext()), R.layout.incoming_chat_message, parent, false);
-            return new IncomingBindingHolder(incomingChatMessageBinding);
+            return new IncomingBindingHolder((IncomingChatMessageBinding) incomingChatMessageBinding);
         } else {
-            OutgoingChatMessageBinding outgoingChatMessageBinding = DataBindingUtil.inflate(
+            ViewDataBinding outgoingChatMessageBinding = DataBindingUtil.inflate(
                     LayoutInflater.from(parent.getContext()), R.layout.outgoing_chat_message, parent, false);
-            return new OutgoingBindingHolder(outgoingChatMessageBinding);
+            return new OutgoingBindingHolder((OutgoingChatMessageBinding) outgoingChatMessageBinding);
         }
 
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (mMessages.get(position).getStatus().equals(ChatStatus.RECEIVED)) {
+        if (mViewMessages.get(position).getChatMessage().getStatus().equals(ChatStatus.RECEIVED)) {
             return MESSAGE_INCOMING;
         }
         return MESSAGE_OUTGOING;
@@ -158,11 +164,11 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         if (holder instanceof IncomingBindingHolder) {
             IncomingChatMessageBinding binding =
                     ((IncomingBindingHolder) holder).getIncomingChatMessageBinding();
-            binding.setViewModel(new ChatIncomingViewModel(mContext, mMessages.get(position)));
+            binding.setViewModel(new ChatIncomingViewModel(mContext, mViewMessages.get(position)));
         } else {
             OutgoingChatMessageBinding binding =
                     ((OutgoingBindingHolder) holder).getOutgoingChatMessageBinding();
-            binding.setViewModel(new ChatOutgoingViewModel(mMessages.get(position)));
+            binding.setViewModel(new ChatOutgoingViewModel(mViewMessages.get(position)));
         }
     }
 
@@ -172,29 +178,33 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
      * @param textBody
      */
     public void sendMessage(String recipientId, String textBody) {
-        mPublisherSubHandler.sendPrivateMessage(recipientId, textBody);
+        ChatMessage chatMessage = new ChatMessage(recipientId, textBody);
+        ViewMessage viewMessageToSend = new ViewMessage(chatMessage);
+        viewMessageToSend.setViewMessageId((long) mViewMessages.size() + 1);
+        changeStatusIcon(viewMessageToSend, ChatStatus.SEND);
+        addMessage(viewMessageToSend);
+        mPublisherSubHandler.sendPrivateMessage(chatMessage);
     }
 
     /**
      * Add a message to the recyclerView
-     * @param chatMessage
+     * @param viewChatMessage
      */
-    public void addMessage(final ChatMessage chatMessage) {
-        changeStatusIcon(chatMessage);
-        mMessages.add(chatMessage);
-        notifyItemInserted(mMessages.size());
+    public void addMessage(final ViewMessage viewChatMessage) {
+        mViewMessages.add(viewChatMessage);
+        notifyItemInserted(mViewMessages.size());
         //notify the recycler view to scroll up the recycler view
         mItemInsertedListener.onItemInserted();
     }
 
     @Override
     public int getItemCount() {
-        return mMessages.size();
+        return mViewMessages.size();
     }
 
     @Override
     public long getItemId(int position) {
-        return mMessages.get(position).getMessageId();
+        return mViewMessages.get(position).getViewMessageId();
     }
 
     public class BindingHolder extends RecyclerView.ViewHolder {

@@ -5,7 +5,7 @@ import android.databinding.BindingAdapter;
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
-import com.social.backendless.model.ChatMessage;
+import com.parse.sinch.social.model.ViewMessage;
 
 /**
  * Created by valgood on 2/20/2017.
@@ -13,12 +13,12 @@ import com.social.backendless.model.ChatMessage;
 
 public class ChatIncomingViewModel {
     private Context mContext;
-    private ChatMessage mChatMessage;
+    private ViewMessage mViewChatMessage;
     private Drawable mIconStatus;
 
-    public ChatIncomingViewModel(Context context, ChatMessage chatMessage){
+    public ChatIncomingViewModel(Context context, ViewMessage viewChatMessage){
         this.mContext = context;
-        this.mChatMessage = chatMessage;
+        this.mViewChatMessage = viewChatMessage;
     }
 
     @BindingAdapter("indicator")
@@ -29,8 +29,8 @@ public class ChatIncomingViewModel {
         return mIconStatus;
     }
 
-    public ChatMessage getChatMessage() {
-        return mChatMessage;
+    public ViewMessage getViewChatMessage() {
+        return mViewChatMessage;
     }
 
 }

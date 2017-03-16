@@ -55,7 +55,7 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="15dp"
                 android:autoLink="web"
-                android:text="@{viewModel.chatMessage.textBody}"
+                android:text="@{viewModel.viewChatMessage.chatMessage.textBody}"
                 style="@style/chat_text_message_style"/>
 
         </FrameLayout>

@@ -92,66 +92,6 @@ public class ChatBriteDataSource {
         }
         return result;
     }
-
-    /**
-     * Verify a sent message is already in DB using the sentID received
-     * @param senderId
-     * @param recipientId
-     * @param sentId
-     * @return
-     * @throws SQLException
-     */
-    public Long verifyMessageBySentID(final String senderId,
-                              final String recipientId,
-                              final String sentId) throws SQLException {
-        Long messageId = -1L;
-        String identifier = String.valueOf(senderId + ":" + recipientId);
-        String queryMessages = String.valueOf("SELECT " +
-                ChatSQLiteHelper.COLUMN_ID_MSG + " FROM " +
-                ChatSQLiteHelper.TABLE_MESSAGES + " WHERE " +
-                ChatSQLiteHelper.COLUMN_PARTICIPANTS + " = ? AND " +
-                ChatSQLiteHelper.COLUMN_SENT_ID + " = ? ");
-        Cursor cursor = mChatBriteDB.query(queryMessages, identifier, sentId);
-        if (cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            messageId = cursor.getLong(0);
-            cursor.close();
-        }
-        return messageId;
-    }
-
-    /**
-     * Verify if a message received already exits with the same timestamp
-     * @param chatMessage
-     * @return
-     * @throws SQLException
-     */
-    public Long verifyMessageByDate(final ChatMessage chatMessage) throws SQLException {
-        synchronized (mObjectLock) {
-            Long messageId = -1L;
-            String identifier;
-            if (chatMessage.getStatus().equals(ChatStatus.RECEIVED)) {
-                identifier = String.valueOf(chatMessage.getRecipientId() + ":" +
-                        chatMessage.getSenderId());
-            } else {
-                identifier = String.valueOf(chatMessage.getSenderId() + ":" +
-                        chatMessage.getRecipientId());
-            }
-            String queryMessages = String.valueOf("SELECT " +
-                    ChatSQLiteHelper.COLUMN_ID_MSG + " FROM " +
-                    ChatSQLiteHelper.TABLE_MESSAGES + " WHERE " +
-                    ChatSQLiteHelper.COLUMN_PARTICIPANTS + " = ? AND " +
-                    ChatSQLiteHelper.COLUMN_DATE + " = '" + DateUtils.convertDateToString(chatMessage.getTimestamp()) +
-                    "' AND " + ChatSQLiteHelper.COLUMN_MESSAGE + " = ? ");
-            Cursor cursor = mChatBriteDB.query(queryMessages, identifier, chatMessage.getTextBody());
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                messageId = cursor.getLong(0);
-                cursor.close();
-            }
-            return messageId;
-        }
-    }
     /**
      * Changes the status for a message
      * @param messageId
@@ -165,14 +105,6 @@ public class ChatBriteDataSource {
                 ChatSQLiteHelper.COLUMN_ID_MSG + " = ? ");
         mChatBriteDB.execute(queryUpdateMessage, status.name(), String.valueOf(messageId));
     }
-
-//    public void updateTextMessage(Long messageId, String textBody) {
-//        String queryUpdateMessage = String.valueOf("UPDATE " +
-//                ChatSQLiteHelper.TABLE_MESSAGES) + " SET " +
-//                ChatSQLiteHelper.COLUMN_MESSAGE + " = ?  WHERE " +
-//                ChatSQLiteHelper.COLUMN_ID_MSG + " = ? ";
-//        mChatBriteDB.execute(queryUpdateMessage, textBody, String.valueOf(messageId));
-//    }
 
     public Long addNewMessage(ChatMessage chatMessage) throws SQLException {
         synchronized (mObjectLock) {
@@ -194,12 +126,11 @@ public class ChatBriteDataSource {
                             ChatSQLiteHelper.COLUMN_PARTICIPANTS + ", " +
                             ChatSQLiteHelper.COLUMN_MESSAGE + ", " +
                             ChatSQLiteHelper.COLUMN_FROM + ", " +
-                            ChatSQLiteHelper.COLUMN_SENT_ID + ", " +
                             ChatSQLiteHelper.COLUMN_DATE + ", " +
                             ChatSQLiteHelper.COLUMN_STATUS
-                            + " ) VALUES ( ?, ?, ? , ? , ?, ?, ? ) ",
+                            + " ) VALUES ( ?, ?, ? , ? , ?, ? ) ",
                     totalMessages, identifier, chatMessage.getTextBody(),
-                    chatMessage.getSenderId(), chatMessage.getSentId(),
+                    chatMessage.getSenderId(),
                     DateUtils.convertDateToString(chatMessage.getTimestamp()), chatMessage.getStatus());
             return totalMessages;
         }
@@ -227,18 +158,17 @@ public class ChatBriteDataSource {
                     while (!cursor.isAfterLast()) {
                         Long id = cursor.getLong(0);
                         String fromUser = cursor.getString(3);
-                        ChatMessage chatMessage = new ChatMessage();
+                        String toUser;
+                        if (fromUser.equals(user1)) {
+                            toUser = user2;
+                        } else {
+                            toUser = user1;
+                        }
+                        ChatMessage chatMessage = new ChatMessage(toUser, cursor.getString(2));
                         chatMessage.setMessageId(id);
                         chatMessage.setSenderId(fromUser);
-                        if (fromUser.equals(user1)) {
-                            chatMessage.setRecipientIds(user2);
-                        } else {
-                            chatMessage.setRecipientIds(user1);
-                        }
-                        chatMessage.setTextBody(cursor.getString(2));
-                        chatMessage.setSentId(cursor.getString(4));
-                        chatMessage.setTimestamp(DateUtils.convertStringToDate(cursor.getString(5)));
-                        chatMessage.setStatus(ChatStatus.fromString(cursor.getString(6)));
+                        chatMessage.setTimestamp(DateUtils.convertStringToDate(cursor.getString(4)));
+                        chatMessage.setStatus(ChatStatus.fromString(cursor.getString(5)));
                         listConversations.add(chatMessage);
                         cursor.moveToNext();
                     }
@@ -250,36 +180,7 @@ public class ChatBriteDataSource {
         }
     }
 
-    public Long verifyMessageDelivered(String sentId, Date timestamp) {
-        Long messageId = -1L;
-        String queryMessages = String.valueOf("SELECT " +
-                ChatSQLiteHelper.COLUMN_ID_MSG + " FROM " +
-                ChatSQLiteHelper.TABLE_MESSAGES + " WHERE " +
-                ChatSQLiteHelper.COLUMN_SENT_ID + " = '" + sentId + "' AND " +
-                ChatSQLiteHelper.COLUMN_DATE + " = '" + DateUtils.convertDateToString(timestamp) + "'");
-        String mydate = DateUtils.convertDateToString(timestamp);
-        Cursor cursor = mChatBriteDB.query(queryMessages);
-        Log.e(TAG, "Verifying DELIVERED + " + sentId + " == " + mydate + " count == " + cursor.getCount());
-        if (cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            messageId = cursor.getLong(0);
-            cursor.close();
-        }
-        return messageId;
-    }
-
     public void closeDatabase() {
         mChatBriteDB.close();
-    }
-
-    public void updateSentIdAndStatus(Long messageId, String sentId) {
-        String queryUpdateMessage = String.valueOf("UPDATE " +
-                ChatSQLiteHelper.TABLE_MESSAGES + " SET " +
-                ChatSQLiteHelper.COLUMN_STATUS + " = ? , " +
-                ChatSQLiteHelper.COLUMN_SENT_ID + " = ? WHERE " +
-                ChatSQLiteHelper.COLUMN_ID_MSG + " = ? ");
-        mChatBriteDB.execute(queryUpdateMessage, ChatStatus.SENT.toString(),
-                                                 sentId,
-                                                 String.valueOf(messageId));
     }
 }

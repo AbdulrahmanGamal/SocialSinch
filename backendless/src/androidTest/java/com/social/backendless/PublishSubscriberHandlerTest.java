@@ -8,6 +8,7 @@ import com.backendless.Backendless;
 import com.backendless.BackendlessUser;
 import com.social.backendless.PublishSubscribeHandler;
 import com.social.backendless.data.DataManager;
+import com.social.backendless.model.ChatMessage;
 import com.social.backendless.model.ChatStatus;
 
 import org.junit.After;
@@ -45,7 +46,8 @@ public class PublishSubscriberHandlerTest {
             PublishSubscribeHandler handler = PublishSubscribeHandler.getInstance(mMockContext);
             handler.attachToChannel();
             //send message to the same user
-            handler.processOutgoingMessage("8E4B12A7-2B39-778B-FF00-9715DF18DA00", "hello", ChatStatus.SEND);
+            handler.processOutgoingMessage(new ChatMessage("8E4B12A7-2B39-778B-FF00-9715DF18DA00", "hello"),
+                                                                                                    ChatStatus.SEND);
             //wait while we receive the message back
             Thread.sleep(5000);
             long totalMessages = handler.getTotalMessages("8E4B12A7-2B39-778B-FF00-9715DF18DA00:8E4B12A7-2B39-778B-FF00-9715DF18DA00");

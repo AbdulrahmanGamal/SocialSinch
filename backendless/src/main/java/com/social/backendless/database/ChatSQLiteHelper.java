@@ -29,7 +29,6 @@ public class ChatSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_PARTICIPANTS = "participants";
     public static final String COLUMN_MESSAGE = "message";
     public static final String COLUMN_FROM = "sender";
-    public static final String COLUMN_SENT_ID = "sentId";
     public static final String COLUMN_DATE = "timestamp";
     public static final String COLUMN_STATUS = "status";
 
@@ -45,7 +44,6 @@ public class ChatSQLiteHelper extends SQLiteOpenHelper {
             + " integer primary key, " + COLUMN_PARTICIPANTS
             + " text not null, " + COLUMN_MESSAGE
             + " text not null, " + COLUMN_FROM
-            + " text not null, " + COLUMN_SENT_ID
             + " text null, " + COLUMN_DATE
             + " text not null, " + COLUMN_STATUS
             + " text not null );";

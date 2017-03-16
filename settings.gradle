@@ -1,1 +1,1 @@
-include ':app', ':sinchservice', ':backendless'
+include ':app', ':backendless'
