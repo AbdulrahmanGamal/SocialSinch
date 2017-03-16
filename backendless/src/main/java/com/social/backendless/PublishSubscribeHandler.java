@@ -24,6 +24,7 @@ import java.util.Locale;
 import rx.Emitter;
 import rx.Observable;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 /**
  * Singleton to handle the subscription to the channel and the publishing
@@ -87,20 +88,31 @@ public class PublishSubscribeHandler {
      * @param textBody
      */
     public void sendPrivateMessage(String recipientUserId, String textBody) {
-        processOutgoingMessage(recipientUserId, textBody, ChatStatus.SEND);
+        processOutgoingMessage(recipientUserId, textBody, null, ChatStatus.SEND);
     }
     /**
      * Sends an instant message to the default channel
      * @param recipientUserId
      * @param textBody
      */
-    public void processOutgoingMessage(String recipientUserId, String textBody, ChatStatus status) {
+    public void processOutgoingMessage(String recipientUserId,
+                                       String textBody,
+                                       String sentId,
+                                       ChatStatus status) {
         final ChatMessage chatMessageInfo = generateChatMessage(recipientUserId, textBody, status);
+        chatMessageInfo.setSentId(sentId);
 
         Gson gson = new Gson();
         String jsonMessage = gson.toJson(chatMessageInfo);
 
-        getPublisher(jsonMessage, recipientUserId).subscribe(new Action1<Object>() {
+        getPublisher(jsonMessage, recipientUserId).filter(new Func1<Object, Boolean>() {
+            @Override
+            public Boolean call(Object result) {
+                //skip the notification received for DELIVERED messages
+                return  result instanceof MessageStatus &&
+                        !chatMessageInfo.getStatus().equals(ChatStatus.DELIVERED);
+            }
+        }).subscribe(new Action1<Object>() {
             @Override
             public void call(Object result) {
                 if (result instanceof MessageStatus) {
@@ -118,13 +130,21 @@ public class PublishSubscribeHandler {
      * Notify the views about the event using the rx bus
      * @param message
      */
-    public void notifyViews(ChatMessage message, ChatStatus status) {
-        if (status.equals(ChatStatus.SENT) || status.equals(ChatStatus.FAILED)) {
-            mDataSource.updateMessageStatus(message.getMessageId(), status);
-        }
-        if (status.equals(ChatStatus.RECEIVED)) {
-            message.setStatus(ChatStatus.RECEIVED);
-            mDataSource.addNewMessage(message);
+    public synchronized void notifyViews(ChatMessage message, ChatStatus status) {
+        switch (status) {
+            case SENT:
+            case FAILED:
+                mDataSource.updateMessageStatus(message.getMessageId(), status);
+                break;
+            case RECEIVED:
+                message.setStatus(ChatStatus.RECEIVED);
+                Long messageId = mDataSource.addNewMessage(message);
+                message.setMessageId(messageId);
+                break;
+            case DELIVERED:
+                //change the status in DB to flag the previous SENT now to DELIVERED
+                mDataSource.updateMessageStatus(Long.valueOf(message.getSentId()), status);
+                break;
         }
         if (mMessageBus.hasObservers()) {
             message.setStatus(status);
@@ -144,9 +164,14 @@ public class PublishSubscribeHandler {
             switch (messageReceived.getStatus()) {
                 case SEND:
                     notifyViews(messageReceived, ChatStatus.RECEIVED);
-                    //processOutgoingMessage(messageReceived.getSenderId(), "", ChatStatus.RECEIVED);
+                    //use the sentId filed to notify the other user that the message id
+                    //was received correctly
+                    processOutgoingMessage(messageReceived.getSenderId(), "",
+                                           String.valueOf(messageReceived.getMessageId()),
+                                           ChatStatus.DELIVERED);
                     break;
-                case RECEIVED:
+                case DELIVERED:
+                    notifyViews(messageReceived, ChatStatus.DELIVERED);
                     break;
                 //TODO consider the other type of cases
                 default:

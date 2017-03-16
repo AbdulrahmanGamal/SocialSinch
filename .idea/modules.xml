@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SocialSinch.iml" filepath="$PROJECT_DIR$/SocialSinch.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/backendless/backendless.iml" filepath="$PROJECT_DIR$/backendless/backendless.iml" />
       <module fileurl="file://$PROJECT_DIR$/sinchservice/sinchservice.iml" filepath="$PROJECT_DIR$/sinchservice/sinchservice.iml" />
     </modules>
   </component>

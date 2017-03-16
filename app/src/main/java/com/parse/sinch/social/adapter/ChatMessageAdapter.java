@@ -83,11 +83,18 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
      * @param message
      */
     private void findMessagePosition(ChatMessage message) {
-        if (mMessages.contains(message)) {
-            int position = mMessages.indexOf(message);
-            changeStatusIcon(mMessages.get(position));
-            notifyItemChanged(position);
-        } else {
+        boolean found = false;
+        for (int i = mMessages.size() -1; i > 0; i--) {
+            if (mMessages.get(i).getMessageId().equals(Long.valueOf(message.getSentId()))) {
+                //change to the new status
+                mMessages.get(i).setStatus(message.getStatus());
+                changeStatusIcon(mMessages.get(i));
+                notifyItemChanged(i);
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
             //new message, add it
             addMessage(message);
         }

@@ -1,6 +1,8 @@
 package com.parse.sinch.social.viewmodel;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.BindingAdapter;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,9 +12,11 @@ import android.widget.Toast;
 import com.backendless.BackendlessCollection;
 import com.backendless.BackendlessUser;
 import com.backendless.exceptions.BackendlessFault;
+import com.parse.sinch.social.LoginActivity;
 import com.parse.sinch.social.adapter.UserCallsAdapter;
-import com.parse.sinch.social.data.DataManager;
 import com.parse.sinch.social.model.UserInfo;
+import com.parse.sinch.social.utils.Constants;
+import com.social.backendless.data.DataManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,19 +93,31 @@ public class ListUserCallViewModel {
                     (BackendlessCollection<BackendlessUser>) data;
             mUserCallsAdapter.setUserCalls(convertToUserInfo(users));
         } else {
-            BackendlessFault fault = (BackendlessFault) data;
+            //BackendlessFault fault = (BackendlessFault) data;
             //reset the previous list of calls
             mUserCallsAdapter = new UserCallsAdapter(mContext);
-            showError(fault.getMessage());
+            redirectToLogin();
         }
         callsRecyclerView.setAdapter(mUserCallsAdapter);
     }
 
-    private void showError(String message) {
-        Toast.makeText(mContext,
-                "Error Loading Users: " + message,
-                Toast.LENGTH_LONG).show();
+    /**
+     * After an error getting the users, redirect to login screen
+     */
+    private void redirectToLogin() {
+        Intent intent = new Intent(mContext, LoginActivity.class);
+        intent.putExtra(Constants.FAULT_REFRESH_TOKEN, true);
+        mContext.startActivity(intent);
+        if (mContext instanceof Activity) {
+            ((Activity) mContext).finish();
+        }
     }
+
+//    private void showError(String message) {
+//        Toast.makeText(mContext,
+//                "Error Loading Users: " + message,
+//                Toast.LENGTH_LONG).show();
+//    }
     private List<UserInfo> convertToUserInfo(BackendlessCollection<BackendlessUser> calls) {
         List<BackendlessUser> userList = calls.getData();
         UserInfo user;

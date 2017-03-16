@@ -16,7 +16,7 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.parse.sinch.social.R;
 import com.parse.sinch.social.TabActivity;
-import com.parse.sinch.social.data.DataManager;
+import com.social.backendless.data.DataManager;
 
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;

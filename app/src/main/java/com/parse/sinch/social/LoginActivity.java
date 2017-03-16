@@ -13,6 +13,7 @@ import android.view.ViewTreeObserver;
 
 import com.backendless.Backendless;
 import com.parse.sinch.social.databinding.ActivityLoginBinding;
+import com.parse.sinch.social.utils.Constants;
 import com.parse.sinch.social.viewmodel.LoginViewViewModel;
 
 public class LoginActivity extends AppCompatActivity
@@ -35,7 +36,8 @@ public class LoginActivity extends AppCompatActivity
                 });
 
         String userLogged = Backendless.UserService.loggedInUser();
-        if (userLogged != null && !userLogged.isEmpty()) {
+        boolean comesFromFault = getIntent().getBooleanExtra(Constants.FAULT_REFRESH_TOKEN, false);
+        if (userLogged != null && !userLogged.isEmpty() && !comesFromFault) {
             loginViewViewModel.loadMainUserList();
             finish();
         }

@@ -160,19 +160,19 @@ public class ChatBriteDataSource {
      */
     public void updateMessageStatus(Long messageId, ChatStatus status) throws SQLException {
         String queryUpdateMessage = String.valueOf("UPDATE " +
-                ChatSQLiteHelper.TABLE_MESSAGES) + " SET " +
+                ChatSQLiteHelper.TABLE_MESSAGES + " SET " +
                 ChatSQLiteHelper.COLUMN_STATUS + " = ?  WHERE " +
-                ChatSQLiteHelper.COLUMN_ID_MSG + " = ? ";
+                ChatSQLiteHelper.COLUMN_ID_MSG + " = ? ");
         mChatBriteDB.execute(queryUpdateMessage, status.name(), String.valueOf(messageId));
     }
 
-    public void updateTextMessage(Long messageId, String textBody) {
-        String queryUpdateMessage = String.valueOf("UPDATE " +
-                ChatSQLiteHelper.TABLE_MESSAGES) + " SET " +
-                ChatSQLiteHelper.COLUMN_MESSAGE + " = ?  WHERE " +
-                ChatSQLiteHelper.COLUMN_ID_MSG + " = ? ";
-        mChatBriteDB.execute(queryUpdateMessage, textBody, String.valueOf(messageId));
-    }
+//    public void updateTextMessage(Long messageId, String textBody) {
+//        String queryUpdateMessage = String.valueOf("UPDATE " +
+//                ChatSQLiteHelper.TABLE_MESSAGES) + " SET " +
+//                ChatSQLiteHelper.COLUMN_MESSAGE + " = ?  WHERE " +
+//                ChatSQLiteHelper.COLUMN_ID_MSG + " = ? ";
+//        mChatBriteDB.execute(queryUpdateMessage, textBody, String.valueOf(messageId));
+//    }
 
     public Long addNewMessage(ChatMessage chatMessage) throws SQLException {
         synchronized (mObjectLock) {
@@ -270,5 +270,16 @@ public class ChatBriteDataSource {
 
     public void closeDatabase() {
         mChatBriteDB.close();
+    }
+
+    public void updateSentIdAndStatus(Long messageId, String sentId) {
+        String queryUpdateMessage = String.valueOf("UPDATE " +
+                ChatSQLiteHelper.TABLE_MESSAGES + " SET " +
+                ChatSQLiteHelper.COLUMN_STATUS + " = ? , " +
+                ChatSQLiteHelper.COLUMN_SENT_ID + " = ? WHERE " +
+                ChatSQLiteHelper.COLUMN_ID_MSG + " = ? ");
+        mChatBriteDB.execute(queryUpdateMessage, ChatStatus.SENT.toString(),
+                                                 sentId,
+                                                 String.valueOf(messageId));
     }
 }
