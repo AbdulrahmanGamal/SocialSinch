@@ -35,9 +35,6 @@ public class UserCallsAdapter extends RecyclerView.Adapter<UserCallsAdapter.Bind
 	public void onBindViewHolder(BindingHolder holder, int position) {
         UserCallsInfoBinding userCallsBinding = holder.binding;
         userCallsBinding.setViewModel(new UserCallsItemViewModel(mContext, mUserCalls.get(position)));
-//		if(userInfo.get(position).isStatus()){
-//			userViewHolder.imgStatus.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.connected));
-//		}
 	}
 
 	@Override

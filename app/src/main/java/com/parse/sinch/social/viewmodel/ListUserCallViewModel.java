@@ -7,17 +7,18 @@ import android.databinding.BindingAdapter;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.Toast;
 
+import com.backendless.Backendless;
 import com.backendless.BackendlessCollection;
 import com.backendless.BackendlessUser;
-import com.backendless.exceptions.BackendlessFault;
 import com.parse.sinch.social.LoginActivity;
 import com.parse.sinch.social.adapter.UserCallsAdapter;
 import com.parse.sinch.social.app.SocialSinchApplication;
 import com.parse.sinch.social.model.UserInfo;
 import com.parse.sinch.social.utils.Constants;
+import com.social.backendless.bus.RxIncomingEventBus;
 import com.social.backendless.data.DataManager;
+import com.social.backendless.model.EventMessage;
 import com.social.backendless.model.EventStatus;
 
 import java.util.ArrayList;
@@ -34,13 +35,15 @@ import rx.functions.Action0;
 public class ListUserCallViewModel {
     private Context mContext;
     private UserCallsAdapter mUserCallsAdapter;
+    private List<String> mUserContactIds;
     private boolean mShowPanel;
 
     private static final String TAG = "ListUserCallViewModel";
 
     public ListUserCallViewModel(Context context) {
         this.mContext = context;
-        mUserCallsAdapter = new UserCallsAdapter(context);
+        this.mUserCallsAdapter = new UserCallsAdapter(context);
+        this.mUserContactIds = new ArrayList<>();
     }
     private UserCallsAdapter getAdapter() {
         return mUserCallsAdapter;
@@ -115,11 +118,6 @@ public class ListUserCallViewModel {
         }
     }
 
-//    private void showError(String message) {
-//        Toast.makeText(mContext,
-//                "Error Loading Users: " + message,
-//                Toast.LENGTH_LONG).show();
-//    }
     private List<UserInfo> convertToUserInfo(BackendlessCollection<BackendlessUser> calls) {
         List<BackendlessUser> userList = calls.getData();
         UserInfo user;
@@ -131,9 +129,24 @@ public class ListUserCallViewModel {
             user.setPhoneNumber((String) backendlessUser.getProperty("phone"));
             user.setProfilePicture((String) backendlessUser.getProperty("avatar"));
             lstUsers.add(user);
-            SocialSinchApplication.getEventPublisherSubscriber().
-                    publishEvent(EventStatus.ONLINE, backendlessUser.getObjectId());
+            mUserContactIds.add(user.getObjectId());
+            EventMessage eventMessage = new EventMessage(Backendless.UserService.loggedInUser(),
+                                                         user.getObjectId(),
+                                                         EventStatus.ONLINE.toString(),
+                                                         EventStatus.ONLINE);
+            RxIncomingEventBus.getInstance().sendEvent(eventMessage);
         }
         return lstUsers;
+    }
+
+    public void notifyConnectionStatus(String message) {
+        EventMessage eventMessage;
+        for (String contactId : mUserContactIds) {
+            eventMessage = new EventMessage(Backendless.UserService.loggedInUser(),
+                    contactId,
+                    message,
+                    EventStatus.OFFLINE);
+            RxIncomingEventBus.getInstance().sendEvent(eventMessage);
+        }
     }
 }

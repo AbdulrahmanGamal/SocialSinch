@@ -6,4 +6,8 @@ package com.social.backendless.utils;
 
 public interface Constants {
     String DEFAULT_CHANNEL = "default";
+    String MESSAGE_TYPE_KEY = "messageType";
+    String MESSAGE_TYPE_CHAT_KEY = "chat";
+    String MESSAGE_TYPE_EVENT_KEY = "event";
+    String RECIPIENT_KEY = "recipient";
 }

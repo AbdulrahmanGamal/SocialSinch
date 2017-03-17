@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import com.parse.sinch.social.R;
 import com.parse.sinch.social.databinding.FragmentCallsListBinding;
 import com.parse.sinch.social.viewmodel.ListUserCallViewModel;
+import com.social.backendless.utils.DateUtils;
+
+import java.util.Date;
 
 /**
  * Created by GeorgeLocal on 29/12/2014.
@@ -17,6 +20,7 @@ import com.parse.sinch.social.viewmodel.ListUserCallViewModel;
  */
 public class UserListFragment extends Fragment {
 
+    private ListUserCallViewModel mListUserCallViewModel;
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -24,7 +28,14 @@ public class UserListFragment extends Fragment {
         // properly.
         final View rootView = inflater.inflate(R.layout.fragment_calls_list, container, false);
         FragmentCallsListBinding fragmentCallsListBinding = FragmentCallsListBinding.bind(rootView);
-        fragmentCallsListBinding.setViewModel(new ListUserCallViewModel(getContext()));
+        mListUserCallViewModel = new ListUserCallViewModel(getContext());
+        fragmentCallsListBinding.setViewModel(mListUserCallViewModel);
         return rootView;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mListUserCallViewModel.notifyConnectionStatus(DateUtils.convertDateToString(new Date()));
     }
 }

@@ -45,21 +45,6 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted{
         };
     }
 
-    /**
-     * Method to wrap the information into a Chat Message
-     * @return
-     */
-//    private ChatMessage assembleChatToSend() {
-//        ChatMessage chatToSend = new ChatMessage();
-//        String currentUserId = Backendless.UserService.loggedInUser();
-//        chatToSend.setStatus(ChatStatus.WAITING);
-//        chatToSend.setTextBody(mMessage.getText().toString());
-//        chatToSend.setSenderId(currentUserId);
-//        chatToSend.setResourceId(R.drawable.message_waiting);
-//        chatToSend.setRecipientIds(mRecipientId);
-//        return chatToSend;
-//    }
-
     public void setMessage(EditText message) {
         this.mMessage = message;
     }

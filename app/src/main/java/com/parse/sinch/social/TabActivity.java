@@ -15,10 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
-import com.parse.sinch.social.app.SocialSinchApplication;
 import com.parse.sinch.social.databinding.ActivityOptionsTabBinding;
 import com.parse.sinch.social.viewmodel.TabOptionsViewModel;
-import com.social.backendless.model.EventStatus;
 
 public class TabActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {

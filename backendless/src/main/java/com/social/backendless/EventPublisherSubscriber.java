@@ -32,11 +32,11 @@ public class EventPublisherSubscriber {
      * Observable that publishes private messages to an specific recipient
      * @return
      */
-    public void publishEvent(final EventStatus event, String recipientUserId) {
+    public void publishEvent(final String event, String recipientUserId) {
         PublishOptions publishOptions = new PublishOptions();
         publishOptions.setPublisherId(Backendless.UserService.loggedInUser());
-        publishOptions.putHeader("recipient", recipientUserId);
-        publishOptions.putHeader("messageType", "Event");
+        publishOptions.putHeader(Constants.RECIPIENT_KEY, recipientUserId);
+        publishOptions.putHeader(Constants.MESSAGE_TYPE_KEY, Constants.MESSAGE_TYPE_EVENT_KEY);
 //        DeliveryOptions deliveryOptions = new DeliveryOptions();
 //        deliveryOptions.setRepeatEvery( 60 ); // the message will be delivered every 10 seconds
         Backendless.Messaging.publish(Constants.DEFAULT_CHANNEL, event, publishOptions,
@@ -60,7 +60,9 @@ public class EventPublisherSubscriber {
     public Observable<Object> subscribeToGlobalEvents() {
         final SubscriptionOptions subscriptionOptions = new SubscriptionOptions();
         subscriptionOptions.setSubscriberId(Backendless.UserService.loggedInUser());
-        subscriptionOptions.setSelector("recipient = '" + Backendless.UserService.loggedInUser() + "' AND messageType = 'Event'");
+        String selector = Constants.RECIPIENT_KEY + " = '" + Backendless.UserService.loggedInUser() +
+                          "' AND " + Constants.MESSAGE_TYPE_KEY + " = '" + Constants.MESSAGE_TYPE_EVENT_KEY + "'";
+        subscriptionOptions.setSelector(selector);
        return Observable.fromEmitter(new Action1<Emitter<Object>>() {
             @Override
             public void call(final Emitter<Object> emitter) {

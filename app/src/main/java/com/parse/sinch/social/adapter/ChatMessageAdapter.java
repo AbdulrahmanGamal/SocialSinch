@@ -10,8 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.parse.sinch.social.model.ViewMessage;
-import com.social.backendless.PublishSubscribeHandler;
+import com.social.backendless.bus.RxIncomingMessageBus;
 import com.social.backendless.bus.RxOutgoingMessageBus;
+import com.social.backendless.database.ChatBriteDataSource;
 import com.social.backendless.model.ChatMessage;
 import com.social.backendless.model.ChatStatus;
 import com.parse.sinch.social.R;
@@ -34,7 +35,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     private Context mContext;
     private List<ViewMessage> mViewMessages;
     private NewItemInserted mItemInsertedListener;
-    private PublishSubscribeHandler mPublisherSubHandler;
+    private ChatBriteDataSource mDataSource;
 
     private static final String TAG = "ChatMessageAdapter";
 
@@ -48,8 +49,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         this.mContext = context;
         this.mViewMessages = new ArrayList<>();
         this.mItemInsertedListener = itemInsertedListener;
-        this.mPublisherSubHandler = PublishSubscribeHandler.getInstance(context);
-        this.mPublisherSubHandler.attachToChannel();
+        this.mDataSource = ChatBriteDataSource.getInstance(context);
         setHasStableIds(true);
         retrieveOldMessages(senderId, recipientId);
         configureMessageBus();
@@ -136,7 +136,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
      * @param recipientId
      */
     private void retrieveOldMessages(final String senderId, String recipientId) {
-        List<ChatMessage> chatMessages = mPublisherSubHandler.retrieveLastMessages(senderId, recipientId, 100);
+        List<ChatMessage> chatMessages = mDataSource.retrieveLastMessages(senderId, recipientId, 100);
         for (ChatMessage oldChatMessage : chatMessages) {
             ViewMessage viewMessage = new ViewMessage(oldChatMessage);
             changeStatusIcon(viewMessage, oldChatMessage.getStatus());
@@ -155,7 +155,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         viewMessageToSend.setViewMessageId((long) mViewMessages.size() + 1);
         changeStatusIcon(viewMessageToSend, ChatStatus.SEND);
         addMessage(viewMessageToSend);
-        mPublisherSubHandler.sendPrivateMessage(chatMessage);
+        RxIncomingMessageBus.getInstance().sendMessage(chatMessage);
     }
 
     /**
