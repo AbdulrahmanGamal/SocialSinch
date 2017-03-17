@@ -3,8 +3,12 @@ package com.parse.sinch.social.app;
 import android.app.Application;
 
 import com.backendless.Backendless;
+import com.social.backendless.EventPublisherSubscriber;
 
 public class SocialSinchApplication extends Application {
+
+	private static EventPublisherSubscriber mEventPublisherSubscriber =
+            new EventPublisherSubscriber();
 
 	@Override
 	public void onCreate() {
@@ -14,5 +18,7 @@ public class SocialSinchApplication extends Application {
 				"91A4FF6A-01C4-C388-FFF1-9389DC345F00", "v1");
 	}
 
-	
+	public static EventPublisherSubscriber getEventPublisherSubscriber() {
+        return mEventPublisherSubscriber;
+    }
 }

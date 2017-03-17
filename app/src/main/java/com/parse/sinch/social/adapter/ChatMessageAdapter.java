@@ -69,18 +69,24 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
                 Log.e(TAG, "RECEIVED MESSAGE FROM BUS!!!: " + chatMessage);
                 ViewMessage viewMessage = new ViewMessage(chatMessage);
                 if (chatMessage.getStatus().equals(ChatStatus.RECEIVED)) {
-                    viewMessage.setViewMessageId((long) mViewMessages.size() + 1);
-                    addMessage(viewMessage);
+                    processReceivedMessage(viewMessage);
                 } else if (!mViewMessages.isEmpty()) {
                     findMessagePosition(viewMessage);
                 } else {
-                    Log.e(TAG, "chat list EMPTY, ADDING MESSAGE");
                     addMessage(viewMessage);
                 }
             }
         });
     }
 
+    /**
+     * Assign a secuential id based on the messages size and add it to the RV
+     * @param viewMessage
+     */
+    private void processReceivedMessage(ViewMessage viewMessage) {
+        viewMessage.setViewMessageId((long) mViewMessages.size() + 1);
+        addMessage(viewMessage);
+    }
     /**
      * Find the message in the current message list and modify the icon
      * @param viewMessage
@@ -138,6 +144,30 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
             addMessage(viewMessage);
         }
     }
+    /**
+     * Sends a private message
+     * @param recipientId
+     * @param textBody
+     */
+    public void sendMessage(String recipientId, String textBody) {
+        ChatMessage chatMessage = new ChatMessage(recipientId, textBody);
+        ViewMessage viewMessageToSend = new ViewMessage(chatMessage);
+        viewMessageToSend.setViewMessageId((long) mViewMessages.size() + 1);
+        changeStatusIcon(viewMessageToSend, ChatStatus.SEND);
+        addMessage(viewMessageToSend);
+        mPublisherSubHandler.sendPrivateMessage(chatMessage);
+    }
+
+    /**
+     * Add a message to the recyclerView
+     * @param viewChatMessage
+     */
+    public void addMessage(final ViewMessage viewChatMessage) {
+        mViewMessages.add(viewChatMessage);
+        notifyItemInserted(mViewMessages.size());
+        //notify the recycler view to scroll up the recycler view
+        mItemInsertedListener.onItemInserted();
+    }
     @Override
     public BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == MESSAGE_INCOMING) {
@@ -170,31 +200,6 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
                     ((OutgoingBindingHolder) holder).getOutgoingChatMessageBinding();
             binding.setViewModel(new ChatOutgoingViewModel(mViewMessages.get(position)));
         }
-    }
-
-    /**
-     * Sends a private message
-     * @param recipientId
-     * @param textBody
-     */
-    public void sendMessage(String recipientId, String textBody) {
-        ChatMessage chatMessage = new ChatMessage(recipientId, textBody);
-        ViewMessage viewMessageToSend = new ViewMessage(chatMessage);
-        viewMessageToSend.setViewMessageId((long) mViewMessages.size() + 1);
-        changeStatusIcon(viewMessageToSend, ChatStatus.SEND);
-        addMessage(viewMessageToSend);
-        mPublisherSubHandler.sendPrivateMessage(chatMessage);
-    }
-
-    /**
-     * Add a message to the recyclerView
-     * @param viewChatMessage
-     */
-    public void addMessage(final ViewMessage viewChatMessage) {
-        mViewMessages.add(viewChatMessage);
-        notifyItemInserted(mViewMessages.size());
-        //notify the recycler view to scroll up the recycler view
-        mItemInsertedListener.onItemInserted();
     }
 
     @Override

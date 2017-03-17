@@ -14,9 +14,11 @@ import com.backendless.BackendlessUser;
 import com.backendless.exceptions.BackendlessFault;
 import com.parse.sinch.social.LoginActivity;
 import com.parse.sinch.social.adapter.UserCallsAdapter;
+import com.parse.sinch.social.app.SocialSinchApplication;
 import com.parse.sinch.social.model.UserInfo;
 import com.parse.sinch.social.utils.Constants;
 import com.social.backendless.data.DataManager;
+import com.social.backendless.model.EventStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -129,6 +131,8 @@ public class ListUserCallViewModel {
             user.setPhoneNumber((String) backendlessUser.getProperty("phone"));
             user.setProfilePicture((String) backendlessUser.getProperty("avatar"));
             lstUsers.add(user);
+            SocialSinchApplication.getEventPublisherSubscriber().
+                    publishEvent(EventStatus.ONLINE, backendlessUser.getObjectId());
         }
         return lstUsers;
     }

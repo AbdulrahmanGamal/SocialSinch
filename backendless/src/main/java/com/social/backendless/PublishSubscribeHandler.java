@@ -16,6 +16,7 @@ import com.social.backendless.database.ChatBriteDataSource;
 import com.social.backendless.model.ChatMessage;
 import com.social.backendless.model.ChatStatus;
 import com.google.gson.Gson;
+import com.social.backendless.utils.Constants;
 
 import java.util.Calendar;
 import java.util.List;
@@ -32,7 +33,6 @@ import rx.functions.Func1;
 public class PublishSubscribeHandler {
 
     private static final String TAG = "PublishSubscribeHandler";
-    private static final String DEFAULT_CHANNEL = "default";
     private Subscription mSubscription;
     private static PublishSubscribeHandler sPublishSubscriberHandler;
     private ChatBriteDataSource mDataSource;
@@ -55,8 +55,8 @@ public class PublishSubscribeHandler {
     public void attachToChannel() {
         SubscriptionOptions subscriptionOptions = new SubscriptionOptions();
         subscriptionOptions.setSubscriberId(Backendless.UserService.loggedInUser());
-        subscriptionOptions.setSelector( "recipient='" + Backendless.UserService.loggedInUser() + "'");
-        Backendless.Messaging.subscribe(DEFAULT_CHANNEL,
+        subscriptionOptions.setSelector( "recipient = '" + Backendless.UserService.loggedInUser() + "' AND messageType = 'Chat'");
+        Backendless.Messaging.subscribe(Constants.DEFAULT_CHANNEL,
                 new AsyncCallback<List<Message>>() {
                     @Override
                     public void handleResponse( List<Message> response ) {
@@ -196,7 +196,7 @@ public class PublishSubscribeHandler {
 
 
     /**
-     * Observable that publishes the messages
+     * Observable that publishes private messages to an specific recipient
      * @return
      */
     private Observable<Object> getPublisher(final String jsonMessage, final String recipientUserId) {
@@ -206,7 +206,8 @@ public class PublishSubscribeHandler {
                 PublishOptions publishOptions = new PublishOptions();
                 publishOptions.setPublisherId(Backendless.UserService.loggedInUser());
                 publishOptions.putHeader("recipient", recipientUserId);
-                Backendless.Messaging.publish(DEFAULT_CHANNEL, jsonMessage, publishOptions, new AsyncCallback<MessageStatus>() {
+                publishOptions.putHeader("messageType", "Chat");
+                Backendless.Messaging.publish(Constants.DEFAULT_CHANNEL, jsonMessage, publishOptions, new AsyncCallback<MessageStatus>() {
                     @Override
                     public void handleResponse(MessageStatus messageStatus) {
                         emitter.onNext(messageStatus);

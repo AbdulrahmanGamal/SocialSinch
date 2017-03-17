@@ -33,8 +33,8 @@ public class TabOptionsViewModel {
         // ViewPager and its adapters use support library
         // fragments, so use getSupportFragmentManager.
         mUserChatCollectionPagerAdapter.addFragment(new UserListFragment(), "CALLS");
-        mUserChatCollectionPagerAdapter.addFragment(new UserListFragment(), "CHATS");
-        mUserChatCollectionPagerAdapter.addFragment(new UserListFragment(), "CONTACTS");
+        //mUserChatCollectionPagerAdapter.addFragment(new UserListFragment(), "CHATS");
+        //mUserChatCollectionPagerAdapter.addFragment(new UserListFragment(), "CONTACTS");
         mViewPager.setAdapter(mUserChatCollectionPagerAdapter);
         mTabLayout.setupWithViewPager(mViewPager);
     }

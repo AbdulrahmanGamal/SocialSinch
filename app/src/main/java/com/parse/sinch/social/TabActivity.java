@@ -14,8 +14,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+
+import com.parse.sinch.social.app.SocialSinchApplication;
 import com.parse.sinch.social.databinding.ActivityOptionsTabBinding;
 import com.parse.sinch.social.viewmodel.TabOptionsViewModel;
+import com.social.backendless.model.EventStatus;
 
 public class TabActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
@@ -35,7 +38,6 @@ public class TabActivity extends AppCompatActivity {
                         tabOptionsViewModel.setupWithViewPager();
                     }
                 });
-
         // Create a tab listener that is called when the user changes tabs.
 //        ActionBar.TabListener tabListener = new ActionBar.TabListener() {
 //            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
@@ -85,6 +87,18 @@ public class TabActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        //TODO save timestamp to backendles to keep track last time seen
     }
 
     public void mostrarDialogo(int resId){

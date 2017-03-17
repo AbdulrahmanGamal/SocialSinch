@@ -5,6 +5,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -13,16 +14,17 @@ import android.widget.TextView;
 
 import com.backendless.Backendless;
 import com.bumptech.glide.Glide;
+import com.parse.sinch.social.app.SocialSinchApplication;
 import com.parse.sinch.social.databinding.ActivityChatMainBinding;
 import com.parse.sinch.social.model.UserInfo;
 import com.parse.sinch.social.utils.Constants;
 import com.parse.sinch.social.viewmodel.MessageViewModel;
 
-import java.util.ArrayList;
-import java.util.List;
+import rx.functions.Action1;
 
 public class MessagesActivity extends AppCompatActivity {
     private  MessageViewModel messageViewModel;
+	private static final String TAG = "MessagesActivity";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,12 @@ public class MessagesActivity extends AppCompatActivity {
         ((TextView)activityChatMainBinding.toolbarChats.findViewById(R.id.action_bar_title_2)).
                 setText("an hour ago");
 
+		SocialSinchApplication.getEventPublisherSubscriber().subscribeToGlobalEvents().subscribe(new Action1<Object>() {
+			@Override
+			public void call(Object event) {
+				Log.e(TAG, "Received this EVENT: " + event);
+			}
+		});
         setSupportActionBar(activityChatMainBinding.toolbarChats);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
