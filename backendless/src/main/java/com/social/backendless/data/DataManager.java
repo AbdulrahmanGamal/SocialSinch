@@ -50,11 +50,11 @@ public class DataManager {
      * Observable to obtain all the users registered in the backend
      * @return
      */
-    public static Observable<Object> getFetchAllUsersObservable() {
+    public static Observable<Object> getFetchAllUsersObservable(final String subscriberId) {
         return Observable.create(new Observable.OnSubscribe<Object>() {
             @Override
             public void call(final Subscriber<? super Object> subscriber) {
-                String whereClause = "objectId != '" + Backendless.UserService.loggedInUser() + "'";
+                String whereClause = "objectId != '" + subscriberId + "'";
                 BackendlessDataQuery dataQuery = new BackendlessDataQuery();
                 dataQuery.setWhereClause( whereClause );
                 Backendless.Data.of(BackendlessUser.class).find(dataQuery, new AsyncCallback<BackendlessCollection<BackendlessUser>>() {

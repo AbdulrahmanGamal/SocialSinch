@@ -16,6 +16,7 @@ import com.parse.sinch.social.adapter.UserCallsAdapter;
 import com.parse.sinch.social.app.SocialSinchApplication;
 import com.parse.sinch.social.model.UserInfo;
 import com.parse.sinch.social.utils.Constants;
+import com.parse.sinch.social.utils.LoggedUser;
 import com.social.backendless.bus.RxIncomingEventBus;
 import com.social.backendless.data.DataManager;
 import com.social.backendless.model.EventMessage;
@@ -69,7 +70,8 @@ public class ListUserCallViewModel {
         recyclerView.setLayoutManager(viewModel.createLayoutManager());
     }
     private void getUserCalls(final RecyclerView callsRecyclerView) {
-        DataManager.getFetchAllUsersObservable().doOnSubscribe(new Action0() {
+        DataManager.getFetchAllUsersObservable(LoggedUser.getInstance().getUserLogged())
+                .doOnSubscribe(new Action0() {
             @Override
             public void call() {
                   setShowPanel(true);
@@ -135,7 +137,7 @@ public class ListUserCallViewModel {
             user.setLastSeen(DateUtils.convertDateToLastSeenFormat(lastTimeSeen.getTime()));
             lstUsers.add(user);
             mUserContactIds.add(user.getObjectId());
-            EventMessage eventMessage = new EventMessage(Backendless.UserService.loggedInUser(),
+            EventMessage eventMessage = new EventMessage(LoggedUser.getInstance().getUserLogged(),
                                                          user.getObjectId(),
                                                          EventStatus.ONLINE.toString(),
                                                          EventStatus.ONLINE);
@@ -147,7 +149,7 @@ public class ListUserCallViewModel {
     public void notifyConnectionStatus(String message) {
         EventMessage eventMessage;
         for (String contactId : mUserContactIds) {
-            eventMessage = new EventMessage(Backendless.UserService.loggedInUser(),
+            eventMessage = new EventMessage(LoggedUser.getInstance().getUserLogged(),
                     contactId,
                     message,
                     EventStatus.OFFLINE);

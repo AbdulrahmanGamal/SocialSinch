@@ -25,10 +25,10 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted{
     private RecyclerView mChatRecyclerView;
     private String mRecipientId;
 
-    public MessageViewModel(Context context, String senderId, String recipientInfo) {
+    public MessageViewModel(Context context, String recipientInfo) {
         this.mContext = context;
         this.mRecipientId = recipientInfo;
-        this.mChatMessageAdapter = new ChatMessageAdapter(context, senderId, recipientInfo, this);
+        this.mChatMessageAdapter = new ChatMessageAdapter(context, recipientInfo, this);
     }
 
     public View.OnClickListener onClickSend() {

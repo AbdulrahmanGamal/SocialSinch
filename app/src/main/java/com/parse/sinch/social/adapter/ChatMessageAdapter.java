@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.parse.sinch.social.model.ViewMessage;
+import com.parse.sinch.social.utils.LoggedUser;
 import com.social.backendless.bus.RxIncomingMessageBus;
 import com.social.backendless.bus.RxOutgoingMessageBus;
 import com.social.backendless.database.ChatBriteDataSource;
@@ -43,7 +44,6 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     private static final int MESSAGE_INCOMING = 2;
 
     public ChatMessageAdapter(Context context,
-                              String senderId,
                               String recipientId,
                               NewItemInserted itemInsertedListener) {
         this.mContext = context;
@@ -51,7 +51,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         this.mItemInsertedListener = itemInsertedListener;
         this.mDataSource = ChatBriteDataSource.getInstance(context);
         setHasStableIds(true);
-        retrieveOldMessages(senderId, recipientId);
+        retrieveOldMessages(recipientId);
         configureMessageBus();
 
     }
@@ -70,10 +70,8 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
                 ViewMessage viewMessage = new ViewMessage(chatMessage);
                 if (chatMessage.getStatus().equals(ChatStatus.RECEIVED)) {
                     processReceivedMessage(viewMessage);
-                } else if (!mViewMessages.isEmpty()) {
-                    findMessagePosition(viewMessage);
                 } else {
-                    addMessage(viewMessage);
+                    findMessagePosition(viewMessage);
                 }
             }
         });
@@ -93,7 +91,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
      */
     private void findMessagePosition(ViewMessage viewMessage) {
         boolean found = false;
-        for (int i = mViewMessages.size() -1; i > 0; i--) {
+        for (int i = mViewMessages.size() -1; i >= 0; i--) {
             if (mViewMessages.get(i).getChatMessage().getMessageId().equals(
                                                                         viewMessage.getChatMessage().getMessageId())) {
                 changeStatusIcon(mViewMessages.get(i), viewMessage.getChatMessage().getStatus());
@@ -104,6 +102,9 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         }
         if (!found) {
             //new message, add it
+            if (viewMessage.getViewMessageId() == null) {
+                viewMessage.setViewMessageId((long)mViewMessages.size() + 1);
+            }
             addMessage(viewMessage);
         }
     }
@@ -132,11 +133,12 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     }
     /**
      * Once the adapter is instantiate, it has to retrieve the old messages saved in DB
-     * @param senderId
      * @param recipientId
      */
-    private void retrieveOldMessages(final String senderId, String recipientId) {
-        List<ChatMessage> chatMessages = mDataSource.retrieveLastMessages(senderId, recipientId, 100);
+    private void retrieveOldMessages(String recipientId) {
+        List<ChatMessage> chatMessages =
+                mDataSource.retrieveLastMessages(LoggedUser.getInstance().getUserLogged(),
+                                                                                recipientId, 100);
         for (ChatMessage oldChatMessage : chatMessages) {
             ViewMessage viewMessage = new ViewMessage(oldChatMessage);
             changeStatusIcon(viewMessage, oldChatMessage.getStatus());
@@ -151,9 +153,10 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
      */
     public void sendMessage(String recipientId, String textBody) {
         ChatMessage chatMessage = new ChatMessage(recipientId, textBody);
+        chatMessage.setStatus(ChatStatus.WAITING);
         ViewMessage viewMessageToSend = new ViewMessage(chatMessage);
         viewMessageToSend.setViewMessageId((long) mViewMessages.size() + 1);
-        changeStatusIcon(viewMessageToSend, ChatStatus.SEND);
+        changeStatusIcon(viewMessageToSend, chatMessage.getStatus());
         addMessage(viewMessageToSend);
         RxIncomingMessageBus.getInstance().sendMessage(chatMessage);
     }

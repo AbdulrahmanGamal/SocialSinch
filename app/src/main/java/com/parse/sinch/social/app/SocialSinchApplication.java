@@ -5,6 +5,7 @@ import android.app.Application;
 import com.backendless.Backendless;
 
 public class SocialSinchApplication extends Application {
+
 	@Override
 	public void onCreate() {
 		super.onCreate();

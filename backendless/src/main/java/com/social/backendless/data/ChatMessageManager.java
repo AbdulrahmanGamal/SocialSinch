@@ -27,12 +27,14 @@ import rx.functions.Func1;
  */
 
 public class ChatMessageManager {
+    private String mUserLogged;
     private ChatBriteDataSource mDataSource;
 
     private static final String TAG = "ChatMessageManager";
 
-    public ChatMessageManager(Context context) {
+    public ChatMessageManager(Context context, String userLogged) {
         this.mDataSource = ChatBriteDataSource.getInstance(context);
+        this.mUserLogged = userLogged;
         configureIncomingMessageBus();
     }
 
@@ -142,7 +144,7 @@ public class ChatMessageManager {
      * @return
      */
     private ChatMessage completeChatMessage(ChatMessage message,  ChatStatus status) {
-        message.setSenderId(Backendless.UserService.loggedInUser());
+        message.setSenderId(mUserLogged);
         message.setTimestamp(Calendar.getInstance(Locale.getDefault()).getTime());
         message.setStatus(status);
 

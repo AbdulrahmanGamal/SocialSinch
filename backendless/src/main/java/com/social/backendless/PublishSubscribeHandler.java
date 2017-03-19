@@ -25,25 +25,27 @@ public class PublishSubscribeHandler {
     private static PublishSubscribeHandler sPublishSubscriberHandler;
     private ChatMessageManager mChatMessageManager;
     private EventMessageManager mEventMessageManager;
+    private String mUserLogged;
 
-    public static PublishSubscribeHandler getInstance(Context context) {
+    public static PublishSubscribeHandler getInstance(Context context, String userLogged) {
         if (sPublishSubscriberHandler == null) {
-           sPublishSubscriberHandler = new PublishSubscribeHandler(context);
+           sPublishSubscriberHandler = new PublishSubscribeHandler(context, userLogged);
         }
         return sPublishSubscriberHandler;
     }
 
-    private PublishSubscribeHandler(Context context) {
-        this.mChatMessageManager = new ChatMessageManager(context);
+    private PublishSubscribeHandler(Context context, String userLogged) {
+        this.mChatMessageManager = new ChatMessageManager(context, userLogged);
         this.mEventMessageManager = new EventMessageManager();
+        this.mUserLogged = userLogged;
     }
 
     /**
      * Subscribes ti the default channel
      */
-    public void subscribe(String subscriberId) {
+    public void subscribe() {
         SubscriptionOptions subscriptionOptions = new SubscriptionOptions();
-        subscriptionOptions.setSelector(Constants.RECIPIENT_KEY + " = '" + subscriberId + "'");
+        subscriptionOptions.setSelector(Constants.RECIPIENT_KEY + " = '" + mUserLogged + "'");
         Backendless.Messaging.subscribe(Constants.DEFAULT_CHANNEL,
                 new AsyncCallback<List<Message>>() {
                     @Override

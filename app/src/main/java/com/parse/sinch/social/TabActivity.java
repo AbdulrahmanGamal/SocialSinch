@@ -14,13 +14,18 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-
 import com.parse.sinch.social.databinding.ActivityOptionsTabBinding;
+import com.parse.sinch.social.utils.LoggedUser;
 import com.parse.sinch.social.viewmodel.TabOptionsViewModel;
+import com.social.backendless.PublishSubscribeHandler;
 
 public class TabActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //subscribe to events sent from this user
+        PublishSubscribeHandler.
+                getInstance(this, LoggedUser.getInstance().getUserLogged()).subscribe();
+
         final TabOptionsViewModel tabOptionsViewModel = new TabOptionsViewModel(this,
                                                                     getSupportFragmentManager());
         ActivityOptionsTabBinding activityOptionsTabBinding =

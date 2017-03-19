@@ -1,5 +1,6 @@
 package com.parse.sinch.social.viewmodel;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.BindingAdapter;
@@ -17,6 +18,7 @@ import com.jakewharton.rxbinding.widget.RxTextView;
 import com.parse.sinch.social.R;
 import com.parse.sinch.social.TabActivity;
 import com.parse.sinch.social.app.SocialSinchApplication;
+import com.parse.sinch.social.utils.LoggedUser;
 import com.social.backendless.data.DataManager;
 import com.social.backendless.model.EventStatus;
 
@@ -82,7 +84,8 @@ public class LoginViewViewModel {
         };
     }
 
-    public void loadMainUserList() {
+    public void loadMainUserList(String userLogged) {
+        LoggedUser.getInstance().setUserLogged(userLogged);
         mContext.startActivity(new Intent(mContext, TabActivity.class));
     }
 
@@ -202,7 +205,8 @@ public class LoginViewViewModel {
                         enableSignIn();
                         if (o instanceof BackendlessUser) {
                             Log.e(TAG, "Backendless user successfully retrieved: " + o);
-                            loadMainUserList();
+                            loadMainUserList(((BackendlessUser)o).getObjectId());
+                            ((Activity)mContext).finish();
                         } else {
                             Log.e(TAG, "Error retrieving the user: " + o);
                         }

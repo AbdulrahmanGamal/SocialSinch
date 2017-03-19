@@ -49,7 +49,7 @@ public class MessagesActivity extends AppCompatActivity {
         recipientInfo.setProfilePicture(intent.getStringExtra(Constants.RECIPIENT_AVATAR));
         recipientInfo.setLastSeen(intent.getStringExtra(Constants.RECIPIENT_LAST_TIME_SEEN));
 
-        MessageViewModel messageViewModel = new MessageViewModel(this, Backendless.UserService.loggedInUser(),
+        MessageViewModel messageViewModel = new MessageViewModel(this,
                 recipientInfo.getObjectId());
         activityChatMainBinding.setViewModel(messageViewModel);
 

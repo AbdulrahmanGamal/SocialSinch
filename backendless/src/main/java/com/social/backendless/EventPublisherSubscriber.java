@@ -32,9 +32,9 @@ public class EventPublisherSubscriber {
      * Observable that publishes private messages to an specific recipient
      * @return
      */
-    public void publishEvent(final String event, String recipientUserId) {
+    public void publishEvent(final String event, String subscriberId,  String recipientUserId) {
         PublishOptions publishOptions = new PublishOptions();
-        publishOptions.setPublisherId(Backendless.UserService.loggedInUser());
+        publishOptions.setPublisherId(subscriberId);
         publishOptions.putHeader(Constants.RECIPIENT_KEY, recipientUserId);
         publishOptions.putHeader(Constants.MESSAGE_TYPE_KEY, Constants.MESSAGE_TYPE_EVENT_KEY);
 //        DeliveryOptions deliveryOptions = new DeliveryOptions();
@@ -57,10 +57,10 @@ public class EventPublisherSubscriber {
     /**
      * Creates an emitter observable to listen event messages from the contacts
      */
-    public Observable<Object> subscribeToGlobalEvents() {
+    public Observable<Object> subscribeToGlobalEvents(String subscriberId) {
         final SubscriptionOptions subscriptionOptions = new SubscriptionOptions();
-        subscriptionOptions.setSubscriberId(Backendless.UserService.loggedInUser());
-        String selector = Constants.RECIPIENT_KEY + " = '" + Backendless.UserService.loggedInUser() +
+        subscriptionOptions.setSubscriberId(subscriberId);
+        String selector = Constants.RECIPIENT_KEY + " = '" + subscriberId +
                           "' AND " + Constants.MESSAGE_TYPE_KEY + " = '" + Constants.MESSAGE_TYPE_EVENT_KEY + "'";
         subscriptionOptions.setSelector(selector);
        return Observable.fromEmitter(new Action1<Emitter<Object>>() {

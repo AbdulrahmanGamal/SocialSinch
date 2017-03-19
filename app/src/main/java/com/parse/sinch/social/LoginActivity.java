@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 
 import com.backendless.Backendless;
+import com.parse.sinch.social.app.SocialSinchApplication;
 import com.parse.sinch.social.databinding.ActivityLoginBinding;
 import com.parse.sinch.social.utils.Constants;
 import com.parse.sinch.social.viewmodel.LoginViewViewModel;
@@ -39,9 +40,7 @@ public class LoginActivity extends AppCompatActivity
         String userLogged = Backendless.UserService.loggedInUser();
         boolean comesFromFault = getIntent().getBooleanExtra(Constants.FAULT_REFRESH_TOKEN, false);
         if (userLogged != null && !userLogged.isEmpty() && !comesFromFault) {
-            //subscribe to events sent from this user
-            PublishSubscribeHandler.getInstance(this).subscribe(userLogged);
-            loginViewViewModel.loadMainUserList();
+            loginViewViewModel.loadMainUserList(userLogged);
             finish();
         }
 //		RxView.clicks(mSignUp)

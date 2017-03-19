@@ -1,4 +1,4 @@
-package com.example.jorgevalbuena.backendless;
+package com.social.backendless;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -44,8 +44,7 @@ public class PublishSubscriberHandlerTest {
     public void publishMessage() throws InterruptedException {
         Object result = DataManager.getLoginObservable("condorito@gmail.com", "123456789", true).toBlocking().first();
         if (result instanceof BackendlessUser) {
-            PublishSubscribeHandler handler = PublishSubscribeHandler.getInstance(mMockContext);
-            PublishSubscribeHandler.getInstance(mMockContext).subscribe("8E4B12A7-2B39-778B-FF00-9715DF18DA00");
+            PublishSubscribeHandler.getInstance(mMockContext,"8E4B12A7-2B39-778B-FF00-9715DF18DA00").subscribe();
             //send message to the same user
             RxIncomingMessageBus.getInstance().sendMessage(new ChatMessage("8E4B12A7-2B39-778B-FF00-9715DF18DA00", "hello"));
             //wait while we receive the message back
