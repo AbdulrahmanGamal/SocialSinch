@@ -54,5 +54,9 @@
     <string name="invalid_email">Email Invalid</string>
     <string name="invalid_password">Password must be at least 6 Characters</string>
     <string name="type_your_message">Type a message</string>
+    <string name="last_time_seen">last time seen</string>
+    <string name="today">today</string>
+    <string name="yesterday">yesterday</string>
+    <string name="at">at</string>
 
 </resources>

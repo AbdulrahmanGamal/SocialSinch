@@ -34,6 +34,8 @@ dependencies {
     compile 'com.squareup.sqlbrite:sqlbrite:1.1.1'
     compile 'com.backendless:backendless:3.0.25'
     compile 'com.google.code.gson:gson:2.4'
+    testCompile 'org.robolectric:robolectric:3.0'
+    testCompile 'org.robolectric:shadows-multidex:3.0'
     androidTestCompile 'com.android.support:support-annotations:25.0.1'
     testCompile 'junit:junit:4.12'
 }

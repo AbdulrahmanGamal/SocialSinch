@@ -36,6 +36,7 @@ public class UserListFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mListUserCallViewModel.notifyConnectionStatus(DateUtils.convertDateToString(new Date()));
+        mListUserCallViewModel.
+                notifyConnectionStatus(DateUtils.convertDateToLastSeenFormat(new Date().getTime()));
     }
 }

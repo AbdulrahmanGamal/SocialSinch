@@ -4,67 +4,76 @@ import java.io.Serializable;
 
 public class UserInfo implements Serializable{
 
-    private String objectId;
-	private String username;
-	private String name;
-	private String fullName;
-	private boolean status;
-	private String phoneNumber;
-    private String profilePicture;
+    private String mObjectId;
+	private String mUsername;
+	private String mName;
+	private String mFullName;
+	private boolean mStatus;
+	private String mPhoneNumber;
+    private String mProfilePicture;
+	private String mLastSeen;
 	
 	public String getPhoneNumber() {
-		return phoneNumber;
+		return mPhoneNumber;
 	}
 
 	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
+		this.mPhoneNumber = phoneNumber;
 	}
 
 	public boolean isStatus() {
-		return status;
+		return mStatus;
 	}
 
 	public void setStatus(boolean status) {
-		this.status = status;
+		this.mStatus = status;
 	}
 
 	public String getName() {
-		return name;
+		return mName;
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.mName = name;
 	}
 
 	public String getUsername() {
-		return username;
+		return mUsername;
 	}
 
 	public void setUsername(String username) {
-		this.username = username;
+		this.mUsername = username;
 	}
 
     public String getFullName() {
-        return fullName;
+        return mFullName;
     }
 
     public void setFullName(String fullName) {
-        this.fullName = fullName;
+        this.mFullName = fullName;
     }
 
     public String getObjectId() {
-        return objectId;
+        return mObjectId;
     }
 
     public void setObjectId(String objectId) {
-        this.objectId = objectId;
+        this.mObjectId = objectId;
     }
 
     public String getProfilePicture() {
-        return profilePicture;
+        return mProfilePicture;
     }
 
     public void setProfilePicture(String profilePicture) {
-        this.profilePicture = profilePicture;
+        this.mProfilePicture = profilePicture;
     }
+
+	public String getLastSeen() {
+		return mLastSeen;
+	}
+
+	public void setLastSeen(String lastSeen) {
+		this.mLastSeen = lastSeen;
+	}
 }

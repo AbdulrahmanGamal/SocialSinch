@@ -55,6 +55,7 @@ public class UserCallsItemViewModel extends BaseObservable {
                 intent.putExtra(Constants.RECIPIENT_ID, mUserInfo.getObjectId());
                 intent.putExtra(Constants.RECIPIENT_AVATAR, mUserInfo.getProfilePicture());
                 intent.putExtra(Constants.RECIPIENT_NAME, mUserInfo.getFullName());
+                intent.putExtra(Constants.RECIPIENT_LAST_TIME_SEEN, mUserInfo.getLastSeen());
                 mContext.startActivity(intent);
             }
         };

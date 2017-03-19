@@ -20,8 +20,10 @@ import com.social.backendless.bus.RxIncomingEventBus;
 import com.social.backendless.data.DataManager;
 import com.social.backendless.model.EventMessage;
 import com.social.backendless.model.EventStatus;
+import com.social.backendless.utils.DateUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import rx.Subscriber;
@@ -81,7 +83,8 @@ public class ListUserCallViewModel {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e(TAG, "Error trying to get the List of Calls");
+                        Log.e(TAG, "Error trying to get the List of Calls: " + e.getMessage());
+                        redirectToLogin();
                     }
 
                     @Override
@@ -128,6 +131,8 @@ public class ListUserCallViewModel {
             user.setFullName((String) backendlessUser.getProperty("full_name"));
             user.setPhoneNumber((String) backendlessUser.getProperty("phone"));
             user.setProfilePicture((String) backendlessUser.getProperty("avatar"));
+            Date lastTimeSeen = (Date) backendlessUser.getProperty("lastLogin");
+            user.setLastSeen(DateUtils.convertDateToLastSeenFormat(lastTimeSeen.getTime()));
             lstUsers.add(user);
             mUserContactIds.add(user.getObjectId());
             EventMessage eventMessage = new EventMessage(Backendless.UserService.loggedInUser(),
