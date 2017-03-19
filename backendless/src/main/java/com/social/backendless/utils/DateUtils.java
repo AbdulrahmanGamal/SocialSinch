@@ -48,9 +48,9 @@ public class DateUtils {
         final String timeFormatString = "h:mm aa";
         final String dateTimeFormatString = "MMM dd, yyyy";
         if (now.get(Calendar.DATE) == recipientTime.get(Calendar.DATE) ) {
-            return "today at " + DateFormat.format(timeFormatString, recipientTime);
+            return " today at " + DateFormat.format(timeFormatString, recipientTime);
         } else if (now.get(Calendar.DATE) - recipientTime.get(Calendar.DATE) == 1  ){
-            return "yesterday at " + DateFormat.format(timeFormatString, recipientTime);
+            return " yesterday at " + DateFormat.format(timeFormatString, recipientTime);
         } else {
             return DateFormat.format(dateTimeFormatString, recipientTime).toString();
         }

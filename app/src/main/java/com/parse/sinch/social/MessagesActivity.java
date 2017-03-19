@@ -102,15 +102,14 @@ public class MessagesActivity extends AppCompatActivity {
         StringBuilder outputFormat = new StringBuilder();
         if (lastTimeSeen.contains("today")) {
             lastTimeSeen = lastTimeSeen.replace("today at", "");
-            outputFormat.append(getResources().getString(R.string.today));
+            outputFormat.append(getResources().getString(R.string.today)).append(" ").
+                    append(getResources().getString(R.string.at));
         } else if (lastTimeSeen.contains("yesterday")) {
             lastTimeSeen = lastTimeSeen.replace("yesterday at", "");
-            getResources().getString(R.string.yesterday);
+            outputFormat.append(getResources().getString(R.string.yesterday)).append(" ").
+                    append(getResources().getString(R.string.at));
         }
-        outputFormat.append(" ");
-        outputFormat.append(getResources().getString(R.string.at)).
-                append(lastTimeSeen);
-
+        outputFormat.append(lastTimeSeen);
         textView.animateText(lastTimeSeenText, lastTimeSeenText + outputFormat.toString());
     }
 
