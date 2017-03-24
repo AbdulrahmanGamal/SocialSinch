@@ -83,32 +83,7 @@ public class ChatMessageManager {
             }
         });
     }
-    /**
-     * Notify the views about the event using the rx bus
-     * @param message
-     */
-    public synchronized void notifyViews(ChatMessage message, ChatStatus status) {
-        switch (status) {
-            case SENT:
-            case FAILED:
-                mDataSource.updateMessageStatus(message.getMessageId(), status);
-                break;
-            case RECEIVED:
-                message.setStatus(ChatStatus.RECEIVED);
-                Long messageId = mDataSource.addNewMessage(message);
-                message.setMessageId(messageId);
-                break;
-            case DELIVERED:
-                //change the status in DB to flag the previous SENT now to DELIVERED
-                mDataSource.updateMessageStatus(message.getMessageId(), status);
-                break;
-        }
-        RxOutgoingMessageBus messageBus = RxOutgoingMessageBus.getInstance();
-        if (messageBus.hasObservers()) {
-            message.setStatus(status);
-            messageBus.setMessage(message);
-        }
-    }
+
     /**
      * Process the receive message and execute the according action depending of the status
      * @param message
@@ -134,6 +109,32 @@ public class ChatMessageManager {
                     break;
 
             }
+        }
+    }
+    /**
+     * Notify the views about the event using the rx bus
+     * @param message
+     */
+    public synchronized void notifyViews(ChatMessage message, ChatStatus status) {
+        switch (status) {
+            case SENT:
+            case FAILED:
+                mDataSource.updateMessageStatus(message.getMessageId(), status);
+                break;
+            case RECEIVED:
+                message.setStatus(ChatStatus.RECEIVED);
+                Long messageId = mDataSource.addNewMessage(message);
+                message.setMessageId(messageId);
+                break;
+            case DELIVERED:
+                //change the status in DB to flag the previous SENT now to DELIVERED
+                mDataSource.updateMessageStatus(message.getMessageId(), status);
+                break;
+        }
+        RxOutgoingMessageBus messageBus = RxOutgoingMessageBus.getInstance();
+        if (messageBus.hasObservers()) {
+            message.setStatus(status);
+            messageBus.setMessage(message);
         }
     }
     /**

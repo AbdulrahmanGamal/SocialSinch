@@ -9,34 +9,48 @@
                     android:layout_height="wrap_content"
                     android:onClick="@{viewModel.onClickUserCall()}">
 
-        <TextView
-            android:id="@+id/txtNombre"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/name_panel"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:layout_marginTop="5dp"
             android:layout_alignTop="@+id/imgPanel"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@+id/imgPanel"
-            android:textSize="14sp"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@{viewModel.fullName}"/>
+            android:layout_toEndOf="@+id/imgPanel">
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="0dp"
+                android:textSize="15sp"
+                android:maxLines="1"
+                android:ellipsize="marquee"
+                android:textColor="@color/darker_grey"
+                android:textStyle="bold"
+                android:text="@{viewModel.fullName}"/>
 
-        <!--<TextView-->
-            <!--android:id="@+id/txtLastname"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_below="@+id/txtNombre"-->
-            <!--android:layout_marginStart="10dp"-->
-            <!--android:layout_toEndOf="@+id/imgPanel"-->
-            <!--android:textSize="14sp"-->
-            <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
-
+            <TextView
+                android:id="@+id/lastMessageDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="13sp"
+                android:layout_marginStart="0dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="end"
+                android:textColor="@color/soft_grey"
+                android:text="2/18/17"/>
+        </LinearLayout>
         <LinearLayout
             android:id="@+id/imgPanel"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="15dp"
-            android:layout_marginStart="31dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginStart="14dp"
             android:layout_gravity="center_horizontal"
             android:orientation="vertical" >
 
@@ -45,40 +59,40 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            socialsinch:riv_corner_radius="150dip"
+            socialsinch:riv_corner_radius="360dip"
             socialsinch:avatarUrl="@{viewModel.userAvatar}"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:layout_below="@+id/name_panel"
+            android:layout_toEndOf="@+id/imgPanel"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp">
+            <ImageView
+                android:id="@+id/user_reply_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:paddingBottom="3dp"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
+                android:src="@drawable/message_got_read_receipt_from_target"/>
+
+            <TextView
+                android:id="@+id/txtSubtitled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="2dp"
+                android:textSize="12sp"
+                android:textColor="@color/light_grey"
+                android:text="yes I received your message yesterday"/>
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/imgStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignTop="@+id/imgPanel"
-            android:layout_marginStart="20dp"
-            android:src="@drawable/disconnected" />
-
-        <ImageView
-            android:id="@+id/imgArrow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_below="@+id/imgStatus"
-            android:layout_marginEnd="18dp"
-            android:layout_marginTop="5dp"
-            android:src="@drawable/arrow_right" />
-
-        <TextView
-            android:id="@+id/txtSubtitled"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/txtNombre"
-            android:layout_below="@+id/txtNombre"
-            android:paddingTop="2dp"
-            android:textSize="12sp"
-            android:textColor="@android:color/darker_gray"
-            android:text="@{viewModel.phoneNumber}"/>
 
     </RelativeLayout>
 </layout>

@@ -4,6 +4,7 @@ import android.databinding.BindingAdapter;
 import android.widget.ImageView;
 
 import com.parse.sinch.social.model.ViewMessage;
+import com.social.backendless.utils.DateUtils;
 
 /**
  * Created by valgood on 2/20/2017.
@@ -26,5 +27,9 @@ public class ChatOutgoingViewModel {
 
     public ViewMessage getViewChatMessage() {
         return mViewChatMessage;
+    }
+
+    public String getFormattedTime() {
+        return DateUtils.convertChatDate(mViewChatMessage.getChatMessage().getTimestamp());
     }
 }

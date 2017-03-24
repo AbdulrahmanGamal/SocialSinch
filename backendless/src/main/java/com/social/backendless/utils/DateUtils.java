@@ -68,4 +68,10 @@ public class DateUtils {
                 cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
                 cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR));
     }
+
+    public static String convertChatDate(Date timestamp) {
+        Log.e(TAG, "Time to convert: " + timestamp);
+        final String timeChatFormatString = "h:mm aa";
+        return DateFormat.format(timeChatFormatString, timestamp).toString();
+    }
 }

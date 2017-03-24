@@ -9,4 +9,9 @@
     <color name="very_dark_gray">#636363</color>
     <color name="boton1">#EB4E4E</color>
     <color name="greyish">#fff2f1f2</color>
+    <color name="darker_grey">#494949</color>
+    <color name="light_grey">#747474</color>
+    <color name="soft_grey">#9b9b9b</color>
+    <color name="green_new">#00D55B</color>
+    <color name="hint_type">#c9c9c9</color>
 </resources>
