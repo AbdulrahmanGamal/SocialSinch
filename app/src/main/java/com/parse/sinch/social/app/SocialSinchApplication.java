@@ -3,6 +3,7 @@ package com.parse.sinch.social.app;
 import android.app.Application;
 
 import com.backendless.Backendless;
+import com.social.backendless.data.DataManager;
 
 public class SocialSinchApplication extends Application {
 

@@ -10,7 +10,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.parse.sinch.social.MessagesActivity;
-import com.parse.sinch.social.model.UserInfo;
+import com.social.backendless.model.UserInfo;
 import com.parse.sinch.social.utils.Constants;
 
 /**

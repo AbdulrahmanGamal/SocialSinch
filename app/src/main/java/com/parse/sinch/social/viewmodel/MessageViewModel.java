@@ -18,7 +18,7 @@ import com.parse.sinch.social.adapter.ChatMessageAdapter;
  * Model View attached to the Incoming/outgoing chat messages
  */
 
-public class MessageViewModel implements ChatMessageAdapter.NewItemInserted{
+public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
     private Context mContext;
     private ChatMessageAdapter mChatMessageAdapter;
     private EditText mMessage;

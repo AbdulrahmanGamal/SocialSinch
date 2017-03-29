@@ -41,12 +41,12 @@ public class ChatSQLiteHelper extends SQLiteOpenHelper {
     //SQL statement to create table MESSAGES
     private static final String CREATE_TABLE_MESSAGES = "create table "
             + TABLE_MESSAGES + "( " + COLUMN_ID_MSG
-            + " integer primary key, " + COLUMN_PARTICIPANTS
+            + " integer, " + COLUMN_PARTICIPANTS
             + " text not null, " + COLUMN_MESSAGE
             + " text not null, " + COLUMN_FROM
             + " text null, " + COLUMN_DATE
             + " text not null, " + COLUMN_STATUS
-            + " text not null );";
+            + " text not null, PRIMARY KEY ( " + COLUMN_ID_MSG + ", " + COLUMN_PARTICIPANTS + " ));";
 
     private static final String TAG = "ChatSQLiteHelper";
 

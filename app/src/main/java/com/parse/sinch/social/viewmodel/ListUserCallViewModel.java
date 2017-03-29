@@ -8,15 +8,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
-import com.backendless.Backendless;
 import com.backendless.BackendlessCollection;
 import com.backendless.BackendlessUser;
 import com.parse.sinch.social.LoginActivity;
 import com.parse.sinch.social.adapter.UserCallsAdapter;
-import com.parse.sinch.social.app.SocialSinchApplication;
-import com.parse.sinch.social.model.UserInfo;
+import com.social.backendless.model.UserInfo;
 import com.parse.sinch.social.utils.Constants;
-import com.parse.sinch.social.utils.LoggedUser;
+import com.social.backendless.utils.LoggedUser;
 import com.social.backendless.bus.RxIncomingEventBus;
 import com.social.backendless.data.DataManager;
 import com.social.backendless.model.EventMessage;
@@ -70,7 +68,7 @@ public class ListUserCallViewModel {
         recyclerView.setLayoutManager(viewModel.createLayoutManager());
     }
     private void getUserCalls(final RecyclerView callsRecyclerView) {
-        DataManager.getFetchAllUsersObservable(LoggedUser.getInstance().getUserLogged())
+        DataManager.getFetchAllUsersObservable(LoggedUser.getInstance().getUserIdLogged())
                 .doOnSubscribe(new Action0() {
             @Override
             public void call() {
@@ -123,6 +121,7 @@ public class ListUserCallViewModel {
         }
     }
 
+    //TODO refactor this to remove backendless user dependency
     private List<UserInfo> convertToUserInfo(BackendlessCollection<BackendlessUser> calls) {
         List<BackendlessUser> userList = calls.getData();
         UserInfo user;
@@ -133,15 +132,22 @@ public class ListUserCallViewModel {
             user.setFullName((String) backendlessUser.getProperty("full_name"));
             user.setPhoneNumber((String) backendlessUser.getProperty("phone"));
             user.setProfilePicture((String) backendlessUser.getProperty("avatar"));
-            Date lastTimeSeen = (Date) backendlessUser.getProperty("lastLogin");
-            user.setLastSeen(DateUtils.convertDateToLastSeenFormat(lastTimeSeen.getTime()));
+            Date lastTimeSeen = (Date) backendlessUser.getProperty("last_seen");
+            Date lastLogin = (Date) backendlessUser.getProperty("lastLogin");
+            if (lastTimeSeen == null) {
+                user.setLastSeen(DateUtils.convertDateToString(lastLogin));
+            } else {
+                user.setLastSeen(DateUtils.convertDateToString(lastTimeSeen));
+            }
             lstUsers.add(user);
             mUserContactIds.add(user.getObjectId());
-            EventMessage eventMessage = new EventMessage(LoggedUser.getInstance().getUserLogged(),
-                                                         user.getObjectId(),
-                                                         EventStatus.ONLINE.toString(),
-                                                         EventStatus.ONLINE);
-            RxIncomingEventBus.getInstance().sendEvent(eventMessage);
+            if (DateUtils.isSameDay(user.getLastSeen())) {
+                EventMessage eventMessage = new EventMessage(LoggedUser.getInstance().getUserIdLogged(),
+                        user.getObjectId(),
+                        EventStatus.ONLINE.toString(),
+                        EventStatus.ONLINE);
+                RxIncomingEventBus.getInstance().sendEvent(eventMessage);
+            }
         }
         return lstUsers;
     }
@@ -149,7 +155,7 @@ public class ListUserCallViewModel {
     public void notifyConnectionStatus(String message) {
         EventMessage eventMessage;
         for (String contactId : mUserContactIds) {
-            eventMessage = new EventMessage(LoggedUser.getInstance().getUserLogged(),
+            eventMessage = new EventMessage(LoggedUser.getInstance().getUserIdLogged(),
                     contactId,
                     message,
                     EventStatus.OFFLINE);

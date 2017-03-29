@@ -1,11 +1,20 @@
 package com.social.backendless.data;
 
+import android.util.Log;
+
 import com.backendless.Backendless;
 import com.backendless.BackendlessCollection;
 import com.backendless.BackendlessUser;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.persistence.BackendlessDataQuery;
+import com.social.backendless.model.UserInfo;
+import com.social.backendless.utils.DateUtils;
+import com.social.backendless.utils.LoggedUser;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -16,6 +25,9 @@ import rx.schedulers.Schedulers;
  */
 
 public class DataManager {
+
+    private static final String LAST_SEEN_PROPERTY = "last_seen";
+    private static final String TAG = "DataManager";
 
     /**
      * Observable to sign in the user with the backend
@@ -70,5 +82,64 @@ public class DataManager {
                 });
             }
         }).subscribeOn(Schedulers.io());
+    }
+    /**
+     * Update the last seen filed in the remote sever
+     */
+    public static void updateLastSeenFieldInRemote() {
+        BackendlessUser currentUser = LoggedUser.getInstance().getUserLogged();
+        if (currentUser != null) {
+            Date lastSeenDate = Calendar.getInstance(Locale.getDefault()).getTime();
+            currentUser.setProperty(LAST_SEEN_PROPERTY, lastSeenDate);
+            Backendless.UserService.update(currentUser, new AsyncCallback<BackendlessUser>() {
+                @Override
+                public void handleResponse(BackendlessUser response) {
+                    Log.d(TAG, "LastSeen Time updated SuccessFully!!");
+                    LoggedUser.getInstance().setUserLogged(response);
+                }
+
+                @Override
+                public void handleFault(BackendlessFault fault) {
+                    Log.e(TAG, "LastSeen Time Failed: " + fault.toString());
+                }
+            });
+        }
+    }
+
+    public static Observable<UserInfo> getUserInformationObservable(final String userId) {
+        return Observable.create(new Observable.OnSubscribe<UserInfo>() {
+            @Override
+            public void call(final Subscriber<? super UserInfo> subscriber) {
+                String whereClause = "objectId = '" + userId + "'";
+                Backendless.UserService.findById(userId, new AsyncCallback<BackendlessUser>() {
+                    @Override
+                    public void handleResponse(BackendlessUser response) {
+                        subscriber.onNext(convertToUserInfo(response));
+                    }
+
+                    @Override
+                    public void handleFault(BackendlessFault fault) {
+                        subscriber.onNext(new UserInfo());
+                    }
+                });
+            }
+        }).subscribeOn(Schedulers.io()).share();
+    }
+
+    private static UserInfo convertToUserInfo(BackendlessUser backendlessUser) {
+
+        UserInfo user = new UserInfo();
+        user.setObjectId(backendlessUser.getObjectId());
+        user.setFullName((String) backendlessUser.getProperty("full_name"));
+        user.setPhoneNumber((String) backendlessUser.getProperty("phone"));
+        user.setProfilePicture((String) backendlessUser.getProperty("avatar"));
+        Date lastTimeSeen = (Date) backendlessUser.getProperty("last_seen");
+        Date lastLogin = (Date) backendlessUser.getProperty("lastLogin");
+        if (lastTimeSeen == null) {
+            user.setLastSeen(DateUtils.convertDateToString(lastLogin));
+        } else {
+            user.setLastSeen(DateUtils.convertDateToString(lastTimeSeen));
+        }
+        return user;
     }
 }

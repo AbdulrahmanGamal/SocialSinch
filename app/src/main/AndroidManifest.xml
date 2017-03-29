@@ -39,9 +39,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/SocialSinchTheme" >
         </activity>
-
-        <service android:name="com.social.sinchservice.SinchService" />
-
+        <activity
+            android:name=".RedesignMessagesActivity2"
+            android:screenOrientation="portrait"
+            android:theme="@style/SocialSinchTheme" >
+        </activity>
         <activity
             android:name=".TabActivity"
             android:label="@string/title_activity_tab"

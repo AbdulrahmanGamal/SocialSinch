@@ -36,4 +36,32 @@
         <item name="android:textColor">@color/soft_grey</item>
     </style>
 
+    <style name="chat_collapsing_header_several_lines">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentBottom">true</item>
+        <item name="android:layout_alignParentStart">true</item>
+        <item name="android:layout_marginTop">15dp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:lineSpacingExtra">-5dp</item>
+        <item name="android:maxLines">3</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingEnd">13dp</item>
+        <item name="android:paddingStart">13dp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">@dimen/chat_profile_collapsing_header_text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+
+    <style name="ChatCollapsedTitleBar">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/off_white</item>
+    </style>
+
+    <style name="ChatExpandedTitleBar">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:ellipsize">end</item>
+    </style>
 </resources>

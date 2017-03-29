@@ -5,7 +5,7 @@ import android.databinding.BindingAdapter;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.parse.sinch.social.model.UserInfo;
+import com.social.backendless.model.UserInfo;
 
 /**
  * Created by valgood on 2/27/2017.

@@ -58,5 +58,7 @@
     <string name="today">today</string>
     <string name="yesterday">yesterday</string>
     <string name="at">at</string>
+    <string name="status_online">Online</string>
+
 
 </resources>

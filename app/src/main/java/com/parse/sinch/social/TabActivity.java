@@ -15,7 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import com.parse.sinch.social.databinding.ActivityOptionsTabBinding;
-import com.parse.sinch.social.utils.LoggedUser;
+import com.social.backendless.data.DataManager;
+import com.social.backendless.utils.LoggedUser;
 import com.parse.sinch.social.viewmodel.TabOptionsViewModel;
 import com.social.backendless.PublishSubscribeHandler;
 
@@ -24,7 +25,7 @@ public class TabActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //subscribe to events sent from this user
         PublishSubscribeHandler.
-                getInstance(this, LoggedUser.getInstance().getUserLogged()).subscribe();
+                getInstance(this, LoggedUser.getInstance().getUserIdLogged()).subscribe();
 
         final TabOptionsViewModel tabOptionsViewModel = new TabOptionsViewModel(this,
                                                                     getSupportFragmentManager());
@@ -95,13 +96,13 @@ public class TabActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        DataManager.updateLastSeenFieldInRemote();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
-        //TODO save timestamp to backendles to keep track last time seen
+        DataManager.updateLastSeenFieldInRemote();
     }
 
     public void mostrarDialogo(int resId){

@@ -17,10 +17,8 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.parse.sinch.social.R;
 import com.parse.sinch.social.TabActivity;
-import com.parse.sinch.social.app.SocialSinchApplication;
-import com.parse.sinch.social.utils.LoggedUser;
+import com.social.backendless.utils.LoggedUser;
 import com.social.backendless.data.DataManager;
-import com.social.backendless.model.EventStatus;
 
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -84,8 +82,7 @@ public class LoginViewViewModel {
         };
     }
 
-    public void loadMainUserList(String userLogged) {
-        LoggedUser.getInstance().setUserLogged(userLogged);
+    public void loadMainUserList() {
         mContext.startActivity(new Intent(mContext, TabActivity.class));
     }
 
@@ -205,7 +202,7 @@ public class LoginViewViewModel {
                         enableSignIn();
                         if (o instanceof BackendlessUser) {
                             Log.e(TAG, "Backendless user successfully retrieved: " + o);
-                            loadMainUserList(((BackendlessUser)o).getObjectId());
+                            loadMainUserList();
                             ((Activity)mContext).finish();
                         } else {
                             Log.e(TAG, "Error retrieving the user: " + o);

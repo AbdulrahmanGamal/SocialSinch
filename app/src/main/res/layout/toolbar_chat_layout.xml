@@ -13,10 +13,10 @@
 
         <com.makeramen.RoundedImageView
             android:id="@+id/conversation_contact_photo"
-            android:layout_width="35.0dip"
-            android:layout_height="35.0dip"
+            android:layout_width="@dimen/avatar_small_width"
+            android:layout_height="@dimen/avatar_small_height"
             android:scaleType="centerCrop"
-            app:riv_corner_radius="150dip" />
+            app:riv_corner_radius="@dimen/avatar_corner_radius" />
 
     </LinearLayout>
 

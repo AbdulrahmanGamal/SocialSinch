@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.parse.sinch.social.model.ViewMessage;
-import com.parse.sinch.social.utils.LoggedUser;
+import com.social.backendless.utils.LoggedUser;
 import com.social.backendless.bus.RxIncomingMessageBus;
 import com.social.backendless.bus.RxOutgoingMessageBus;
 import com.social.backendless.database.ChatBriteDataSource;
@@ -137,7 +137,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
      */
     private void retrieveOldMessages(String recipientId) {
         List<ChatMessage> chatMessages =
-                mDataSource.retrieveLastMessages(LoggedUser.getInstance().getUserLogged(),
+                mDataSource.retrieveLastMessages(LoggedUser.getInstance().getUserIdLogged(),
                                                                                 recipientId, 100);
         for (ChatMessage oldChatMessage : chatMessages) {
             ViewMessage viewMessage = new ViewMessage(oldChatMessage);

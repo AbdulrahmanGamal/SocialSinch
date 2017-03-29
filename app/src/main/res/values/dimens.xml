@@ -3,4 +3,16 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
-    </resources>
+    <dimen name="chat_collapsing_toolbar_margin">12dp</dimen>
+    <dimen name="chat_profile_collapsing_header_text">23sp</dimen>
+    <dimen name="avatar_small_width">35dp</dimen>
+    <dimen name="avatar_small_height">35dp</dimen>
+    <dimen name="avatar_big_width">100dp</dimen>
+    <dimen name="avatar_big_height">100dp</dimen>
+    <dimen name="avatar_corner_radius">150dp</dimen>
+    <dimen name="header_view_end_margin_left">95dp</dimen>
+    <dimen name="header_view_end_margin_right">14dp</dimen>
+    <dimen name="header_view_start_margin_bottom">14dp</dimen>
+    <dimen name="header_view_start_margin_top">3dp</dimen>
+    <dimen name="header_view_info_margin_left">35dp</dimen>
+</resources>

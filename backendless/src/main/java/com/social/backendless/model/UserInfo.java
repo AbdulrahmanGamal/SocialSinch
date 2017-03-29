@@ -1,4 +1,4 @@
-package com.parse.sinch.social.model;
+package com.social.backendless.model;
 
 import java.io.Serializable;
 

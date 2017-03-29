@@ -11,7 +11,9 @@ import com.parse.sinch.social.databinding.FragmentCallsListBinding;
 import com.parse.sinch.social.viewmodel.ListUserCallViewModel;
 import com.social.backendless.utils.DateUtils;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by GeorgeLocal on 29/12/2014.
@@ -36,7 +38,8 @@ public class UserListFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Date currentTime = Calendar.getInstance(Locale.getDefault()).getTime();
         mListUserCallViewModel.
-                notifyConnectionStatus(DateUtils.convertDateToLastSeenFormat(new Date().getTime()));
+                notifyConnectionStatus(DateUtils.convertDateToString(currentTime));
     }
 }

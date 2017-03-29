@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import com.parse.sinch.social.R;
 import com.parse.sinch.social.databinding.UserCallsInfoBinding;
-import com.parse.sinch.social.model.UserInfo;
+import com.social.backendless.model.UserInfo;
 import com.parse.sinch.social.viewmodel.UserCallsItemViewModel;
 
 public class UserCallsAdapter extends RecyclerView.Adapter<UserCallsAdapter.BindingHolder> {

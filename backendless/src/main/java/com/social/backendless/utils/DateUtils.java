@@ -35,13 +35,14 @@ public class DateUtils {
         return Calendar.getInstance(Locale.getDefault()).getTime();
     }
 
-    public static String convertDateToLastSeenFormat(long timeInMiliseconds) {
+    public static String convertDateToLastSeenFormat(String lastTimeSeen) {
         //if today: last seen today at 8:04 p.m else
         // last seen Jun 20, 2016
         //Mon Jul 25 11:26:32 EDT 2016
 
         Calendar recipientTime = Calendar.getInstance();
-        recipientTime.setTimeInMillis(timeInMiliseconds);
+        Date dateLastTimeSeen = convertStringToDate(lastTimeSeen);
+        recipientTime.setTime(dateLastTimeSeen);
 
         Calendar now = Calendar.getInstance();
 
@@ -57,13 +58,16 @@ public class DateUtils {
     }
 
     /**
-     * <p>Checks if two calendars represent the same day ignoring time.</p>
-     * @param cal1  the first calendar, not altered, not null
-     * @param cal2  the second calendar, not altered, not null
+     * <p>Checks if two dates represent the same day ignoring time.</p>
+     * @param dateToCompare  the first calendar, not altered, not null
      * @return true if they represent the same day
      * @throws IllegalArgumentException if either calendar is <code>null</code>
      */
-    private static boolean isSameDay(@NonNull Calendar cal1, @NonNull Calendar cal2) {
+    public static boolean isSameDay(@NonNull String dateToCompare) {
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+        Date dateParsed = convertStringToDate(dateToCompare);
+        cal2.setTime(dateParsed);
         return (cal1.get(Calendar.ERA) == cal2.get(Calendar.ERA) &&
                 cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
                 cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR));
