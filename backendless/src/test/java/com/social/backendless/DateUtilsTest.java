@@ -47,16 +47,13 @@ public class DateUtilsTest {
     @Test
     public void convertDateToLastSeenFormat() {
         //long time ago
-        Date lastSeen = DateUtils.convertStringToDate("Mon Jul 25 11:26:32 EDT 2016");
-        String lastSeenFormat = DateUtils.convertDateToLastSeenFormat(lastSeen.getTime());
+        String lastSeenFormat = DateUtils.convertDateToLastSeenFormat("Mon Jul 25 11:26:32 EDT 2016");
         Assert.assertEquals("Last Seen date not equals", lastSeenFormat, "Jul 25, 2016");
         //yesterday
-        lastSeen = DateUtils.convertStringToDate("Mon Mar 18 11:26:32 EDT 2017");
-        lastSeenFormat = DateUtils.convertDateToLastSeenFormat(lastSeen.getTime());
+        lastSeenFormat = DateUtils.convertDateToLastSeenFormat("Mon Mar 18 11:26:32 EDT 2017");
         Assert.assertEquals("Last Seen date not equals", lastSeenFormat, "yesterday at 11:26 AM");
         //today
-        lastSeen = DateUtils.convertStringToDate("Sun Mar 19 11:26:32 EDT 2017");
-        lastSeenFormat = DateUtils.convertDateToLastSeenFormat(lastSeen.getTime());
+        lastSeenFormat = DateUtils.convertDateToLastSeenFormat("Sun Mar 19 11:26:32 EDT 2017");
         Assert.assertEquals("Last Seen date not equals", lastSeenFormat, "today at 11:26 AM");
 
     }

@@ -21,6 +21,9 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.parse.sinch.social.R;
+import com.parse.sinch.social.custom.TypeWriter;
+
 public class Utils {
 
     private static final String TAG = "Utils";
@@ -70,7 +73,7 @@ public class Utils {
 		return result;  
 	}
 
-	public static Bitmap getResizedBitmap(Context context, String imagePath, int imageMaxSize){
+	public static Bitmap getResizedBitmap(String imagePath, int imageMaxSize){
 
 		try
 		{
@@ -99,21 +102,29 @@ public class Utils {
 		return null;
 	}
 
-//	public static String convertDateToString(@NonNull Date messageDate) {
-//        final SimpleDateFormat dateFormat = new SimpleDateFormat(
-//                "EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
-//        return dateFormat.format(messageDate);
-//	}
-//
-//    public static Date convertStringToDate(@NonNull String messageDate) {
-//        try {
-//            final SimpleDateFormat dateFormat = new SimpleDateFormat(
-//                    "EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
-//            return dateFormat.parse(messageDate);
-//        } catch (final ParseException e) {
-//            Log.e(TAG, "Parsing exception: " + e.getMessage());
-//        }
-//
-//        return null;
-//    }
+	/**
+	 * Set the last time seen text and animate it
+	 * @param lastTimeSeen
+	 * @param textView
+	 */
+	public static void formatLastTimeSeenText(Context context, String lastTimeSeen, TypeWriter textView) {
+		// Start after 2000ms
+		textView.setInitialDelay(2000);
+		// Remove a character every 150ms
+		textView.setCharacterDelay(1);
+		String lastTimeSeenText = context.getResources().getString(R.string.last_time_seen) + " ";
+
+		StringBuilder outputFormat = new StringBuilder();
+		if (lastTimeSeen.contains("today")) {
+			lastTimeSeen = lastTimeSeen.replace("today at", "");
+			outputFormat.append(context.getResources().getString(R.string.today)).append(" ").
+					append(context.getResources().getString(R.string.at));
+		} else if (lastTimeSeen.contains("yesterday")) {
+			lastTimeSeen = lastTimeSeen.replace("yesterday at", "");
+			outputFormat.append(context.getResources().getString(R.string.yesterday)).append(" ").
+					append(context.getResources().getString(R.string.at));
+		}
+		outputFormat.append(lastTimeSeen);
+		textView.animateText(lastTimeSeenText, lastTimeSeenText + outputFormat.toString());
+	}
 }

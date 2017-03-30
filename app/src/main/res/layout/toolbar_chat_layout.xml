@@ -11,12 +11,12 @@
         android:layout_centerVertical="true"
         android:orientation="horizontal">
 
-        <com.makeramen.RoundedImageView
+        <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/conversation_contact_photo"
             android:layout_width="@dimen/avatar_small_width"
             android:layout_height="@dimen/avatar_small_height"
             android:scaleType="centerCrop"
-            app:riv_corner_radius="@dimen/avatar_corner_radius" />
+            app:roundAsCircle="true" />
 
     </LinearLayout>
 

@@ -11,10 +11,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.parse.sinch.social.custom.ProfileHeaderView;
-import com.parse.sinch.social.custom.TypeWriter;
 import com.social.backendless.model.UserInfo;
 import com.parse.sinch.social.utils.Constants;
 
@@ -49,7 +47,6 @@ public class RedesignMessagesActivity2 extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fresco.initialize(this);
         setContentView(R.layout.profile_layout);
         findViews();
 
@@ -140,32 +137,6 @@ public class RedesignMessagesActivity2 extends AppCompatActivity
                 mIsTheTitleVisible = false;
             }
         }
-    }
-
-    /**
-     * Set the last time seen text and animate it
-     * @param lastTimeSeen
-     * @param textView
-     */
-    private void formatLastTimeSeenText(String lastTimeSeen, TypeWriter textView) {
-        // Start after 2000ms
-        textView.setInitialDelay(2000);
-        // Remove a character every 150ms
-        textView.setCharacterDelay(1);
-        String lastTimeSeenText = getResources().getString(R.string.last_time_seen) + " ";
-
-        StringBuilder outputFormat = new StringBuilder();
-        if (lastTimeSeen.contains("today")) {
-            lastTimeSeen = lastTimeSeen.replace("today at", "");
-            outputFormat.append(getResources().getString(R.string.today)).append(" ").
-                    append(getResources().getString(R.string.at));
-        } else if (lastTimeSeen.contains("yesterday")) {
-            lastTimeSeen = lastTimeSeen.replace("yesterday at", "");
-            outputFormat.append(getResources().getString(R.string.yesterday)).append(" ").
-                    append(getResources().getString(R.string.at));
-        }
-        outputFormat.append(lastTimeSeen);
-        textView.animateText(lastTimeSeenText, lastTimeSeenText + outputFormat.toString());
     }
 
     @Override

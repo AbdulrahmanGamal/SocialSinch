@@ -21,7 +21,7 @@ import rx.Subscriber;
 import rx.schedulers.Schedulers;
 
 /**
- * Created by valgood on 2/14/2017.
+ * Class to handle all the operations performed with Backendless
  */
 
 public class DataManager {
@@ -46,11 +46,15 @@ public class DataManager {
                         password, new  AsyncCallback<BackendlessUser>() {
                             @Override
                             public void handleResponse(BackendlessUser backendlessUser) {
+                                LoggedUser currentUser = LoggedUser.getInstance();
+                                currentUser.setUserLogged(backendlessUser);
+                                currentUser.setUserLoggedId(backendlessUser.getUserId());
                                 subscriber.onNext(backendlessUser);
                             }
 
                             @Override
                             public void handleFault(BackendlessFault backendlessFault) {
+                                LoggedUser.getInstance().setUserLogged(null);
                                 subscriber.onNext(backendlessFault);
                             }
                         }, keepLogged);
@@ -59,7 +63,7 @@ public class DataManager {
     }
 
     /**
-     * Observable to obtain all the users registered in the backend
+     * Observable to obtain all the users registered in the backend but the user logged
      * @return
      */
     public static Observable<Object> getFetchAllUsersObservable(final String subscriberId) {
@@ -106,11 +110,15 @@ public class DataManager {
         }
     }
 
+    /**
+     * Obtains the latest information registered in backendless for a specific user.
+     * @param userId
+     * @return
+     */
     public static Observable<UserInfo> getUserInformationObservable(final String userId) {
         return Observable.create(new Observable.OnSubscribe<UserInfo>() {
             @Override
             public void call(final Subscriber<? super UserInfo> subscriber) {
-                String whereClause = "objectId = '" + userId + "'";
                 Backendless.UserService.findById(userId, new AsyncCallback<BackendlessUser>() {
                     @Override
                     public void handleResponse(BackendlessUser response) {
@@ -126,6 +134,11 @@ public class DataManager {
         }).subscribeOn(Schedulers.io()).share();
     }
 
+    /**
+     * Transform a backendless user object to UserInfo object recognized by the UI
+     * @param backendlessUser
+     * @return
+     */
     private static UserInfo convertToUserInfo(BackendlessUser backendlessUser) {
 
         UserInfo user = new UserInfo();

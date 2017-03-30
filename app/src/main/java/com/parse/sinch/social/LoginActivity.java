@@ -14,7 +14,6 @@ import android.view.ViewTreeObserver;
 import com.parse.sinch.social.databinding.ActivityLoginBinding;
 import com.parse.sinch.social.utils.Constants;
 import com.parse.sinch.social.viewmodel.LoginViewViewModel;
-import com.social.backendless.data.DataManager;
 import com.social.backendless.utils.LoggedUser;
 
 public class LoginActivity extends AppCompatActivity

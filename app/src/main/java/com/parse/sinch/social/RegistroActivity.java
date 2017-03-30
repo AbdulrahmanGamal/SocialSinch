@@ -29,8 +29,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.androidquery.AQuery;
-import com.makeramen.RoundedDrawable;
-import com.makeramen.RoundedImageView;
 import com.parse.sinch.social.utils.Utils;
 
 public class RegistroActivity extends Activity {
@@ -310,18 +308,12 @@ public class RegistroActivity extends Activity {
 			    String filepath = null;
 			    
 			    if(isFromGallery){	
-		            // SDK >= 11 && SDK < 19
-		            if (Build.VERSION.SDK_INT < 19)
-		                filepath = Utils.getRealPathFromURI_API11to18(context, picture);
-		            // SDK > 19 (Android 4.4)
-		            else
-		                filepath = Utils.getRealPathFromURI_API19(context, picture);
-			    				    	
+					filepath = Utils.getRealPathFromURI_API19(context, picture);
 			    }else{
 			    	filepath = picture.getPath();
 			    }
 
-                profiePictureResized = Utils.getResizedBitmap(this, filepath, 100);
+                profiePictureResized = Utils.getResizedBitmap(filepath, 100);
 			    f = new File(filepath);
 				ExifInterface exif = new ExifInterface(f.getPath());
 				int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);

@@ -1,5 +1,5 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:socialsinch="http://schemas.android.com/apk/res-auto">
+        xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable name="viewModel" type="com.parse.sinch.social.viewmodel.UserCallsItemViewModel" />
     </data>
@@ -54,13 +54,13 @@
             android:layout_gravity="center_horizontal"
             android:orientation="vertical" >
 
-        <com.makeramen.RoundedImageView
+        <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/imgUser"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            socialsinch:riv_corner_radius="360dip"
-            socialsinch:avatarUrl="@{viewModel.userAvatar}"/>
+            app:roundAsCircle="true"
+            app:avatarUrl="@{viewModel.userAvatar}"/>
         </LinearLayout>
 
         <LinearLayout

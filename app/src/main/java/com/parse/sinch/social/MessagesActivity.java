@@ -2,6 +2,7 @@ package com.parse.sinch.social;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -13,9 +14,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.parse.sinch.social.custom.TypeWriter;
 import com.parse.sinch.social.databinding.ActivityChatMainBinding;
+import com.parse.sinch.social.utils.Utils;
 import com.social.backendless.model.UserInfo;
 import com.parse.sinch.social.utils.Constants;
 import com.parse.sinch.social.viewmodel.MessageViewModel;
@@ -37,29 +38,31 @@ public class MessagesActivity extends AppCompatActivity {
                 DataBindingUtil.setContentView(this, R.layout.activity_chat_main);
         //get recipient information from the intent
         Intent intent = getIntent();
-        //create the view model
-//        final UserInfo recipientInfo = new UserInfo();
-//        recipientInfo.setObjectId(intent.getStringExtra(Constants.RECIPIENT_ID));
-//        recipientInfo.setFullName(intent.getStringExtra(Constants.RECIPIENT_NAME));
-//        recipientInfo.setProfilePicture(intent.getStringExtra(Constants.RECIPIENT_AVATAR));
-//        //TODO replace this with a call to observable
-//        recipientInfo.setLastSeen(intent.getStringExtra(Constants.RECIPIENT_LAST_TIME_SEEN));
-
         String userId = intent.getStringExtra(Constants.RECIPIENT_ID);
         MessageViewModel messageViewModel = new MessageViewModel(MessagesActivity.this, userId);
         activityChatMainBinding.setViewModel(messageViewModel);
 
+        final ImageView profilePic = (ImageView) activityChatMainBinding.
+                toolbarChats.findViewById(R.id.conversation_contact_photo);
+        final TextView userNameTextView =
+                ((TextView)activityChatMainBinding.toolbarChats.findViewById(R.id.action_bar_title_1));
+        final TypeWriter lastTimeSeenTV =
+                ((TypeWriter) activityChatMainBinding.toolbarChats.findViewById(R.id.action_bar_title_2));
+
+        getWindow().setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.background));
+        setSupportActionBar(activityChatMainBinding.toolbarChats);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        //Get the current user's information from the backend
         DataManager.getUserInformationObservable(userId)
                 .subscribe(new Action1<UserInfo>() {
                     @Override
                     public void call(final UserInfo userInfo) {
                         //toolbar settings
-                        final ImageView profilePic = (ImageView) activityChatMainBinding.
-                                toolbarChats.findViewById(R.id.conversation_contact_photo);
-                        Glide.with(MessagesActivity.this).load(userInfo.getProfilePicture()).into(profilePic);
-
-                        ((TextView)activityChatMainBinding.toolbarChats.findViewById(R.id.action_bar_title_1)).
-                                setText(userInfo.getFullName());
+                        Uri imageUri = Uri.parse(userInfo.getProfilePicture());
+                        profilePic.setImageURI(imageUri);
+                        userNameTextView.setText(userInfo.getFullName());
 
                         activityChatMainBinding.toolbarChats.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -73,66 +76,41 @@ public class MessagesActivity extends AppCompatActivity {
                             }
                         });
 
-                        final TypeWriter lastTimeSeenTV =
-                                ((TypeWriter) activityChatMainBinding.toolbarChats.findViewById(R.id.action_bar_title_2));
-                        formatLastTimeSeenText(DateUtils.convertDateToLastSeenFormat(userInfo.getLastSeen()), lastTimeSeenTV);
+                        Utils.formatLastTimeSeenText(MessagesActivity.this,
+                                         DateUtils.convertDateToLastSeenFormat(userInfo.getLastSeen()), lastTimeSeenTV);
                         //subscribe to the global event bus to receive events from this user
-                        RxOutgoingEventBus.getInstance().getMessageObservable().subscribe(new Consumer<EventMessage>() {
-                            @Override
-                            public void accept(EventMessage eventMessage) throws Exception {
-                                Log.e(TAG, "Received this EVENT: " + eventMessage);
-                                switch (eventMessage.getEventStatus()) {
-                                    case ONLINE:
-                                        lastTimeSeenTV.setText(getResources().getString(R.string.status_online));
-                                        break;
-                                    case OFFLINE:
-                                        lastTimeSeenTV.
-                                                setText(DateUtils.
-                                                        convertDateToLastSeenFormat(eventMessage.getEventMessage()));
-                                        break;
-                                    default:
-                                        lastTimeSeenTV.setText("");
-                                        break;
-                                }
-                            }
-                        });
+                        subscribeToLastSeenEvents(lastTimeSeenTV);
 
                     }
                 });
-
-		getWindow().setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.background));
-		setSupportActionBar(activityChatMainBinding.toolbarChats);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
 	}
 
     /**
-     * Set the last time seen text and animate it
-     * @param lastTimeSeen
-     * @param textView
+     * Last seen listener to update the last seen text
+     * @param lastTimeSeenTV
      */
-	private void formatLastTimeSeenText(String lastTimeSeen, TypeWriter textView) {
-        // Start after 2000ms
-        textView.setInitialDelay(2000);
-        // Remove a character every 150ms
-        textView.setCharacterDelay(1);
-        String lastTimeSeenText = getResources().getString(R.string.last_time_seen) + " ";
-
-        StringBuilder outputFormat = new StringBuilder();
-        if (lastTimeSeen.contains("today")) {
-            lastTimeSeen = lastTimeSeen.replace("today at", "");
-            outputFormat.append(getResources().getString(R.string.today)).append(" ").
-                    append(getResources().getString(R.string.at));
-        } else if (lastTimeSeen.contains("yesterday")) {
-            lastTimeSeen = lastTimeSeen.replace("yesterday at", "");
-            outputFormat.append(getResources().getString(R.string.yesterday)).append(" ").
-                    append(getResources().getString(R.string.at));
-        }
-        outputFormat.append(lastTimeSeen);
-        textView.animateText(lastTimeSeenText, lastTimeSeenText + outputFormat.toString());
+    private void subscribeToLastSeenEvents(final TextView lastTimeSeenTV) {
+        //subscribe to the global event bus to receive events from this user
+        RxOutgoingEventBus.getInstance().getMessageObservable().subscribe(new Consumer<EventMessage>() {
+            @Override
+            public void accept(EventMessage eventMessage) throws Exception {
+                Log.e(TAG, "Received this EVENT: " + eventMessage);
+                switch (eventMessage.getEventStatus()) {
+                    case ONLINE:
+                        lastTimeSeenTV.setText(getResources().getString(R.string.status_online));
+                        break;
+                    case OFFLINE:
+                        lastTimeSeenTV.
+                                setText(DateUtils.
+                                        convertDateToLastSeenFormat(eventMessage.getEventMessage()));
+                        break;
+                    default:
+                        lastTimeSeenTV.setText("");
+                        break;
+                }
+            }
+        });
     }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -163,7 +141,6 @@ public class MessagesActivity extends AppCompatActivity {
 			startActivity(new Intent(this, CallingActivity.class));
 			return true;
 		case R.id.action_sms:
-			//mostrarDialogo(R.string.sms);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

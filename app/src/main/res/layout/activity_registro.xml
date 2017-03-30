@@ -1,5 +1,5 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:socialsinch="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -39,13 +39,13 @@
         android:layout_gravity="center_horizontal"
         android:orientation="vertical" >
 
-        <com.makeramen.RoundedImageView
+        <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/imgProfile"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/userpicture"
             android:scaleType="centerCrop"
-            socialsinch:riv_corner_radius="150dip"/>
+            app:roundAsCircle="true"/>
         </LinearLayout>
 
         <EditText

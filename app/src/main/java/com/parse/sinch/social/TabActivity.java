@@ -21,6 +21,7 @@ import com.parse.sinch.social.viewmodel.TabOptionsViewModel;
 import com.social.backendless.PublishSubscribeHandler;
 
 public class TabActivity extends AppCompatActivity {
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //subscribe to events sent from this user
@@ -33,6 +34,7 @@ public class TabActivity extends AppCompatActivity {
                 DataBindingUtil.setContentView(this, R.layout.activity_options_tab);
         activityOptionsTabBinding.setViewModel(tabOptionsViewModel);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+
         final View rootView = getWindow().getDecorView().getRootView();
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {

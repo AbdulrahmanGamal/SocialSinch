@@ -4,11 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.databinding.BaseObservable;
 import android.databinding.BindingAdapter;
+import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
 import com.parse.sinch.social.MessagesActivity;
 import com.social.backendless.model.UserInfo;
 import com.parse.sinch.social.utils.Constants;
@@ -31,8 +31,8 @@ public class UserCallsItemViewModel extends BaseObservable {
 
     @BindingAdapter("avatarUrl")
     public static void setImageUrl(ImageView imageView, String url) {
-        Context context = imageView.getContext();
-        Glide.with(context).load(url).into(imageView);
+        Uri imageUri = Uri.parse(url);
+        imageView.setImageURI(imageUri);
     }
     public String getUserAvatar() {
         return mUserInfo.getProfilePicture();
@@ -53,9 +53,6 @@ public class UserCallsItemViewModel extends BaseObservable {
                 Log.e("UserCallsViewModel", "Click on user call");
                 Intent intent = new Intent(mContext, MessagesActivity.class);
                 intent.putExtra(Constants.RECIPIENT_ID, mUserInfo.getObjectId());
-                intent.putExtra(Constants.RECIPIENT_AVATAR, mUserInfo.getProfilePicture());
-                intent.putExtra(Constants.RECIPIENT_NAME, mUserInfo.getFullName());
-                intent.putExtra(Constants.RECIPIENT_LAST_TIME_SEEN, mUserInfo.getLastSeen());
                 mContext.startActivity(intent);
             }
         };
