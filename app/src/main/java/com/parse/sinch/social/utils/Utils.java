@@ -23,6 +23,8 @@ import android.util.Log;
 
 import com.parse.sinch.social.R;
 import com.parse.sinch.social.custom.TypeWriter;
+import com.parse.sinch.social.model.ViewMessage;
+import com.social.backendless.model.ChatStatus;
 
 public class Utils {
 
@@ -102,6 +104,28 @@ public class Utils {
 		return null;
 	}
 
+	/**
+	 * Change the resource icon based on the message's status
+	 * @param viewMessage
+	 */
+	public static void changeStatusIcon(ViewMessage viewMessage, ChatStatus status) {
+		switch (status) {
+			case SENT:
+				viewMessage.setResourceId(R.drawable.message_got_receipt_from_server);
+				break;
+			case DELIVERED:
+				viewMessage.setResourceId(R.drawable.message_got_receipt_from_target);
+				break;
+			case READ:
+				viewMessage.setResourceId(R.drawable.message_got_read_receipt_from_target);
+				break;
+			case WAITING:
+			case FAILED:
+			default:
+				viewMessage.setResourceId(R.drawable.message_waiting);
+				break;
+		}
+	}
 	/**
 	 * Set the last time seen text and animate it
 	 * @param lastTimeSeen

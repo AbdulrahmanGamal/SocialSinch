@@ -10,23 +10,39 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.parse.sinch.social.MessagesActivity;
-import com.social.backendless.model.UserInfo;
+import com.parse.sinch.social.model.UserViewInfoMessage;
 import com.parse.sinch.social.utils.Constants;
+import com.parse.sinch.social.utils.Utils;
+import com.social.backendless.model.ChatStatus;
+import com.social.backendless.utils.DateUtils;
 
 /**
  * View Model to populate the user calls information in the calls recycler view
  */
 public class UserCallsItemViewModel extends BaseObservable {
     private Context mContext;
-    private UserInfo mUserInfo;
+    private UserViewInfoMessage mUserInfo;
 
-    public UserCallsItemViewModel(Context context, UserInfo userInfo) {
+    public UserCallsItemViewModel(Context context, UserViewInfoMessage userInfo) {
         this.mContext = context;
         this.mUserInfo = userInfo;
     }
 
     public String getFullName() {
-       return mUserInfo.getFullName();
+       return mUserInfo.getUserInfo().getFullName();
+    }
+
+    public String getLastMessage() {
+        return mUserInfo.getLastViewMessage().getChatMessage().getTextBody();
+    }
+
+    public String getLastMessageDate() {
+        return DateUtils.
+                convertChatDate(mUserInfo.getLastViewMessage().getChatMessage().getTimestamp());
+    }
+    @BindingAdapter("android:src")
+    public static void setImageResource(ImageView indicatorImgView, UserCallsItemViewModel model) {
+        model.setMessageIndicator(indicatorImgView);
     }
 
     @BindingAdapter("avatarUrl")
@@ -35,15 +51,7 @@ public class UserCallsItemViewModel extends BaseObservable {
         imageView.setImageURI(imageUri);
     }
     public String getUserAvatar() {
-        return mUserInfo.getProfilePicture();
-    }
-
-    public String getPhoneNumber() {
-        return mUserInfo.getPhoneNumber();
-    }
-
-    public boolean isConnected() {
-        return mUserInfo.isStatus();
+        return mUserInfo.getUserInfo().getProfilePicture();
     }
 
     public View.OnClickListener onClickUserCall() {
@@ -52,9 +60,26 @@ public class UserCallsItemViewModel extends BaseObservable {
             public void onClick(View v) {
                 Log.e("UserCallsViewModel", "Click on user call");
                 Intent intent = new Intent(mContext, MessagesActivity.class);
-                intent.putExtra(Constants.RECIPIENT_ID, mUserInfo.getObjectId());
+                intent.putExtra(Constants.RECIPIENT_ID, mUserInfo.getUserInfo().getObjectId());
                 mContext.startActivity(intent);
             }
         };
+    }
+
+    /**
+     * Based on the last message status, set up the indicator icon
+     * @param view
+     */
+    public void setMessageIndicator(ImageView view) {
+        if (mUserInfo.getLastViewMessage().
+                getChatMessage().getMessageId() != null &&
+            !mUserInfo.getLastViewMessage().
+                getChatMessage().getStatus().equals(ChatStatus.RECEIVED)) {
+            Utils.changeStatusIcon(mUserInfo.getLastViewMessage(),
+                    mUserInfo.getLastViewMessage().getChatMessage().getStatus());
+            view.setImageResource(mUserInfo.getLastViewMessage().getResourceId());
+        } else {
+            view.setVisibility(View.GONE);
+        }
     }
 }

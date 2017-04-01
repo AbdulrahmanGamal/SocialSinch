@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.parse.sinch.social.model.ViewMessage;
+import com.parse.sinch.social.utils.Utils;
 import com.social.backendless.utils.LoggedUser;
 import com.social.backendless.bus.RxIncomingMessageBus;
 import com.social.backendless.bus.RxOutgoingMessageBus;
@@ -94,7 +95,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         for (int i = mViewMessages.size() -1; i >= 0; i--) {
             if (mViewMessages.get(i).getChatMessage().getMessageId().equals(
                                                                         viewMessage.getChatMessage().getMessageId())) {
-                changeStatusIcon(mViewMessages.get(i), viewMessage.getChatMessage().getStatus());
+                Utils.changeStatusIcon(mViewMessages.get(i), viewMessage.getChatMessage().getStatus());
                 notifyItemChanged(i);
                 found = true;
                 break;
@@ -108,29 +109,6 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
             addMessage(viewMessage);
         }
     }
-
-    /**
-     * Change the resource icon based on the message's status
-     * @param viewMessage
-     */
-    private void changeStatusIcon(ViewMessage viewMessage, ChatStatus status) {
-        switch (status) {
-            case SENT:
-                viewMessage.setResourceId(R.drawable.message_got_receipt_from_server);
-                break;
-            case DELIVERED:
-                viewMessage.setResourceId(R.drawable.message_got_receipt_from_target);
-                break;
-            case READ:
-                viewMessage.setResourceId(R.drawable.message_got_read_receipt_from_target);
-                break;
-            case WAITING:
-            case FAILED:
-                default:
-                viewMessage.setResourceId(R.drawable.message_waiting);
-                break;
-        }
-    }
     /**
      * Once the adapter is instantiate, it has to retrieve the old messages saved in DB
      * @param recipientId
@@ -141,7 +119,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
                                                                                 recipientId, 100);
         for (ChatMessage oldChatMessage : chatMessages) {
             ViewMessage viewMessage = new ViewMessage(oldChatMessage);
-            changeStatusIcon(viewMessage, oldChatMessage.getStatus());
+            Utils.changeStatusIcon(viewMessage, oldChatMessage.getStatus());
             viewMessage.setViewMessageId((long) mViewMessages.size() + 1);
             addMessage(viewMessage);
         }
@@ -156,7 +134,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         chatMessage.setStatus(ChatStatus.WAITING);
         ViewMessage viewMessageToSend = new ViewMessage(chatMessage);
         viewMessageToSend.setViewMessageId((long) mViewMessages.size() + 1);
-        changeStatusIcon(viewMessageToSend, chatMessage.getStatus());
+        Utils.changeStatusIcon(viewMessageToSend, chatMessage.getStatus());
         addMessage(viewMessageToSend);
         RxIncomingMessageBus.getInstance().sendMessage(chatMessage);
     }

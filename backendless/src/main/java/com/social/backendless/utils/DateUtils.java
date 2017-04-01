@@ -75,7 +75,11 @@ public class DateUtils {
 
     public static String convertChatDate(Date timestamp) {
         Log.e(TAG, "Time to convert: " + timestamp);
-        final String timeChatFormatString = "h:mm aa";
-        return DateFormat.format(timeChatFormatString, timestamp).toString();
+        String convertedDate = "";
+        if (timestamp != null) {
+            final String timeChatFormatString = "h:mm aa";
+            convertedDate = DateFormat.format(timeChatFormatString, timestamp).toString();
+        }
+        return convertedDate;
     }
 }

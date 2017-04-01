@@ -5,10 +5,8 @@ import java.io.Serializable;
 public class UserInfo implements Serializable{
 
     private String mObjectId;
-	private String mUsername;
 	private String mName;
 	private String mFullName;
-	private boolean mStatus;
 	private String mPhoneNumber;
     private String mProfilePicture;
 	private String mLastSeen;
@@ -21,28 +19,12 @@ public class UserInfo implements Serializable{
 		this.mPhoneNumber = phoneNumber;
 	}
 
-	public boolean isStatus() {
-		return mStatus;
-	}
-
-	public void setStatus(boolean status) {
-		this.mStatus = status;
-	}
-
 	public String getName() {
 		return mName;
 	}
 
 	public void setName(String name) {
 		this.mName = name;
-	}
-
-	public String getUsername() {
-		return mUsername;
-	}
-
-	public void setUsername(String username) {
-		this.mUsername = username;
 	}
 
     public String getFullName() {

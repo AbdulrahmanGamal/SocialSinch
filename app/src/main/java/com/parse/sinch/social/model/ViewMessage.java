@@ -34,8 +34,4 @@ public class ViewMessage {
     public ChatMessage getChatMessage() {
         return mChatMessage;
     }
-
-    public void setChatMessage(ChatMessage chatMessage) {
-        this.mChatMessage = chatMessage;
-    }
 }

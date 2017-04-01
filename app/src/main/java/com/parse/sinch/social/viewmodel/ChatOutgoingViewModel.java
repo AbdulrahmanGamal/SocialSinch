@@ -7,7 +7,7 @@ import com.parse.sinch.social.model.ViewMessage;
 import com.social.backendless.utils.DateUtils;
 
 /**
- * Created by valgood on 2/20/2017.
+ * View Model class to bind the chat messages sent by the logged user
  */
 
 public class ChatOutgoingViewModel {

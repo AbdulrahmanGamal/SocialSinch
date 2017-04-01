@@ -11,7 +11,7 @@ import android.util.Log;
 import com.backendless.BackendlessCollection;
 import com.backendless.BackendlessUser;
 import com.parse.sinch.social.LoginActivity;
-import com.parse.sinch.social.adapter.UserCallsAdapter;
+import com.parse.sinch.social.adapter.UserChatAdapter;
 import com.social.backendless.model.UserInfo;
 import com.parse.sinch.social.utils.Constants;
 import com.social.backendless.utils.LoggedUser;
@@ -35,7 +35,7 @@ import rx.functions.Action0;
 
 public class ListUserCallViewModel {
     private Context mContext;
-    private UserCallsAdapter mUserCallsAdapter;
+    private UserChatAdapter mUserCallsAdapter;
     private List<String> mUserContactIds;
     private boolean mShowPanel;
 
@@ -43,10 +43,10 @@ public class ListUserCallViewModel {
 
     public ListUserCallViewModel(Context context) {
         this.mContext = context;
-        this.mUserCallsAdapter = new UserCallsAdapter(context);
+        this.mUserCallsAdapter = new UserChatAdapter(context);
         this.mUserContactIds = new ArrayList<>();
     }
-    private UserCallsAdapter getAdapter() {
+    private UserChatAdapter getAdapter() {
         return mUserCallsAdapter;
     }
 
@@ -101,9 +101,8 @@ public class ListUserCallViewModel {
                     (BackendlessCollection<BackendlessUser>) data;
             mUserCallsAdapter.setUserCalls(convertToUserInfo(users));
         } else {
-            //BackendlessFault fault = (BackendlessFault) data;
             //reset the previous list of calls
-            mUserCallsAdapter = new UserCallsAdapter(mContext);
+            mUserCallsAdapter = new UserChatAdapter(mContext);
             redirectToLogin();
         }
         callsRecyclerView.setAdapter(mUserCallsAdapter);

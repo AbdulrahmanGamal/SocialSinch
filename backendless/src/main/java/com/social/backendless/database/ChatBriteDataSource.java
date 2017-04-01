@@ -180,6 +180,49 @@ public class ChatBriteDataSource {
         }
     }
 
+    /**
+     * Obtains only the last message sent/received to/from a specific user
+     * @param user1
+     * @param user2
+     * @return
+     * @throws SQLException
+     */
+    public ChatMessage retrieveLastMessage(final String user1,
+                                           final String user2) throws SQLException{
+        synchronized (mObjectLock) {
+            String participants = String.valueOf(user1 + ":" + user2);
+
+            String query = "SELECT * FROM " +
+                    "( SELECT * FROM " +
+                    ChatSQLiteHelper.TABLE_MESSAGES + " WHERE " +
+                    ChatSQLiteHelper.COLUMN_PARTICIPANTS + " = ? ORDER BY " +
+                    ChatSQLiteHelper.COLUMN_ID_MSG + " ASC " +
+                    " ) ORDER BY " + ChatSQLiteHelper.COLUMN_ID_MSG + " DESC LIMIT 1";
+            Cursor cursor = mChatBriteDB.query(query, participants);
+            ChatMessage chatMessage;
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                Long id = cursor.getLong(0);
+                String fromUser = cursor.getString(3);
+                String toUser;
+                if (fromUser.equals(user1)) {
+                    toUser = user2;
+                } else {
+                    toUser = user1;
+                }
+                chatMessage = new ChatMessage(toUser, cursor.getString(2));
+                chatMessage.setMessageId(id);
+                chatMessage.setSenderId(fromUser);
+                chatMessage.setTimestamp(DateUtils.convertStringToDate(cursor.getString(4)));
+                chatMessage.setStatus(ChatStatus.fromString(cursor.getString(5)));
+            } else {
+                chatMessage = new ChatMessage(user2, "");
+            }
+            cursor.close();
+            return chatMessage;
+        }
+    }
+
     public void closeDatabase() {
         mChatBriteDB.close();
     }
