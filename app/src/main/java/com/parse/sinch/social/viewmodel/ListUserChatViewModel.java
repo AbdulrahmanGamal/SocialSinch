@@ -8,21 +8,17 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
-import com.backendless.BackendlessCollection;
-import com.backendless.BackendlessUser;
 import com.parse.sinch.social.LoginActivity;
 import com.parse.sinch.social.adapter.UserChatAdapter;
-import com.social.backendless.model.UserInfo;
+import com.social.backendless.model.CurrentChatsEvent;
 import com.parse.sinch.social.utils.Constants;
 import com.social.backendless.utils.LoggedUser;
 import com.social.backendless.bus.RxIncomingEventBus;
 import com.social.backendless.data.DataManager;
 import com.social.backendless.model.EventMessage;
 import com.social.backendless.model.EventStatus;
-import com.social.backendless.utils.DateUtils;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import rx.Subscriber;
@@ -33,7 +29,7 @@ import rx.functions.Action0;
  * Class to encapsulates the logic to display the calls received/made by the user in the list
  */
 
-public class ListUserCallViewModel {
+public class ListUserChatViewModel {
     private Context mContext;
     private UserChatAdapter mUserCallsAdapter;
     private List<String> mUserContactIds;
@@ -41,7 +37,7 @@ public class ListUserCallViewModel {
 
     private static final String TAG = "ListUserCallViewModel";
 
-    public ListUserCallViewModel(Context context) {
+    public ListUserChatViewModel(Context context) {
         this.mContext = context;
         this.mUserCallsAdapter = new UserChatAdapter(context);
         this.mUserContactIds = new ArrayList<>();
@@ -62,12 +58,12 @@ public class ListUserCallViewModel {
     }
     @BindingAdapter("userCallViewModel")
     public static void setUserCallViewModel(RecyclerView recyclerView,
-                                                ListUserCallViewModel viewModel) {
-        viewModel.getUserCalls(recyclerView);
+                                                ListUserChatViewModel viewModel) {
+        viewModel.getUserChats(recyclerView);
         recyclerView.setAdapter(viewModel.getAdapter());
         recyclerView.setLayoutManager(viewModel.createLayoutManager());
     }
-    private void getUserCalls(final RecyclerView callsRecyclerView) {
+    private void getUserChats(final RecyclerView callsRecyclerView) {
         DataManager.getFetchAllUsersObservable(LoggedUser.getInstance().getUserIdLogged())
                 .doOnSubscribe(new Action0() {
             @Override
@@ -75,7 +71,7 @@ public class ListUserCallViewModel {
                   setShowPanel(true);
             }
         }).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Object>() {
+                .subscribe(new Subscriber<CurrentChatsEvent>() {
                     @Override
                     public void onCompleted() {
                         //empty implementation doesn't apply here
@@ -88,18 +84,16 @@ public class ListUserCallViewModel {
                     }
 
                     @Override
-                    public void onNext(Object data) {
+                    public void onNext(CurrentChatsEvent data) {
                         processResponse(callsRecyclerView, data);
                         setShowPanel(false);
                     }
                 });
     }
 
-    private void processResponse(final RecyclerView callsRecyclerView, Object data) {
-        if (data instanceof BackendlessCollection) {
-            BackendlessCollection<BackendlessUser> users =
-                    (BackendlessCollection<BackendlessUser>) data;
-            mUserCallsAdapter.setUserCalls(convertToUserInfo(users));
+    private void processResponse(final RecyclerView callsRecyclerView, CurrentChatsEvent data) {
+        if (data.getCode().equals(com.social.backendless.utils.Constants.SUCCESS_CODE)) {
+            mUserCallsAdapter.setUserCalls(data.getCharUserInfo());
         } else {
             //reset the previous list of calls
             mUserCallsAdapter = new UserChatAdapter(mContext);
@@ -107,7 +101,6 @@ public class ListUserCallViewModel {
         }
         callsRecyclerView.setAdapter(mUserCallsAdapter);
     }
-
     /**
      * After an error getting the users, redirect to login screen
      */
@@ -118,37 +111,6 @@ public class ListUserCallViewModel {
         if (mContext instanceof Activity) {
             ((Activity) mContext).finish();
         }
-    }
-
-    //TODO refactor this to remove backendless user dependency
-    private List<UserInfo> convertToUserInfo(BackendlessCollection<BackendlessUser> calls) {
-        List<BackendlessUser> userList = calls.getData();
-        UserInfo user;
-        List<UserInfo> lstUsers = new ArrayList<>();
-        for (BackendlessUser backendlessUser : userList) {
-            user = new UserInfo();
-            user.setObjectId(backendlessUser.getObjectId());
-            user.setFullName((String) backendlessUser.getProperty("full_name"));
-            user.setPhoneNumber((String) backendlessUser.getProperty("phone"));
-            user.setProfilePicture((String) backendlessUser.getProperty("avatar"));
-            Date lastTimeSeen = (Date) backendlessUser.getProperty("last_seen");
-            Date lastLogin = (Date) backendlessUser.getProperty("lastLogin");
-            if (lastTimeSeen == null) {
-                user.setLastSeen(DateUtils.convertDateToString(lastLogin));
-            } else {
-                user.setLastSeen(DateUtils.convertDateToString(lastTimeSeen));
-            }
-            lstUsers.add(user);
-            mUserContactIds.add(user.getObjectId());
-            if (DateUtils.isSameDay(user.getLastSeen())) {
-                EventMessage eventMessage = new EventMessage(LoggedUser.getInstance().getUserIdLogged(),
-                        user.getObjectId(),
-                        EventStatus.ONLINE.toString(),
-                        EventStatus.ONLINE);
-                RxIncomingEventBus.getInstance().sendEvent(eventMessage);
-            }
-        }
-        return lstUsers;
     }
 
     public void notifyConnectionStatus(String message) {

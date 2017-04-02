@@ -12,13 +12,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.backendless.BackendlessUser;
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.parse.sinch.social.R;
 import com.parse.sinch.social.TabActivity;
-import com.social.backendless.utils.LoggedUser;
 import com.social.backendless.data.DataManager;
+import com.social.backendless.model.OperationResponse;
+import com.social.backendless.utils.Constants;
 
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -189,23 +189,23 @@ public class LoginViewViewModel {
                         disableSignIn();
                     }
                 })
-                .flatMap(new Func1<Void, Observable<Object>>() {
+                .flatMap(new Func1<Void, Observable<OperationResponse>>() {
                     @Override
-                    public Observable<Object> call(Void aVoid) {
+                    public Observable<OperationResponse> call(Void aVoid) {
                         return DataManager.getLoginObservable(mEmail, mPassword, true);
                     }
                 })
                 .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Object>() {
+                .subscribe(new Action1<OperationResponse>() {
                     @Override
-                    public void call(Object o) {
+                    public void call(OperationResponse response) {
                         enableSignIn();
-                        if (o instanceof BackendlessUser) {
-                            Log.e(TAG, "Backendless user successfully retrieved: " + o);
+                        if (response.getOpCode().equals(Constants.SUCCESS_CODE)) {
+                            Log.e(TAG, "Backendless user successfully logged: ");
                             loadMainUserList();
                             ((Activity)mContext).finish();
                         } else {
-                            Log.e(TAG, "Error retrieving the user: " + o);
+                            Log.e(TAG, "Error retrieving the user: " + response.getError());
                         }
                     }
                 });

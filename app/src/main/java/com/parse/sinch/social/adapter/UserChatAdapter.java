@@ -13,11 +13,15 @@ import com.parse.sinch.social.R;
 import com.parse.sinch.social.databinding.UserChatInfoBinding;
 import com.parse.sinch.social.model.UserViewInfoMessage;
 import com.parse.sinch.social.model.ViewMessage;
+import com.social.backendless.bus.RxIncomingEventBus;
 import com.social.backendless.bus.RxOutgoingMessageBus;
 import com.social.backendless.database.ChatBriteDataSource;
 import com.social.backendless.model.ChatMessage;
+import com.social.backendless.model.EventMessage;
+import com.social.backendless.model.EventStatus;
 import com.social.backendless.model.UserInfo;
 import com.parse.sinch.social.viewmodel.UserCallsItemViewModel;
+import com.social.backendless.utils.DateUtils;
 import com.social.backendless.utils.LoggedUser;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -70,9 +74,22 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.Bindin
             UserViewInfoMessage userVM =
                     new UserViewInfoMessage(userInfo, new ViewMessage(lastChatMessage));
             mUserChats.add(userVM);
+			notifyOnlineStatus(userInfo);
         }
         notifyDataSetChanged();
     }
+	/**
+	 * Notifies the user that current logged user is Online
+	 */
+	private void notifyOnlineStatus(UserInfo userInfo) {
+        if (userInfo.getLastSeen() != null && DateUtils.isSameDay(userInfo.getLastSeen())) {
+                EventMessage eventMessage = new EventMessage(LoggedUser.getInstance().getUserIdLogged(),
+                        userInfo.getObjectId(),
+                        EventStatus.ONLINE.toString(),
+                        EventStatus.ONLINE);
+                RxIncomingEventBus.getInstance().sendEvent(eventMessage);
+            }
+	}
 
 	public class BindingHolder extends RecyclerView.ViewHolder {
         private UserChatInfoBinding binding;
@@ -82,7 +99,6 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.Bindin
             this.binding = binding;
 		}
 	}
-
 	/**
 	 * Attach this class with the bus so it can receive notification about the
 	 * messages sent and received
@@ -99,7 +115,6 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.Bindin
 					}
 				});
 	}
-
     /**
      * Refresh the last message information shown under the user name
      * @param message

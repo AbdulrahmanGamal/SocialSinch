@@ -8,12 +8,17 @@ import com.backendless.BackendlessUser;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.persistence.BackendlessDataQuery;
+import com.social.backendless.model.CurrentChatsEvent;
+import com.social.backendless.model.OperationResponse;
 import com.social.backendless.model.UserInfo;
+import com.social.backendless.utils.Constants;
 import com.social.backendless.utils.DateUtils;
 import com.social.backendless.utils.LoggedUser;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import rx.Observable;
@@ -36,12 +41,12 @@ public class DataManager {
      * @param keepLogged
      * @return
      */
-    public static Observable<Object> getLoginObservable(final String login,
+    public static Observable<OperationResponse> getLoginObservable(final String login,
                                          final String password,
                                          final boolean keepLogged) {
-        return Observable.create(new Observable.OnSubscribe<Object>() {
+        return Observable.create(new Observable.OnSubscribe<OperationResponse>() {
             @Override
-            public void call(final Subscriber<? super Object> subscriber) {
+            public void call(final Subscriber<? super OperationResponse> subscriber) {
                 Backendless.UserService.login(login,
                         password, new  AsyncCallback<BackendlessUser>() {
                             @Override
@@ -49,13 +54,15 @@ public class DataManager {
                                 LoggedUser currentUser = LoggedUser.getInstance();
                                 currentUser.setUserLogged(backendlessUser);
                                 currentUser.setUserLoggedId(backendlessUser.getUserId());
-                                subscriber.onNext(backendlessUser);
+                                subscriber.onNext(new OperationResponse(Constants.SUCCESS_CODE, ""));
                             }
 
                             @Override
                             public void handleFault(BackendlessFault backendlessFault) {
                                 LoggedUser.getInstance().setUserLogged(null);
-                                subscriber.onNext(backendlessFault);
+                                subscriber.onNext(
+                                        new OperationResponse(backendlessFault.getCode(),
+                                                backendlessFault.getMessage()));
                             }
                         }, keepLogged);
             }
@@ -66,22 +73,33 @@ public class DataManager {
      * Observable to obtain all the users registered in the backend but the user logged
      * @return
      */
-    public static Observable<Object> getFetchAllUsersObservable(final String subscriberId) {
-        return Observable.create(new Observable.OnSubscribe<Object>() {
+    public static Observable<CurrentChatsEvent> getFetchAllUsersObservable(final String subscriberId) {
+        return Observable.create(new Observable.OnSubscribe<CurrentChatsEvent>() {
             @Override
-            public void call(final Subscriber<? super Object> subscriber) {
+            public void call(final Subscriber<? super CurrentChatsEvent> subscriber) {
                 String whereClause = "objectId != '" + subscriberId + "'";
                 BackendlessDataQuery dataQuery = new BackendlessDataQuery();
                 dataQuery.setWhereClause( whereClause );
                 Backendless.Data.of(BackendlessUser.class).find(dataQuery, new AsyncCallback<BackendlessCollection<BackendlessUser>>() {
                     @Override
                     public void handleResponse(BackendlessCollection<BackendlessUser> backendlessUserBackendlessCollection) {
-                        subscriber.onNext(backendlessUserBackendlessCollection);
+                        CurrentChatsEvent userCurrentChats =
+                                new CurrentChatsEvent(new OperationResponse(Constants.SUCCESS_CODE, ""));
+                        List<UserInfo> userInfoList = new ArrayList<>();
+                        for (BackendlessUser user : backendlessUserBackendlessCollection.getData()) {
+                            userInfoList.add(convertToUserInfo(user));
+                        }
+                        userCurrentChats.setCharUserInfo(userInfoList);
+                        subscriber.onNext(userCurrentChats);
                     }
 
                     @Override
                     public void handleFault(BackendlessFault backendlessFault) {
-                        subscriber.onNext(backendlessFault);
+                        CurrentChatsEvent userCurrentChats =
+                                new CurrentChatsEvent(
+                                        new OperationResponse(backendlessFault.getCode(),
+                                                backendlessFault.getMessage()));
+                        subscriber.onNext(userCurrentChats);
                     }
                 });
             }
@@ -140,7 +158,6 @@ public class DataManager {
      * @return
      */
     private static UserInfo convertToUserInfo(BackendlessUser backendlessUser) {
-
         UserInfo user = new UserInfo();
         user.setObjectId(backendlessUser.getObjectId());
         user.setFullName((String) backendlessUser.getProperty("full_name"));

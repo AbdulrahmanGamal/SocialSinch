@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 
 import com.parse.sinch.social.R;
 import com.parse.sinch.social.databinding.FragmentCallsListBinding;
-import com.parse.sinch.social.viewmodel.ListUserCallViewModel;
+import com.parse.sinch.social.viewmodel.ListUserChatViewModel;
 import com.social.backendless.utils.DateUtils;
 
 import java.util.Calendar;
@@ -22,7 +22,7 @@ import java.util.Locale;
  */
 public class UserListFragment extends Fragment {
 
-    private ListUserCallViewModel mListUserCallViewModel;
+    private ListUserChatViewModel mListUserCallViewModel;
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -30,7 +30,7 @@ public class UserListFragment extends Fragment {
         // properly.
         final View rootView = inflater.inflate(R.layout.fragment_calls_list, container, false);
         FragmentCallsListBinding fragmentCallsListBinding = FragmentCallsListBinding.bind(rootView);
-        mListUserCallViewModel = new ListUserCallViewModel(getContext());
+        mListUserCallViewModel = new ListUserChatViewModel(getContext());
         fragmentCallsListBinding.setViewModel(mListUserCallViewModel);
         return rootView;
     }

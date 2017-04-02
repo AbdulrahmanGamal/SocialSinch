@@ -8,10 +8,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.backendless.Backendless;
-import com.social.backendless.model.ChatMessage;
-import com.social.backendless.model.ChatStatus;
-import com.parse.sinch.social.R;
 import com.parse.sinch.social.adapter.ChatMessageAdapter;
 
 /**
