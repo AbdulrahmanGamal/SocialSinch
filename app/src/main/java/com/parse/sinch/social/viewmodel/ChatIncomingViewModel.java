@@ -1,22 +1,20 @@
 package com.parse.sinch.social.viewmodel;
 
-import android.content.Context;
 import android.databinding.BindingAdapter;
-import android.graphics.drawable.Drawable;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.FrameLayout;
 
+import com.parse.sinch.social.R;
 import com.parse.sinch.social.model.ViewMessage;
 import com.social.backendless.utils.DateUtils;
 
 /**
- * Created by valgood on 2/20/2017.
+ * View Model to display the message incoming
  */
 
 public class ChatIncomingViewModel {
     private ViewMessage mViewChatMessage;
 
-    public ChatIncomingViewModel(Context context, ViewMessage viewChatMessage){
+    public ChatIncomingViewModel(ViewMessage viewChatMessage){
         this.mViewChatMessage = viewChatMessage;
     }
 
@@ -28,4 +26,16 @@ public class ChatIncomingViewModel {
         return mViewChatMessage;
     }
 
+    @BindingAdapter("android:background")
+    public static void setMessageBackground(FrameLayout layout, ChatIncomingViewModel viewModel) {
+        layout.setBackgroundResource(viewModel.getBackground());
+    }
+
+    public int getBackground() {
+        if (mViewChatMessage.isFirstMessage()) {
+            return R.drawable.balloon_incoming_normal_ext;
+        } else {
+            return R.drawable.balloon_incoming_normal;
+        }
+    }
 }

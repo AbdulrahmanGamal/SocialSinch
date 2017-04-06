@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.parse.sinch.social.model.ViewMessage;
+import com.parse.sinch.social.utils.Constants;
 import com.parse.sinch.social.utils.Utils;
 import com.social.backendless.utils.LoggedUser;
 import com.social.backendless.bus.RxIncomingMessageBus;
@@ -34,23 +35,20 @@ import io.reactivex.functions.Consumer;
  * recycler view.
  */
 public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.BindingHolder> {
-    private Context mContext;
     private List<ViewMessage> mViewMessages;
     private NewItemInserted mItemInsertedListener;
     private ChatBriteDataSource mDataSource;
+    private int mLastMessageType;
 
     private static final String TAG = "ChatMessageAdapter";
-
-    private static final int MESSAGE_OUTGOING = 1;
-    private static final int MESSAGE_INCOMING = 2;
 
     public ChatMessageAdapter(Context context,
                               String recipientId,
                               NewItemInserted itemInsertedListener) {
-        this.mContext = context;
         this.mViewMessages = new ArrayList<>();
         this.mItemInsertedListener = itemInsertedListener;
         this.mDataSource = ChatBriteDataSource.getInstance(context);
+        this.mLastMessageType = -1;
         setHasStableIds(true);
         retrieveOldMessages(recipientId);
         configureMessageBus();
@@ -144,14 +142,22 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
      * @param viewChatMessage
      */
     public void addMessage(final ViewMessage viewChatMessage) {
+        if (viewChatMessage.getChatMessage().getStatus().equals(ChatStatus.RECEIVED)) {
+            viewChatMessage.setFirstMessage(mLastMessageType == Constants.MESSAGE_INCOMING);
+            mLastMessageType = Constants.MESSAGE_INCOMING;
+        } else {
+            viewChatMessage.setFirstMessage(mLastMessageType == Constants.MESSAGE_OUTGOING);
+            mLastMessageType = Constants.MESSAGE_OUTGOING;
+        }
         mViewMessages.add(viewChatMessage);
+
         notifyItemInserted(mViewMessages.size());
         //notify the recycler view to scroll up the recycler view
         mItemInsertedListener.onItemInserted();
     }
     @Override
     public BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == MESSAGE_INCOMING) {
+        if (viewType == Constants.MESSAGE_INCOMING) {
             ViewDataBinding incomingChatMessageBinding = DataBindingUtil.inflate(
                     LayoutInflater.from(parent.getContext()), R.layout.incoming_chat_message, parent, false);
             return new IncomingBindingHolder((IncomingChatMessageBinding) incomingChatMessageBinding);
@@ -160,28 +166,28 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
                     LayoutInflater.from(parent.getContext()), R.layout.outgoing_chat_message, parent, false);
             return new OutgoingBindingHolder((OutgoingChatMessageBinding) outgoingChatMessageBinding);
         }
-
     }
 
     @Override
     public int getItemViewType(int position) {
         if (mViewMessages.get(position).getChatMessage().getStatus().equals(ChatStatus.RECEIVED)) {
-            return MESSAGE_INCOMING;
+            return Constants.MESSAGE_INCOMING;
         }
-        return MESSAGE_OUTGOING;
+        return Constants.MESSAGE_OUTGOING;
     }
     @Override
     public void onBindViewHolder(BindingHolder holder, int position) {
         if (holder instanceof IncomingBindingHolder) {
             IncomingChatMessageBinding binding =
                     ((IncomingBindingHolder) holder).getIncomingChatMessageBinding();
-            binding.setViewModel(new ChatIncomingViewModel(mContext, mViewMessages.get(position)));
+            binding.setViewModel(new ChatIncomingViewModel(mViewMessages.get(position)));
         } else {
             OutgoingChatMessageBinding binding =
                     ((OutgoingBindingHolder) holder).getOutgoingChatMessageBinding();
             binding.setViewModel(new ChatOutgoingViewModel(mViewMessages.get(position)));
         }
     }
+
 
     @Override
     public int getItemCount() {

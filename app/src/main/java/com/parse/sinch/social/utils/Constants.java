@@ -10,4 +10,7 @@ public interface Constants {
     String RECIPIENT_NAME = "com.social.utils.recipient_name";
     String RECIPIENT_LAST_TIME_SEEN = "com.social.utils.recipient_last_time_seen";
     String FAULT_REFRESH_TOKEN = "com.social.utils.fault_backendless";
+
+    int MESSAGE_OUTGOING = 1;
+    int MESSAGE_INCOMING = 2;
 }

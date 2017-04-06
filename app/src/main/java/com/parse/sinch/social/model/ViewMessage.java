@@ -9,6 +9,7 @@ import com.social.backendless.model.ChatMessage;
 public class ViewMessage {
     private Long mViewMessageId;
     private int mResourceId;
+    private boolean isFirstMessage;
     private ChatMessage mChatMessage;
 
     public ViewMessage(ChatMessage chatMessage) {
@@ -33,5 +34,13 @@ public class ViewMessage {
 
     public ChatMessage getChatMessage() {
         return mChatMessage;
+    }
+
+    public boolean isFirstMessage() {
+        return isFirstMessage;
+    }
+
+    public void setFirstMessage(boolean firstMessage) {
+        isFirstMessage = firstMessage;
     }
 }
