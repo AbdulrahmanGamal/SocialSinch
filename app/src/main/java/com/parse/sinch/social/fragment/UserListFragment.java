@@ -42,4 +42,10 @@ public class UserListFragment extends Fragment {
         mListUserCallViewModel.
                 notifyConnectionStatus(DateUtils.convertDateToString(currentTime));
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mListUserCallViewModel.refreshLastMessage();
+    }
 }

@@ -41,20 +41,6 @@ public class LoginActivity extends AppCompatActivity
             loginViewViewModel.loadMainUserList();
             finish();
         }
-//		RxView.clicks(mSignUp)
-//				.subscribe(new Action1<Void>() {
-//					@Override
-//					public void call(Void aVoid) {
-//						startActivity(new Intent(LoginActivity.this, RegistroActivity.class));
-//					}
-//				});
-
-//        ParseUser currentUser = ParseUser.getCurrentUser();
-//        if (currentUser != null) {
-//			startActivity(new Intent(LoginActivity.this, TabActivity.class));
-//			//startService(new Intent(LoginActivity.this, SinchService.class));
-//            finish();
-//        }
     }
 
     @Override

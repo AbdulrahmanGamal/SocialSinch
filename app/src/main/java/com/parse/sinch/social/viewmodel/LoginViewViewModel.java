@@ -78,6 +78,7 @@ public class LoginViewViewModel {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                
             }
         };
     }

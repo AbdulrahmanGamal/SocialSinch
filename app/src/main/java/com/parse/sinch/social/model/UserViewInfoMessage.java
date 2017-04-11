@@ -1,5 +1,6 @@
 package com.parse.sinch.social.model;
 
+import com.social.backendless.model.ChatMessage;
 import com.social.backendless.model.UserInfo;
 import com.social.backendless.utils.DateUtils;
 
@@ -25,5 +26,9 @@ public class UserViewInfoMessage {
 
     public void setLastViewMessage(ViewMessage lastViewMessage) {
         this.mLastViewMessage = lastViewMessage;
+    }
+
+    public void updateLastMessage(ChatMessage lastChatMessage) {
+        mLastViewMessage.setChatMessage(lastChatMessage);
     }
 }

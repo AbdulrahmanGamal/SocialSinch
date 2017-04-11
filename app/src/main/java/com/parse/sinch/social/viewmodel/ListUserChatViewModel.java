@@ -101,6 +101,9 @@ public class ListUserChatViewModel {
         }
         callsRecyclerView.setAdapter(mUserCallsAdapter);
     }
+    public void refreshLastMessage() {
+        mUserCallsAdapter.refreshLastMessage();
+    }
     /**
      * After an error getting the users, redirect to login screen
      */

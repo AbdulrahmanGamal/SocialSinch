@@ -11,6 +11,8 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/backendless" />
+            <option value="$PROJECT_DIR$/giphy" />
+            <option value="$PROJECT_DIR$/tenor" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

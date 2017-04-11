@@ -1,6 +1,7 @@
 package com.parse.sinch.social.viewmodel;
 
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.BindingAdapter;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.parse.sinch.social.TenorGridActivity;
 import com.parse.sinch.social.adapter.ChatMessageAdapter;
 
 /**
@@ -41,6 +43,14 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
         };
     }
 
+    public View.OnClickListener onClickEmoji() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mContext.startActivity(new Intent(mContext, TenorGridActivity.class));
+            }
+        };
+    }
     public void setMessage(EditText message) {
         this.mMessage = message;
     }

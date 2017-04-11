@@ -71,7 +71,8 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_gravity="bottom"
-                    android:src="@drawable/input_emoji"/>
+                    android:src="@drawable/input_emoji"
+                    android:onClick="@{viewModel.onClickEmoji}"/>
 
                 <EditText
                     android:id="@+id/chat_edit_text1"

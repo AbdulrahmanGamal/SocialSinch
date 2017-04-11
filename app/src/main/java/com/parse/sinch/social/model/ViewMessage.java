@@ -36,6 +36,10 @@ public class ViewMessage {
         return mChatMessage;
     }
 
+    public void setChatMessage(ChatMessage chatMessage) {
+        this.mChatMessage = chatMessage;
+    }
+
     public boolean isFirstMessage() {
         return isFirstMessage;
     }

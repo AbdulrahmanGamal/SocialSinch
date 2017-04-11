@@ -78,6 +78,15 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.Bindin
         }
         notifyDataSetChanged();
     }
+    public void refreshLastMessage() {
+		for (UserViewInfoMessage userVM : mUserChats) {
+			ChatMessage lastChatMessage =
+					mDataSource.retrieveLastMessage(LoggedUser.getInstance().getUserIdLogged(),
+							userVM.getUserInfo().getObjectId());
+			userVM.updateLastMessage(lastChatMessage);
+		}
+		notifyDataSetChanged();
+	}
 	/**
 	 * Notifies the user that current logged user is Online
 	 */
