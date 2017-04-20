@@ -50,7 +50,7 @@ public class TenorGridViewAdapter extends ArrayAdapter<Result> {
             row = convertView;
         }
         Result item = mGridData.get(position);
-        ((GiphyWebView)row).bindTo(item.getMedia().get(0).getGif().getUrl());
+        ((GiphyWebView)row).bindTo(item.getMedia().get(0).getTinygif().getUrl());
         return row;
     }
 
