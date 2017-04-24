@@ -15,4 +15,5 @@
     <dimen name="header_view_start_margin_bottom">14dp</dimen>
     <dimen name="header_view_start_margin_top">3dp</dimen>
     <dimen name="header_view_info_margin_left">35dp</dimen>
+    <dimen name="dropdownitem_icon_width">32dip</dimen>
 </resources>

@@ -12,7 +12,7 @@ import rx.Observable;
 public class DataManager {
     private static final String TAG = "DataManager";
 
-    public static Observable<TenorModel> searchGiphyByKeyword(String keyword) {
+    public static Observable<TenorModel> searchGiphyByKeyword(String keyword, int limit, String pos) {
         TenorService service =
                 ServiceFactory.createRetrofitService(TenorService.class, TenorService.SERVICE_ENDPOINT);
 
