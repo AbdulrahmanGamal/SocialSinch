@@ -2,11 +2,7 @@ package com.parse.sinch.social;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.content.Context;
 import android.content.res.Resources;
-import android.content.res.TypedArray;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -14,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,7 +21,6 @@ import android.view.animation.AnimationSet;
 import android.view.animation.TranslateAnimation;
 import android.widget.GridView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.parse.sinch.social.adapter.TenorGridViewAdapter;
 import com.parse.sinch.social.custom.EndlessScrollListener;
@@ -33,7 +29,8 @@ import com.social.tenor.model.Result;
 import com.social.tenor.model.TenorModel;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -43,41 +40,60 @@ import rx.schedulers.Schedulers;
 public class TenorGridActivity extends AppCompatActivity {
     private GridView mGridView;
     private ProgressBar mProgressBar;
-    private List<Result> mData;
-    private String mNext;
-    private TenorGridViewAdapter mAdapter;
+    private String mTrendingNext;
+    private String mSearchNext;
+    private TenorGridViewAdapter mTrendingAdapter;
+    private TenorGridViewAdapter mSearchAdapter;
     private MenuItem mSearchItem;
     private Toolbar mToolbar;
+    private String mKeywordSearch;
+
+    private static final int MAX_RESULTS = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_giphy_grid);
+        setContentView(R.layout.activity_gif_grid);
 
         mGridView = (GridView) findViewById(R.id.gridView);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
-
-        mData = new ArrayList<>();
-        mNext = "";
-        mAdapter = new TenorGridViewAdapter(this, mData);
-        mGridView.setAdapter(mAdapter);
+        mTrendingNext = "";
+        mSearchNext = "";
+        mKeywordSearch = "";
+        mTrendingAdapter = new TenorGridViewAdapter(this, new ArrayList<Result>());
+        mSearchAdapter = new TenorGridViewAdapter(this, new ArrayList<Result>());
         mGridView.setOnScrollListener(new EndlessScrollListener() {
             @Override
             public boolean onLoadMore(int page, int totalItemsCount) {
-                // Triggered only when new data needs to be appended to the list
-                // Add whatever code is needed to append new items to your AdapterView
-                loadNextDataFromApi(50);
-                // or loadNextDataFromApi(totalItemsCount);
-                return true; // ONLY if more data is actually being loaded; false otherwise.
+                boolean canSearchMore = "".equals(mKeywordSearch) && !"".equals(mTrendingNext) ||
+                        !"".equals(mKeywordSearch) && !"".equals(mSearchNext);
+
+                Log.e("TenorGridActivity", "mKeywordSearch: " + mKeywordSearch);
+                Log.e("TenorGridActivity", "canSearchMore: " + canSearchMore);
+                Log.e("TenorGridActivity", "mSearchNext: " + mSearchNext);
+                return canSearchMore && makeGifRequest();
             }
         });
-        loadNextDataFromApi(50);
+        //only called the first time the view is created
+        makeGifRequest();
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("GIF Gallery");
+            getSupportActionBar().setTitle(getResources().getString(R.string.gif_galley_title));
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -92,6 +108,7 @@ public class TenorGridActivity extends AppCompatActivity {
                 // Called when SearchView is collapsing
                 if (mSearchItem.isActionViewExpanded()) {
                     animateSearchToolbar(1, false, false);
+                    resetToTrending();
                 }
                 return true;
             }
@@ -114,38 +131,65 @@ public class TenorGridActivity extends AppCompatActivity {
             public boolean onQueryTextChange(String newText) {
                 // newText is text entered by user to SearchView
                 //Toast.makeText(getApplicationContext(), newText, Toast.LENGTH_LONG).show();
+//                mSearchAdapter.clearGridData();
+//                mGridView.setAdapter(mSearchAdapter);
                 if (newText != null && !newText.isEmpty() && newText.length() > 2) {
-                    loadSearchDataFromApi(newText, 0);
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    mKeywordSearch = newText;
+                    loadSearchDataFromApi(MAX_RESULTS);
+                } else {
+                    mSearchNext = "";
+                    mKeywordSearch = "";
+                    mSearchAdapter.clearGridData();
                 }
                 return false;
             }
         });
-
         return true;
     }
 
+    private boolean makeGifRequest() {
+        if (!"".equals(mKeywordSearch)) {
+            loadSearchDataFromApi(MAX_RESULTS);
+        } else {
+            loadNextTrendingFromApi(MAX_RESULTS);
+        }
+        return true;
+    }
+    /**
+     * Resets the adapter to trending gifs
+     */
+    private void resetToTrending() {
+        loadNextTrendingFromApi(MAX_RESULTS);
+        mTrendingNext = "";
+        mKeywordSearch = "";
+    }
     // Append the next page of data into the adapter
     // This method probably sends out a network request and appends new data items to your adapter.
-    public void loadNextDataFromApi(int offset) {
+    public void loadNextTrendingFromApi(int offset) {
         // Send an API request to retrieve appropriate paginated data
         //  --> Send the request including an offset value (i.e `page`) as a query parameter.
         //  --> Deserialize and construct new model objects from the API response
         //  --> Append the new data objects to the existing set of items inside the array of items
         //  --> Notify the adapter of the new items made with `notifyDataSetChanged()`
-        DataManager.getTrending(offset, mNext)
+        DataManager.getTrending(offset, mTrendingNext)
                 .filter(new Func1<TenorModel, Boolean>() {
                     @Override
                     public Boolean call(TenorModel tenorModel) {
                         return tenorModel.getResults() != null;
                     }
                 })
+                .take(1)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<TenorModel>() {
                     @Override
                     public void call(TenorModel tenorModel) {
-                        mAdapter.setGridData(tenorModel.getResults());
-                        mNext = tenorModel.getNext();
+                        mTrendingAdapter.setGridData(tenorModel.getResults());
+                        if ("".equals(mTrendingNext)) {
+                            mGridView.setAdapter(mTrendingAdapter);
+                        }
+                        mTrendingNext = tenorModel.getNext();
                         mProgressBar.setVisibility(View.INVISIBLE);
                     }
                 });
@@ -153,13 +197,15 @@ public class TenorGridActivity extends AppCompatActivity {
 
     // Append the next page of data into the adapter
     // This method probably sends out a network request and appends new data items to your adapter.
-    public void loadSearchDataFromApi(String keyword, int offset) {
+    public void loadSearchDataFromApi(int offset) {
         // Send an API request to retrieve appropriate paginated data
         //  --> Send the request including an offset value (i.e `page`) as a query parameter.
         //  --> Deserialize and construct new model objects from the API response
         //  --> Append the new data objects to the existing set of items inside the array of items
         //  --> Notify the adapter of the new items made with `notifyDataSetChanged()`
-        DataManager.searchGiphyByKeyword(keyword, offset, mNext)
+        String locale = Locale.getDefault().toString();
+        DataManager.searchGiphyByKeyword(mKeywordSearch, offset, mSearchNext, locale)
+                .delay(5, TimeUnit.MILLISECONDS)
                 .filter(new Func1<TenorModel, Boolean>() {
                     @Override
                     public Boolean call(TenorModel tenorModel) {
@@ -171,9 +217,12 @@ public class TenorGridActivity extends AppCompatActivity {
                 .subscribe(new Action1<TenorModel>() {
                     @Override
                     public void call(TenorModel tenorModel) {
-                        mAdapter.clearGridData();
-                        mAdapter.setGridData(tenorModel.getResults());
-                        mNext = tenorModel.getNext();
+                        Log.e("TenorGridActivity", "adding search Results: " + mSearchNext);
+                        mSearchAdapter.setGridData(tenorModel.getResults());
+                        if ("".equals(mSearchNext)) {
+                            mGridView.setAdapter(mSearchAdapter);
+                        }
+                        mSearchNext = tenorModel.getNext();
                         mProgressBar.setVisibility(View.INVISIBLE);
                     }
                 });
@@ -181,7 +230,7 @@ public class TenorGridActivity extends AppCompatActivity {
     public void animateSearchToolbar(int numberOfMenuIcon, boolean containsOverflow, boolean show) {
 
         mToolbar.setBackgroundColor(ContextCompat.getColor(this, android.R.color.white));
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.ColorPrimary));
+        //getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.ColorPrimary));
 
         if (show) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -210,8 +259,8 @@ public class TenorGridActivity extends AppCompatActivity {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         super.onAnimationEnd(animation);
-                        mToolbar.setBackgroundColor(getThemeColor(TenorGridActivity.this, R.attr.colorPrimary));
-                        getWindow().setStatusBarColor(ContextCompat.getColor(TenorGridActivity.this, R.color.ColorPrimary));
+                        mToolbar.setBackgroundColor(ContextCompat.getColor(TenorGridActivity.this, R.color.ColorPrimary));
+                        //getWindow().setStatusBarColor(ContextCompat.getColor(TenorGridActivity.this, R.color.ColorPrimary));
                     }
                 });
                 createCircularReveal.start();
@@ -230,7 +279,7 @@ public class TenorGridActivity extends AppCompatActivity {
 
                     @Override
                     public void onAnimationEnd(Animation animation) {
-                        mToolbar.setBackgroundColor(getThemeColor(TenorGridActivity.this, R.attr.colorPrimary));
+                        mToolbar.setBackgroundColor(ContextCompat.getColor(TenorGridActivity.this, R.color.ColorPrimary));
                     }
 
                     @Override
@@ -240,7 +289,7 @@ public class TenorGridActivity extends AppCompatActivity {
                 });
                 mToolbar.startAnimation(animationSet);
             }
-            getWindow().setStatusBarColor(ContextCompat.getColor(TenorGridActivity.this, R.color.ColorPrimary));
+            //getWindow().setStatusBarColor(ContextCompat.getColor(TenorGridActivity.this, R.color.ColorPrimary));
         }
     }
 
@@ -248,11 +297,11 @@ public class TenorGridActivity extends AppCompatActivity {
         return resources.getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
     }
 
-    private static int getThemeColor(Context context, int id) {
-        Resources.Theme theme = context.getTheme();
-        TypedArray a = theme.obtainStyledAttributes(new int[]{id});
-        int result = a.getColor(0, 0);
-        a.recycle();
-        return result;
-    }
+//    private static int getThemeColor(Context context, int id) {
+//        Resources.Theme theme = context.getTheme();
+//        TypedArray a = theme.obtainStyledAttributes(new int[]{id});
+//        int result = a.getColor(0, 0);
+//        a.recycle();
+//        return result;
+//    }
 }

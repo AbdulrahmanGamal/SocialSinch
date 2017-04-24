@@ -43,6 +43,7 @@ public class TenorGridViewAdapter extends ArrayAdapter<Result> {
 
     public void clearGridData() {
         this.mGridData.clear();
+        notifyDataSetChanged();
     }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {

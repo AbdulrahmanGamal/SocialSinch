@@ -12,11 +12,14 @@ import rx.Observable;
 public class DataManager {
     private static final String TAG = "DataManager";
 
-    public static Observable<TenorModel> searchGiphyByKeyword(String keyword, int limit, String pos) {
+    public static Observable<TenorModel> searchGiphyByKeyword(String keyword,
+                                                              int limit,
+                                                              String pos,
+                                                              String locale) {
         TenorService service =
                 ServiceFactory.createRetrofitService(TenorService.class, TenorService.SERVICE_ENDPOINT);
 
-        return service.searchGif(keyword);
+        return service.searchGif(String.valueOf(limit), pos, keyword, locale);
     }
 
     public static Observable<TenorModel> getTrending(int limit, String pos) {

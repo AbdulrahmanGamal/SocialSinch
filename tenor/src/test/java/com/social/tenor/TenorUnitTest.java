@@ -18,7 +18,7 @@ public class TenorUnitTest {
     @Test
     public void searchByKeywordTest() throws Exception {
         TestSubscriber<TenorModel> testSubscriber = new TestSubscriber<>();
-        DataManager.searchGiphyByKeyword("love").subscribe(testSubscriber);
+        DataManager.searchGiphyByKeyword("love", 1, "", "en_US").subscribe(testSubscriber);
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
 //        List<GiphyModel> model = testSubscriber.getOnNextEvents();

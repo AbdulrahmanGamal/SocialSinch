@@ -59,6 +59,7 @@
     <string name="yesterday">yesterday</string>
     <string name="at">at</string>
     <string name="status_online">Online</string>
-
+    <string name="gif_galley_title">GIF Gallery</string>
+    <string name="search_title">Search</string>
 
 </resources>

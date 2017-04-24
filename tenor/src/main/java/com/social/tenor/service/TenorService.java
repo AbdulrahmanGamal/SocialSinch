@@ -14,7 +14,10 @@ public interface TenorService {
     String SERVICE_ENDPOINT = "https://api.tenor.co/v1/";
 
     @GET("search?")
-    Observable<TenorModel> searchGif(@Query("tag") String keyword);
+    Observable<TenorModel> searchGif(@Query("limit") String offset,
+                                     @Query("pos") String pos,
+                                     @Query("tag") String keyword,
+                                     @Query("locale") String locale);
 
     @GET("trending?")
     Observable<TenorModel> trending(@Query("limit") String offset, @Query("pos") String pos);

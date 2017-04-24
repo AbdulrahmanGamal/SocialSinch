@@ -16,4 +16,7 @@
     <dimen name="header_view_start_margin_top">3dp</dimen>
     <dimen name="header_view_info_margin_left">35dp</dimen>
     <dimen name="dropdownitem_icon_width">32dip</dimen>
+    <dimen name="toolbar_gif_search_padding_start">0dp</dimen>
+    <dimen name="toolbar_gif_search_padding_end">8dp</dimen>
+    <dimen name="toolbar_gif_search_autocomplete_text_size">20sp</dimen>
 </resources>
