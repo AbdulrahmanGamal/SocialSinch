@@ -4,10 +4,10 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.res.Resources;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -25,30 +25,37 @@ import android.widget.ProgressBar;
 import com.parse.sinch.social.adapter.TenorGridViewAdapter;
 import com.parse.sinch.social.custom.EndlessScrollListener;
 import com.social.tenor.data.DataManager;
-import com.social.tenor.model.Result;
 import com.social.tenor.model.TenorModel;
 
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import rx.Observable;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
+import rx.subscriptions.CompositeSubscription;
 
 public class TenorGridActivity extends AppCompatActivity {
     private GridView mGridView;
     private ProgressBar mProgressBar;
-    private String mTrendingNext;
-    private String mSearchNext;
-    private TenorGridViewAdapter mTrendingAdapter;
-    private TenorGridViewAdapter mSearchAdapter;
+    private String mGifNext;
+    private TenorGridViewAdapter mGifAdapter;
     private MenuItem mSearchItem;
     private Toolbar mToolbar;
     private String mKeywordSearch;
+    private SearchView mSearchView;
+    private CompositeSubscription mDisposable;
+    private String mLocale;
 
-    private static final int MAX_RESULTS = 20;
+    private final PublishSubject<String> mPaginator = PublishSubject.create();
+
+    private static final int MAX_RESULTS = 10;
+
+    private static final String TAG = "TenorGridActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,32 +64,50 @@ public class TenorGridActivity extends AppCompatActivity {
 
         mGridView = (GridView) findViewById(R.id.gridView);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
-        mTrendingNext = "";
-        mSearchNext = "";
         mKeywordSearch = "";
-        mTrendingAdapter = new TenorGridViewAdapter(this, new ArrayList<Result>());
-        mSearchAdapter = new TenorGridViewAdapter(this, new ArrayList<Result>());
+        mLocale = Locale.getDefault().toString();
+        mGifAdapter = new TenorGridViewAdapter(this, new ArrayList<>());
+        mGridView.setAdapter(mGifAdapter);
         mGridView.setOnScrollListener(new EndlessScrollListener() {
             @Override
             public boolean onLoadMore(int page, int totalItemsCount) {
-                boolean canSearchMore = "".equals(mKeywordSearch) && !"".equals(mTrendingNext) ||
-                        !"".equals(mKeywordSearch) && !"".equals(mSearchNext);
+                if (!"".equals(mGifNext)) {
+                    mPaginator.onNext(mGifNext);
+                    return true;
+                }
 
-                Log.e("TenorGridActivity", "mKeywordSearch: " + mKeywordSearch);
-                Log.e("TenorGridActivity", "canSearchMore: " + canSearchMore);
-                Log.e("TenorGridActivity", "mSearchNext: " + mSearchNext);
-                return canSearchMore && makeGifRequest();
+                return false;
             }
         });
-        //only called the first time the view is created
-        makeGifRequest();
 
+        mGifNext = "";
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(getResources().getString(R.string.gif_galley_title));
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mDisposable.unsubscribe();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mDisposable.unsubscribe();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mDisposable = new CompositeSubscription();
+        attachPaginator();
+        attachSearchObservable();
+        mPaginator.onNext(mGifNext);
     }
 
     @Override
@@ -96,7 +121,6 @@ public class TenorGridActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_search, menu);
@@ -120,113 +144,123 @@ public class TenorGridActivity extends AppCompatActivity {
                 return true;
             }
         });
-        SearchView searchView = (SearchView) mSearchItem.getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                // newText is text entered by user to SearchView
-                //Toast.makeText(getApplicationContext(), newText, Toast.LENGTH_LONG).show();
-//                mSearchAdapter.clearGridData();
-//                mGridView.setAdapter(mSearchAdapter);
-                if (newText != null && !newText.isEmpty() && newText.length() > 2) {
-                    mProgressBar.setVisibility(View.VISIBLE);
-                    mKeywordSearch = newText;
-                    loadSearchDataFromApi(MAX_RESULTS);
-                } else {
-                    mSearchNext = "";
-                    mKeywordSearch = "";
-                    mSearchAdapter.clearGridData();
-                }
-                return false;
-            }
+        mSearchView = (SearchView) mSearchItem.getActionView();
+        mSearchView.findViewById(R.id.search_close_btn).setOnClickListener(view -> {
+            resetToTrending();
+            mSearchView.setQuery("", false);
         });
+        attachSearchObservable();
         return true;
     }
 
-    private boolean makeGifRequest() {
-        if (!"".equals(mKeywordSearch)) {
-            loadSearchDataFromApi(MAX_RESULTS);
-        } else {
-            loadNextTrendingFromApi(MAX_RESULTS);
+    /**
+     * Subscribes to the paginator observable
+     */
+    private void attachPaginator() {
+        mDisposable.add(
+            mPaginator
+              .observeOn(Schedulers.io())
+              .concatMap(next -> { if ("".equals(mKeywordSearch)) {
+                                     return DataManager.getTrending(MAX_RESULTS, next);
+                                   }
+                                   return DataManager.searchGiphyByKeyword(mKeywordSearch, MAX_RESULTS, next, mLocale);
+              })
+              .filter(tenorModel -> tenorModel.getResults() != null)
+              .observeOn(AndroidSchedulers.mainThread())
+              .subscribe(tenorModel -> {
+                  mGifAdapter.setGridData(tenorModel.getResults());
+                  mGifNext = tenorModel.getNext();
+                  mProgressBar.setVisibility(View.INVISIBLE);
+              })
+        );
+    }
+
+    /**
+     * Subscribes to the search text observable
+     */
+    private void attachSearchObservable() {
+        if (mSearchView == null) {
+            return;
         }
-        return true;
+        mDisposable.add(observableTextChangeListenerWrapper(mSearchView)
+                .debounce(400, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
+                .filter(query -> query != null && !query.isEmpty() && query.length() > 2)
+                .doOnNext(s -> mProgressBar.setVisibility(View.VISIBLE))
+                .observeOn(Schedulers.io())
+                .flatMap(new Func1<String, Observable<TenorModel>>() {
+                    @Override
+                    public Observable<TenorModel> call(String query) {
+                        mKeywordSearch = query;
+                        return DataManager.searchGiphyByKeyword(query, MAX_RESULTS, "", mLocale);
+                    }
+                })
+                .filter(tenorModel -> tenorModel.getResults() != null)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<TenorModel>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, "Error retrieving next gifs results " + e);
+                    }
+
+                    @Override
+                    public void onNext(TenorModel tenorModel) {
+                        mGifAdapter.clearGridData();
+                        mGifAdapter.setGridData(tenorModel.getResults());
+                        mGifNext = tenorModel.getNext();
+                        mProgressBar.setVisibility(View.INVISIBLE);
+
+                    }
+                })
+        );
     }
     /**
-     * Resets the adapter to trending gifs
+     * Reset the adapter and show the current trending gifs
      */
     private void resetToTrending() {
-        loadNextTrendingFromApi(MAX_RESULTS);
-        mTrendingNext = "";
         mKeywordSearch = "";
+        mGifNext = "";
+        mGifAdapter.clearGridData();
+        mPaginator.onNext(mGifNext);
     }
-    // Append the next page of data into the adapter
-    // This method probably sends out a network request and appends new data items to your adapter.
-    public void loadNextTrendingFromApi(int offset) {
-        // Send an API request to retrieve appropriate paginated data
-        //  --> Send the request including an offset value (i.e `page`) as a query parameter.
-        //  --> Deserialize and construct new model objects from the API response
-        //  --> Append the new data objects to the existing set of items inside the array of items
-        //  --> Notify the adapter of the new items made with `notifyDataSetChanged()`
-        DataManager.getTrending(offset, mTrendingNext)
-                .filter(new Func1<TenorModel, Boolean>() {
-                    @Override
-                    public Boolean call(TenorModel tenorModel) {
-                        return tenorModel.getResults() != null;
+    /**
+     * Wraps the ContextQuery into an observable to subscribe and get the search keywords
+     * @param searchView
+     * @return
+     */
+    public Observable<String> observableTextChangeListenerWrapper(final SearchView searchView) {
+        return Observable.create(subscriber -> {
+            SearchView.OnQueryTextListener searchListener = new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    // newText is text entered by user to SearchView
+                    if (subscriber.isUnsubscribed()) {
+                        searchView.setOnQueryTextListener(null);
+                    } else {
+                        subscriber.onNext(newText);
                     }
-                })
-                .take(1)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<TenorModel>() {
-                    @Override
-                    public void call(TenorModel tenorModel) {
-                        mTrendingAdapter.setGridData(tenorModel.getResults());
-                        if ("".equals(mTrendingNext)) {
-                            mGridView.setAdapter(mTrendingAdapter);
-                        }
-                        mTrendingNext = tenorModel.getNext();
-                        mProgressBar.setVisibility(View.INVISIBLE);
-                    }
-                });
+                    return false;
+                }
+            };
+            searchView.setOnQueryTextListener(searchListener);
+        });
     }
 
-    // Append the next page of data into the adapter
-    // This method probably sends out a network request and appends new data items to your adapter.
-    public void loadSearchDataFromApi(int offset) {
-        // Send an API request to retrieve appropriate paginated data
-        //  --> Send the request including an offset value (i.e `page`) as a query parameter.
-        //  --> Deserialize and construct new model objects from the API response
-        //  --> Append the new data objects to the existing set of items inside the array of items
-        //  --> Notify the adapter of the new items made with `notifyDataSetChanged()`
-        String locale = Locale.getDefault().toString();
-        DataManager.searchGiphyByKeyword(mKeywordSearch, offset, mSearchNext, locale)
-                .delay(5, TimeUnit.MILLISECONDS)
-                .filter(new Func1<TenorModel, Boolean>() {
-                    @Override
-                    public Boolean call(TenorModel tenorModel) {
-                        return tenorModel.getResults() != null;
-                    }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<TenorModel>() {
-                    @Override
-                    public void call(TenorModel tenorModel) {
-                        Log.e("TenorGridActivity", "adding search Results: " + mSearchNext);
-                        mSearchAdapter.setGridData(tenorModel.getResults());
-                        if ("".equals(mSearchNext)) {
-                            mGridView.setAdapter(mSearchAdapter);
-                        }
-                        mSearchNext = tenorModel.getNext();
-                        mProgressBar.setVisibility(View.INVISIBLE);
-                    }
-                });
-    }
+    /**
+     * Performs Circular Reveal in the Search View
+     * @param numberOfMenuIcon
+     * @param containsOverflow
+     * @param show
+     */
     public void animateSearchToolbar(int numberOfMenuIcon, boolean containsOverflow, boolean show) {
 
         mToolbar.setBackgroundColor(ContextCompat.getColor(this, android.R.color.white));
@@ -296,12 +330,4 @@ public class TenorGridActivity extends AppCompatActivity {
     private boolean isRtl(Resources resources) {
         return resources.getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
     }
-
-//    private static int getThemeColor(Context context, int id) {
-//        Resources.Theme theme = context.getTheme();
-//        TypedArray a = theme.obtainStyledAttributes(new int[]{id});
-//        int result = a.getColor(0, 0);
-//        a.recycle();
-//        return result;
-//    }
 }
