@@ -3,7 +3,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.parse.sinch.social.viewmodel.TabOptionsViewModel"/>
+            type="com.social.valgoodchat.viewmodel.TabOptionsViewModel"/>
     </data>
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"

@@ -4,7 +4,7 @@
         <import type="android.view.View"/>
         <variable
             name="viewModel"
-            type="com.parse.sinch.social.viewmodel.ListUserChatViewModel"/>
+            type="com.social.valgoodchat.viewmodel.ListUserChatViewModel"/>
     </data>
     <RelativeLayout
         android:layout_width="match_parent"

@@ -8,7 +8,7 @@ android {
     testBuildType "debug"
 
     defaultConfig {
-        applicationId "social.sinch.parse.com.socialsinch"
+        applicationId "com.social.valgoodchat"
         minSdkVersion 21
         targetSdkVersion 25
         versionCode 1

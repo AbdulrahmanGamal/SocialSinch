@@ -3,7 +3,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.parse.sinch.social.viewmodel.MessageViewModel"/>
+            type="com.social.valgoodchat.viewmodel.MessageViewModel"/>
     </data>
     <RelativeLayout
         android:id="@+id/chat_layout"

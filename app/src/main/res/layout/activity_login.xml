@@ -5,7 +5,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.parse.sinch.social.viewmodel.LoginViewViewModel"/>
+            type="com.social.valgoodchat.viewmodel.LoginViewViewModel"/>
     </data>
     <LinearLayout
         android:layout_width="match_parent"

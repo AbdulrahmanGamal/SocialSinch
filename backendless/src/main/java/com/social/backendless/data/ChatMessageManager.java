@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.backendless.Backendless;
+import com.backendless.Subscription;
 import com.backendless.messaging.Message;
 import com.backendless.services.messaging.MessageStatus;
 import com.google.gson.Gson;
@@ -18,6 +19,7 @@ import com.social.backendless.utils.ObservableUtils;
 import java.util.Calendar;
 import java.util.Locale;
 
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -29,6 +31,7 @@ import rx.functions.Func1;
 public class ChatMessageManager {
     private String mUserLogged;
     private ChatBriteDataSource mDataSource;
+    private Disposable mSubscription;
 
     private static final String TAG = "ChatMessageManager";
 
@@ -42,7 +45,7 @@ public class ChatMessageManager {
      * Listen for messages coming from the Views
      */
     private void configureIncomingMessageBus() {
-        RxIncomingMessageBus.getInstance().getMessageObservable().subscribe(new Consumer<ChatMessage>() {
+       mSubscription = RxIncomingMessageBus.getInstance().getMessageObservable().subscribe(new Consumer<ChatMessage>() {
             @Override
             public void accept(ChatMessage chatMessage) throws Exception {
                 processOutgoingMessage(chatMessage, ChatStatus.SEND);
@@ -156,5 +159,11 @@ public class ChatMessageManager {
         }
 
         return message;
+    }
+
+    public void dispose() {
+        if (mSubscription != null) {
+            mSubscription.dispose();
+        }
     }
 }

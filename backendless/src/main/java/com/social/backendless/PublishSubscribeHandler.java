@@ -79,9 +79,10 @@ public class PublishSubscribeHandler {
         );
     }
 
-    public void resumeSubscription() {
+    public void unsubscribe() {
         if (mSubscription != null) {
-            mSubscription.resumeSubscription();
+            mSubscription.cancelSubscription();
+            mChatMessageManager.dispose();
         }
     }
 

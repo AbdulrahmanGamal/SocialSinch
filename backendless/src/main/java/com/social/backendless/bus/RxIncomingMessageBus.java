@@ -6,7 +6,7 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 
 /**
- * Receives chat messages from the Views and sned them to the ChatMessageHandler
+ * Receives chat messages from the Views and send them to the ChatMessageHandler
  */
 public class RxIncomingMessageBus {
     private static RxIncomingMessageBus mRxMessageBus;
