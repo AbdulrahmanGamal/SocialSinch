@@ -56,4 +56,16 @@ public class LoginActivity extends AppCompatActivity
         getMenuInflater().inflate(R.menu.menu_login, menu);
         return true;
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SocialSinchApplication.activityPaused();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SocialSinchApplication.activityResumed();
+    }
 }

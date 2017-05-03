@@ -97,12 +97,14 @@ public class TabActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         DataManager.updateLastSeenFieldInRemote();
+        SocialSinchApplication.activityResumed();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         DataManager.updateLastSeenFieldInRemote();
+        SocialSinchApplication.activityPaused();
     }
 
 //    public void mostrarDialogo(int resId){

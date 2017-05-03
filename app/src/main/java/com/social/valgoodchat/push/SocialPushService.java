@@ -5,14 +5,12 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.backendless.push.BackendlessPushService;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.social.backendless.bus.RxIncomingMessageBus;
 import com.social.backendless.bus.RxOutgoingMessageBus;
 import com.social.backendless.database.ChatBriteDataSource;
 import com.social.backendless.model.ChatMessage;
@@ -20,6 +18,7 @@ import com.social.backendless.model.ChatStatus;
 import com.social.backendless.utils.Constants;
 import com.social.valgoodchat.MessagesActivity;
 import com.social.valgoodchat.R;
+import com.social.valgoodchat.app.SocialSinchApplication;
 
 /**
  * Service to process the push notification messages
@@ -45,23 +44,7 @@ public class SocialPushService extends BackendlessPushService {
         if (messageType != null && messageType.equals(Constants.MESSAGE_TYPE_CHAT_KEY)) {
             String message = intent.getStringExtra( "message" );
             Log.d(TAG, "Push message received. Message: " + message);
-            Log.d(TAG, "OutComingBus hasObserver: " + RxOutgoingMessageBus.getInstance().hasObservers());
-            Gson gson = new Gson();
-            try {
-                ChatMessage messageReceived = gson.fromJson(message, ChatMessage.class);
-                //check if the outcomingbus is false, if so, we need to attach to it and save the message in DB
-                if (!RxOutgoingMessageBus.getInstance().hasObservers()) {
-                    messageReceived.setStatus(ChatStatus.RECEIVED);
-                    ChatBriteDataSource.getInstance(context).addNewMessage(messageReceived);
-                    NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context
-                            .NOTIFICATION_SERVICE);
-                    mNotificationManager.notify(NOTIFICATION_ID, createNotification(true, messageReceived));
-                } else {
-                    //find out if the app is in background to know if i should show the notification or not
-                }
-            } catch (JsonSyntaxException ex) {
-                Log.d(TAG, "PN not a valid chat message, discarded");
-            }
+            processIncomingMessage(context, message);
         }
         // When returning 'true', default Backendless onMessage implementation will be executed.
         // The default implementation displays the notification in the Android Notification Center.
@@ -69,6 +52,26 @@ public class SocialPushService extends BackendlessPushService {
         return false;
     }
 
+    private void processIncomingMessage(Context context, String message) {
+        Gson gson = new Gson();
+        try {
+            ChatMessage messageReceived = gson.fromJson(message, ChatMessage.class);
+            Log.d(TAG, "OutComingBus hasObserver: " + RxOutgoingMessageBus.getInstance().hasObservers());
+            //check if the RxOutgoingMessageBus has no observables, if so, we need to save the message in DB
+            if (!RxOutgoingMessageBus.getInstance().hasObservers()) {
+                messageReceived.setStatus(ChatStatus.RECEIVED);
+                ChatBriteDataSource.getInstance(context).addNewMessage(messageReceived);
+            }
+            //if there's no activity visible, show the notification
+            if (!SocialSinchApplication.isActivityVisible()) {
+                NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context
+                        .NOTIFICATION_SERVICE);
+                mNotificationManager.notify(NOTIFICATION_ID, createNotification(true, messageReceived));
+            }
+        } catch (JsonSyntaxException ex) {
+            Log.d(TAG, "PN not a valid chat message, discarded");
+        }
+    }
     @Override
     public void onError( Context context, String message ) {
         Toast.makeText( context, message, Toast.LENGTH_SHORT).show();

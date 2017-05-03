@@ -17,6 +17,7 @@ import com.social.backendless.bus.RxOutgoingEventBus;
 import com.social.backendless.data.DataManager;
 import com.social.backendless.model.EventMessage;
 import com.social.backendless.utils.DateUtils;
+import com.social.valgoodchat.app.SocialSinchApplication;
 import com.social.valgoodchat.custom.TypeWriter;
 import com.social.valgoodchat.databinding.ActivityChatMainBinding;
 import com.social.valgoodchat.utils.Constants;
@@ -106,12 +107,14 @@ public class MessagesActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         DataManager.updateLastSeenFieldInRemote();
+        SocialSinchApplication.activityResumed();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         DataManager.updateLastSeenFieldInRemote();
+        SocialSinchApplication.activityPaused();
     }
 
 	@Override

@@ -13,6 +13,7 @@ import android.widget.ImageView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.social.backendless.model.UserInfo;
+import com.social.valgoodchat.app.SocialSinchApplication;
 import com.social.valgoodchat.custom.ProfileHeaderView;
 import com.social.valgoodchat.utils.Constants;
 
@@ -114,5 +115,17 @@ public class ProfileActivity extends AppCompatActivity
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SocialSinchApplication.activityPaused();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SocialSinchApplication.activityResumed();
     }
 }

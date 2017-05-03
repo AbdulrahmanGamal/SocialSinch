@@ -25,6 +25,7 @@ import android.widget.ProgressBar;
 import com.social.tenor.data.DataManager;
 import com.social.tenor.model.TenorModel;
 import com.social.valgoodchat.adapter.TenorGridViewAdapter;
+import com.social.valgoodchat.app.SocialSinchApplication;
 import com.social.valgoodchat.custom.EndlessScrollListener;
 
 import java.util.ArrayList;
@@ -98,6 +99,7 @@ public class TenorGridActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         mDisposable.unsubscribe();
+        SocialSinchApplication.activityPaused();
     }
 
     @Override
@@ -107,6 +109,7 @@ public class TenorGridActivity extends AppCompatActivity {
         attachPaginator();
         attachSearchObservable();
         mPaginator.onNext(mGifNext);
+        SocialSinchApplication.activityResumed();
     }
 
     @Override
