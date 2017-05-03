@@ -1,19 +1,17 @@
 package com.parse.sinch.social;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+
+import com.parse.sinch.social.app.SocialSinchApplication;
 import com.parse.sinch.social.databinding.ActivityOptionsTabBinding;
 import com.social.backendless.data.DataManager;
 import com.social.backendless.utils.LoggedUser;
@@ -28,8 +26,8 @@ public class TabActivity extends AppCompatActivity {
         PublishSubscribeHandler.
                 getInstance(this, LoggedUser.getInstance().getUserIdLogged()).subscribe();
 
-        final TabOptionsViewModel tabOptionsViewModel = new TabOptionsViewModel(this,
-                                                                    getSupportFragmentManager());
+        final TabOptionsViewModel tabOptionsViewModel =
+                new TabOptionsViewModel(getSupportFragmentManager());
         ActivityOptionsTabBinding activityOptionsTabBinding =
                 DataBindingUtil.setContentView(this, R.layout.activity_options_tab);
         activityOptionsTabBinding.setViewModel(tabOptionsViewModel);
@@ -85,10 +83,10 @@ public class TabActivity extends AppCompatActivity {
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.action_llamar:
-                mostrarDialogo(R.string.llamar);
+                //mostrarDialogo(R.string.llamar);
                 return true;
             case R.id.action_sms:
-                mostrarDialogo(R.string.sms);
+                //mostrarDialogo(R.string.sms);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -107,53 +105,36 @@ public class TabActivity extends AppCompatActivity {
         DataManager.updateLastSeenFieldInRemote();
     }
 
-    public void mostrarDialogo(int resId){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        // Get the layout inflater
-        LayoutInflater inflater = getLayoutInflater();
-
-        // Inflate and set the layout for the dialog
-        // Pass null as the parent view because its going in the dialog layout
-        builder.setView(inflater.inflate(R.layout.llamar_sms_dialogo, null))
-                // Add action buttons
-                .setPositiveButton(R.string.aceptar, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        startActivity(new Intent(TabActivity.this, CallingActivity.class));
-                    }
-                })
-                .setNegativeButton(R.string.cancelar, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                    }
-                });
-
-        builder.setTitle(resId);
-        builder.create().show();
-    }
+//    public void mostrarDialogo(int resId){
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        // Get the layout inflater
+//        LayoutInflater inflater = getLayoutInflater();
+//
+//        // Inflate and set the layout for the dialog
+//        // Pass null as the parent view because its going in the dialog layout
+//        builder.setView(inflater.inflate(R.layout.llamar_sms_dialogo, null))
+//                // Add action buttons
+//                .setPositiveButton(R.string.aceptar, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        startActivity(new Intent(TabActivity.this, CallingActivity.class));
+//                    }
+//                })
+//                .setNegativeButton(R.string.cancelar, new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        dialog.dismiss();
+//                    }
+//                });
+//
+//        builder.setTitle(resId);
+//        builder.create().show();
+//    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK ) {
-            closeApplicationMessage();
+            SocialSinchApplication.closeApplicationMessage(this);
         }
         return false;
-    }
-
-    private void closeApplicationMessage(){
-        new AlertDialog.Builder(this)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle(R.string.salir)
-                .setMessage(R.string.salir_msj)
-                .setPositiveButton(R.string.aceptar, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-
-                })
-                .setNegativeButton(R.string.cancelar, null)
-                .show();
     }
 }

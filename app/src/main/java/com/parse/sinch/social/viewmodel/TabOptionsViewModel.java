@@ -1,6 +1,5 @@
 package com.parse.sinch.social.viewmodel;
 
-import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
@@ -10,17 +9,15 @@ import com.parse.sinch.social.adapter.TabOptionsPagerAdapter;
 import com.parse.sinch.social.fragment.UserListFragment;
 
 /**
- * Created by valgood on 2/19/2017.
+ * View Model associated with the Tab options
  */
 
 public class TabOptionsViewModel {
-    private Context mContext;
     private TabOptionsPagerAdapter mUserChatCollectionPagerAdapter;
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
 
-    public TabOptionsViewModel(Context context, FragmentManager fragmentManager) {
-        this.mContext = context;
+    public TabOptionsViewModel(FragmentManager fragmentManager) {
         this.mUserChatCollectionPagerAdapter = new TabOptionsPagerAdapter(fragmentManager);
     }
 

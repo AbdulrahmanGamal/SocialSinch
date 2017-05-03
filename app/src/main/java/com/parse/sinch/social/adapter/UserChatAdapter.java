@@ -25,7 +25,6 @@ import com.social.backendless.utils.DateUtils;
 import com.social.backendless.utils.LoggedUser;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 
 public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.BindingHolder> {
 
@@ -115,14 +114,11 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.Bindin
 	private void configureMessageBus() {
 		RxOutgoingMessageBus.getInstance().getMessageObservable()
 				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new Consumer<ChatMessage>() {
-					@Override
-					public void accept(ChatMessage chatMessage) throws Exception {
-						Log.e(TAG, "RECEIVED MESSAGE FROM BUS!!!: " + chatMessage);
-                        processIncomingMessage(chatMessage);
-                        notifyDataSetChanged();
-					}
-				});
+				.subscribe(chatMessage -> {
+                    Log.e(TAG, "RECEIVED MESSAGE FROM BUS!!!: " + chatMessage);
+					processIncomingMessage(chatMessage);
+					notifyDataSetChanged();
+                });
 	}
     /**
      * Refresh the last message information shown under the user name

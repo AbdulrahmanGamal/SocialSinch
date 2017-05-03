@@ -20,32 +20,26 @@ public class ProfileHeaderView extends RelativeLayout {
 
     private TextView mName;
     private TextView mLastSeen;
-    private SimpleDraweeView mPicture;
 
-    private Context context;
 
     public ProfileHeaderView(Context context) {
         super(context);
-        this.context = context;
         init();
     }
 
     public ProfileHeaderView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.context = context;
         init();
     }
 
     public ProfileHeaderView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        this.context = context;
         init();
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public ProfileHeaderView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        this.context = context;
         init();
     }
 

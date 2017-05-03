@@ -55,14 +55,11 @@ public class UserCallsItemViewModel extends BaseObservable {
     }
 
     public View.OnClickListener onClickUserCall() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.e("UserCallsViewModel", "Click on user call");
-                Intent intent = new Intent(mContext, MessagesActivity.class);
-                intent.putExtra(Constants.RECIPIENT_ID, mUserInfo.getUserInfo().getObjectId());
-                mContext.startActivity(intent);
-            }
+        return v -> {
+            Log.e("UserCallsViewModel", "Click on user call");
+            Intent intent = new Intent(mContext, MessagesActivity.class);
+            intent.putExtra(Constants.RECIPIENT_ID, mUserInfo.getUserInfo().getObjectId());
+            mContext.startActivity(intent);
         };
     }
 
@@ -71,15 +68,17 @@ public class UserCallsItemViewModel extends BaseObservable {
      * @param view
      */
     public void setMessageIndicator(ImageView view) {
-        if (mUserInfo.getLastViewMessage().
-                getChatMessage().getMessageId() != null &&
-            !mUserInfo.getLastViewMessage().
-                getChatMessage().getStatus().equals(ChatStatus.RECEIVED)) {
-            Utils.changeStatusIcon(mUserInfo.getLastViewMessage(),
-                    mUserInfo.getLastViewMessage().getChatMessage().getStatus());
-            view.setImageResource(mUserInfo.getLastViewMessage().getResourceId());
-        } else {
+        if (mUserInfo.getLastViewMessage() == null ||
+            mUserInfo.getLastViewMessage().getChatMessage().getMessageId() == null ||
+            mUserInfo.getLastViewMessage().getChatMessage().getStatus() == null ||
+            mUserInfo.getLastViewMessage().getChatMessage().getStatus().equals(ChatStatus.RECEIVED)) {
             view.setVisibility(View.GONE);
+            return;
         }
+
+        Utils.changeStatusIcon(mUserInfo.getLastViewMessage(),
+                mUserInfo.getLastViewMessage().getChatMessage().getStatus());
+        view.setImageResource(mUserInfo.getLastViewMessage().getResourceId());
+        view.setVisibility(View.VISIBLE);
     }
 }

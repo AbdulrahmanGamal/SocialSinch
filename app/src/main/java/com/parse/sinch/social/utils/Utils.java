@@ -116,6 +116,7 @@ public class Utils {
 			case DELIVERED:
 				viewMessage.setResourceId(R.drawable.message_got_receipt_from_target);
 				break;
+			case RECEIVED:
 			case READ:
 				viewMessage.setResourceId(R.drawable.message_got_read_receipt_from_target);
 				break;

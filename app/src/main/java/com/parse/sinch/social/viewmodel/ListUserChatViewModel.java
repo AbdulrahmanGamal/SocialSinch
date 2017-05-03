@@ -23,7 +23,6 @@ import java.util.List;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action0;
 
 /**
  * Class to encapsulates the logic to display the calls received/made by the user in the list
@@ -65,12 +64,7 @@ public class ListUserChatViewModel {
     }
     private void getUserChats(final RecyclerView callsRecyclerView) {
         DataManager.getFetchAllUsersObservable(LoggedUser.getInstance().getUserIdLogged())
-                .doOnSubscribe(new Action0() {
-            @Override
-            public void call() {
-                  setShowPanel(true);
-            }
-        }).observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(() -> setShowPanel(true)).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<CurrentChatsEvent>() {
                     @Override
                     public void onCompleted() {

@@ -10,14 +10,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.parse.sinch.social.custom.TypeWriter;
 import com.parse.sinch.social.databinding.ActivityChatMainBinding;
 import com.parse.sinch.social.utils.Utils;
-import com.social.backendless.model.UserInfo;
 import com.parse.sinch.social.utils.Constants;
 import com.parse.sinch.social.viewmodel.MessageViewModel;
 import com.social.backendless.bus.RxOutgoingEventBus;
@@ -26,7 +24,6 @@ import com.social.backendless.model.EventMessage;
 import com.social.backendless.utils.DateUtils;
 
 import io.reactivex.functions.Consumer;
-import rx.functions.Action1;
 
 public class MessagesActivity extends AppCompatActivity {
     private static final String TAG = "MessagesActivity";
@@ -56,32 +53,26 @@ public class MessagesActivity extends AppCompatActivity {
         }
         //Get the current user's information from the backend
         DataManager.getUserInformationObservable(userId)
-                .subscribe(new Action1<UserInfo>() {
-                    @Override
-                    public void call(final UserInfo userInfo) {
-                        //toolbar settings
-                        Uri imageUri = Uri.parse(userInfo.getProfilePicture());
-                        profilePic.setImageURI(imageUri);
-                        userNameTextView.setText(userInfo.getFullName());
+                .subscribe(userInfo -> {
+                    //toolbar settings
+                    Uri imageUri = Uri.parse(userInfo.getProfilePicture());
+                    profilePic.setImageURI(imageUri);
+                    userNameTextView.setText(userInfo.getFullName());
 
-                        activityChatMainBinding.toolbarChats.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Intent intent = new Intent(MessagesActivity.this, RedesignMessagesActivity2.class);
-                                intent.putExtra(Constants.RECIPIENT_ID, userInfo.getObjectId());
-                                intent.putExtra(Constants.RECIPIENT_AVATAR, userInfo.getProfilePicture());
-                                intent.putExtra(Constants.RECIPIENT_NAME, userInfo.getFullName());
-                                intent.putExtra(Constants.RECIPIENT_LAST_TIME_SEEN, userInfo.getLastSeen());
-                                startActivity(intent);
-                            }
-                        });
+                    activityChatMainBinding.toolbarChats.setOnClickListener(v -> {
+                        Intent intent1 = new Intent(MessagesActivity.this, ProfileActivity.class);
+                        intent1.putExtra(Constants.RECIPIENT_ID, userInfo.getObjectId());
+                        intent1.putExtra(Constants.RECIPIENT_AVATAR, userInfo.getProfilePicture());
+                        intent1.putExtra(Constants.RECIPIENT_NAME, userInfo.getFullName());
+                        intent1.putExtra(Constants.RECIPIENT_LAST_TIME_SEEN, userInfo.getLastSeen());
+                        startActivity(intent1);
+                    });
 
-                        Utils.formatLastTimeSeenText(MessagesActivity.this,
-                                         DateUtils.convertDateToLastSeenFormat(userInfo.getLastSeen()), lastTimeSeenTV);
-                        //subscribe to the global event bus to receive events from this user
-                        subscribeToLastSeenEvents(lastTimeSeenTV);
+                    Utils.formatLastTimeSeenText(MessagesActivity.this,
+                                     DateUtils.convertDateToLastSeenFormat(userInfo.getLastSeen()), lastTimeSeenTV);
+                    //subscribe to the global event bus to receive events from this user
+                    subscribeToLastSeenEvents(lastTimeSeenTV);
 
-                    }
                 });
 	}
 

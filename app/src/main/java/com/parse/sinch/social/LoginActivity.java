@@ -1,7 +1,5 @@
 package com.parse.sinch.social;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +9,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
+import com.parse.sinch.social.app.SocialSinchApplication;
 import com.parse.sinch.social.databinding.ActivityLoginBinding;
 import com.parse.sinch.social.utils.Constants;
 import com.parse.sinch.social.viewmodel.LoginViewViewModel;
@@ -46,27 +45,9 @@ public class LoginActivity extends AppCompatActivity
     @Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 	    if (keyCode == KeyEvent.KEYCODE_BACK ) {
-	    		closeApplicationMessage();		   		        		        
+	    		SocialSinchApplication.closeApplicationMessage(this);
 	    }
 	    return false;
-	}
-	
-	private void closeApplicationMessage(){
-		new AlertDialog.Builder(this)
-		.setIcon(android.R.drawable.ic_dialog_alert)
-		.setTitle(R.string.salir)
-		.setMessage(R.string.salir_msj)
-		.setPositiveButton(R.string.aceptar, new DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-                //stopService(new Intent(LoginActivity.this, SinchService.class));
-				finish(); 
-			}
-
-		})
-		.setNegativeButton(R.string.cancelar, null)
-		.show();
 	}
 
     @Override

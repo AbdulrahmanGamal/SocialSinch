@@ -38,7 +38,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/SocialSinchTheme"/>
         <activity
-            android:name=".RedesignMessagesActivity2"
+            android:name=".ProfileActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SocialSinchTheme"/>
         <activity

@@ -1,6 +1,7 @@
 package com.parse.sinch.social.model;
 
 import com.social.backendless.model.ChatMessage;
+import com.social.backendless.model.ChatStatus;
 import com.social.backendless.model.UserInfo;
 import com.social.backendless.utils.DateUtils;
 
@@ -25,6 +26,11 @@ public class UserViewInfoMessage {
     }
 
     public void setLastViewMessage(ViewMessage lastViewMessage) {
+        //keep the text message delivered to avoid empty message shown only in delivered case
+        if (lastViewMessage.getChatMessage().getStatus() != null &&
+            lastViewMessage.getChatMessage().getStatus().equals(ChatStatus.DELIVERED)) {
+            lastViewMessage.getChatMessage().setTextBody(mLastViewMessage.getChatMessage().getTextBody());
+        }
         this.mLastViewMessage = lastViewMessage;
     }
 

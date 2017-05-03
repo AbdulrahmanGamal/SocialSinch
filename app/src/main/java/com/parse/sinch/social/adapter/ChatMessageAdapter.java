@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 
 /**
  * Adapter in charge of adding the views with the incoming/outgoing chat messages in the main
@@ -62,18 +61,15 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     private void configureMessageBus() {
         RxOutgoingMessageBus.getInstance().getMessageObservable()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<ChatMessage>() {
-            @Override
-            public void accept(ChatMessage chatMessage) throws Exception {
-                Log.e(TAG, "RECEIVED MESSAGE FROM BUS!!!: " + chatMessage);
-                ViewMessage viewMessage = new ViewMessage(chatMessage);
-                if (chatMessage.getStatus().equals(ChatStatus.RECEIVED)) {
-                    processReceivedMessage(viewMessage);
-                } else {
-                    findMessagePosition(viewMessage);
-                }
-            }
-        });
+                .subscribe(chatMessage -> {
+                    Log.e(TAG, "RECEIVED MESSAGE FROM BUS!!!: " + chatMessage);
+                    ViewMessage viewMessage = new ViewMessage(chatMessage);
+                    if (chatMessage.getStatus().equals(ChatStatus.RECEIVED)) {
+                        processReceivedMessage(viewMessage);
+                    } else {
+                        findMessagePosition(viewMessage);
+                    }
+                });
     }
 
     /**

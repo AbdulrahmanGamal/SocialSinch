@@ -27,10 +27,7 @@ import java.util.regex.Pattern;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action0;
-import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -75,11 +72,8 @@ public class LoginViewViewModel {
     }
 
     public View.OnClickListener onClickSignUp() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                
-            }
+        return v -> {
+
         };
     }
 
@@ -90,30 +84,17 @@ public class LoginViewViewModel {
     private void initEmailSubscription(Observable<CharSequence> emailChangeObservable) {
         // Checks for validity of the email input field
         Subscription emailSubscription = emailChangeObservable
-                .doOnNext(new Action1<CharSequence>() {
-                    @Override
-                    public void call(CharSequence charSequence) {
-                        showEmailError(false);
-                    }
-                })
+                .doOnNext(charSequence -> showEmailError(false))
                 .debounce(400, TimeUnit.MILLISECONDS)
-                .filter(new Func1<CharSequence, Boolean>() {
-                    @Override
-                    public Boolean call(CharSequence charSequence) {
-                        return !TextUtils.isEmpty(charSequence);
-                    }
-                })
+                .filter(charSequence -> !TextUtils.isEmpty(charSequence))
                 .observeOn(AndroidSchedulers.mainThread()) // UI Thread
-                .subscribe(new Action1<CharSequence>() {
-                    @Override
-                    public void call(CharSequence charSequence) {
-                        boolean isEmailValid = validateEmail(charSequence.toString());
-                        if (!isEmailValid) {
-                            showEmailError(true);
-                        } else {
-                            setEmail(charSequence.toString());
-                            showEmailError(false);
-                        }
+                .subscribe(charSequence -> {
+                    boolean isEmailValid = validateEmail(charSequence.toString());
+                    if (!isEmailValid) {
+                        showEmailError(true);
+                    } else {
+                        setEmail(charSequence.toString());
+                        showEmailError(false);
                     }
                 });
 
@@ -123,30 +104,17 @@ public class LoginViewViewModel {
     private void initPasswordSubscription(Observable<CharSequence> passwordChangeObservable) {
         // Checks for validity of the password input field
         Subscription passwordSubscription = passwordChangeObservable
-                .doOnNext(new Action1<CharSequence>() {
-                    @Override
-                    public void call(CharSequence charSequence) {
-                        showPasswordError(false);
-                    }
-                })
+                .doOnNext(charSequence -> showPasswordError(false))
                 .debounce(400, TimeUnit.MILLISECONDS)
-                .filter(new Func1<CharSequence, Boolean>() {
-                    @Override
-                    public Boolean call(CharSequence charSequence) {
-                        return !TextUtils.isEmpty(charSequence);
-                    }
-                })
+                .filter(charSequence -> !TextUtils.isEmpty(charSequence))
                 .observeOn(AndroidSchedulers.mainThread()) // UI Thread
-                .subscribe(new Action1<CharSequence>() {
-                    @Override
-                    public void call(CharSequence charSequence) {
-                        boolean isPasswordValid = validatePassword(charSequence.toString());
-                        if (!isPasswordValid) {
-                            showPasswordError(true);
-                        } else {
-                            setPassword(charSequence.toString());
-                            showPasswordError(false);
-                        }
+                .subscribe(charSequence -> {
+                    boolean isPasswordValid = validatePassword(charSequence.toString());
+                    if (!isPasswordValid) {
+                        showPasswordError(true);
+                    } else {
+                        setPassword(charSequence.toString());
+                        showPasswordError(false);
                     }
                 });
 
@@ -159,23 +127,17 @@ public class LoginViewViewModel {
         Subscription signInFieldsSubscription = Observable.
                 combineLatest(emailChangeObservable,
                         passwordChangeObservable,
-                        new Func2<CharSequence, CharSequence, Boolean>() {
-                            @Override
-                            public Boolean call(CharSequence email, CharSequence password) {
-                                boolean isEmailValid = validateEmail(email.toString());
-                                boolean isPasswordValid = validatePassword(password.toString());
+                        (email, password) -> {
+                            boolean isEmailValid = validateEmail(email.toString());
+                            boolean isPasswordValid = validatePassword(password.toString());
 
-                                return isEmailValid && isPasswordValid;
-                            }
+                            return isEmailValid && isPasswordValid;
                         }).observeOn(AndroidSchedulers.mainThread()) // UI Thread
-                .subscribe(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean validFields) {
-                        if (validFields) {
-                            enableSignIn();
-                        } else {
-                            disableSignIn();
-                        }
+                .subscribe(validFields -> {
+                    if (validFields) {
+                        enableSignIn();
+                    } else {
+                        disableSignIn();
                     }
                 });
 
@@ -184,12 +146,7 @@ public class LoginViewViewModel {
 
     private void initSignInListener(Observable<Void> signInClickObservable) {
         signInClickObservable
-                .doOnSubscribe(new Action0() {
-                    @Override
-                    public void call() {
-                        disableSignIn();
-                    }
-                })
+                .doOnSubscribe(() -> disableSignIn())
                 .flatMap(new Func1<Void, Observable<OperationResponse>>() {
                     @Override
                     public Observable<OperationResponse> call(Void aVoid) {
@@ -197,17 +154,14 @@ public class LoginViewViewModel {
                     }
                 })
                 .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<OperationResponse>() {
-                    @Override
-                    public void call(OperationResponse response) {
-                        enableSignIn();
-                        if (response.getOpCode().equals(Constants.SUCCESS_CODE)) {
-                            Log.e(TAG, "Backendless user successfully logged: ");
-                            loadMainUserList();
-                            ((Activity)mContext).finish();
-                        } else {
-                            Log.e(TAG, "Error retrieving the user: " + response.getError());
-                        }
+                .subscribe(response -> {
+                    enableSignIn();
+                    if (response.getOpCode().equals(Constants.SUCCESS_CODE)) {
+                        Log.e(TAG, "Backendless user successfully logged: ");
+                        loadMainUserList();
+                        ((Activity)mContext).finish();
+                    } else {
+                        Log.e(TAG, "Error retrieving the user: " + response.getError());
                     }
                 });
     }

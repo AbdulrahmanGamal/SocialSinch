@@ -30,26 +30,18 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
     }
 
     public View.OnClickListener onClickSend() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mMessage.getText().toString().isEmpty()) {
-                    Toast.makeText(mContext, "Please enter a message", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                mChatMessageAdapter.sendMessage(mRecipientId, mMessage.getText().toString());
-                mMessage.setText("");
+        return v -> {
+            if (mMessage.getText().toString().isEmpty()) {
+                Toast.makeText(mContext, "Please enter a message", Toast.LENGTH_LONG).show();
+                return;
             }
+            mChatMessageAdapter.sendMessage(mRecipientId, mMessage.getText().toString());
+            mMessage.setText("");
         };
     }
 
     public View.OnClickListener onClickEmoji() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mContext.startActivity(new Intent(mContext, TenorGridActivity.class));
-            }
-        };
+        return v -> mContext.startActivity(new Intent(mContext, TenorGridActivity.class));
     }
     public void setMessage(EditText message) {
         this.mMessage = message;
@@ -66,14 +58,9 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
         viewModel.setChatRecyclerView(recyclerView);
         recyclerView.setAdapter(viewModel.getAdapter());
         recyclerView.setLayoutManager(viewModel.createLayoutManager());
-        recyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v,
-                                       int left, int top, int right, int bottom,
-                                       int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                if (bottom < oldBottom) {
-                    viewModel.onItemInserted();
-                }
+        recyclerView.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+            if (bottom < oldBottom) {
+                viewModel.onItemInserted();
             }
         });
     }
@@ -93,13 +80,10 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
     @Override
     public void onItemInserted() {
         if (mChatRecyclerView != null) {
-            mChatRecyclerView.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (mChatRecyclerView.getAdapter().getItemCount() > 0) {
-                        mChatRecyclerView.smoothScrollToPosition(
-                                mChatRecyclerView.getAdapter().getItemCount() - 1);
-                    }
+            mChatRecyclerView.postDelayed(() -> {
+                if (mChatRecyclerView.getAdapter().getItemCount() > 0) {
+                    mChatRecyclerView.smoothScrollToPosition(
+                            mChatRecyclerView.getAdapter().getItemCount() - 1);
                 }
             }, 100);
         }

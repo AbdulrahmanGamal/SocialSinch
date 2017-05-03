@@ -10,9 +10,6 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.interfaces.DraweeController;
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.parse.sinch.social.R;
 import com.social.tenor.model.Result;
 
@@ -50,22 +47,16 @@ public class TenorGridViewAdapter extends ArrayAdapter<Result> {
 
         ViewHolder listViewHolder;
         if (convertView == null) {
-            listViewHolder = new ViewHolder();
             convertView = LayoutInflater.from(parent.getContext()).
                     inflate(R.layout.giphy_item_view, parent, false);
+            listViewHolder = new ViewHolder();
             listViewHolder.imageInListView = (ImageView) convertView.findViewById(R.id.gifView);
             convertView.setTag(listViewHolder);
         } else {
             listViewHolder = (ViewHolder)convertView.getTag();
         }
-//        //Controller is required for controller the GIF animation, here I have just set it to autoplay as per the fresco guide.
         Result item = mGridData.get(position);
-//        DraweeController controller = Fresco.newDraweeControllerBuilder()
-//                .setUri(item.getMedia().get(0).getTinygif().getUrl())
-//                .setAutoPlayAnimations(true)
-//                .build();
-//        //Set the DraweeView controller, and you should be good to go.
-//        draweeView.setController(controller);
+
         GlideDrawableImageViewTarget drawableImgTarget =
                 new GlideDrawableImageViewTarget(listViewHolder.imageInListView);
         Glide.with(listViewHolder.imageInListView.getContext()).

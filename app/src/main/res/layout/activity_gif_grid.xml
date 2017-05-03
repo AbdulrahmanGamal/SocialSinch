@@ -31,6 +31,7 @@
             android:verticalSpacing="5dp"
             android:horizontalSpacing="5dp"
             android:focusable="true"
+            android:transcriptMode="disabled"
             android:clickable="true"/>
 
         <ProgressBar
