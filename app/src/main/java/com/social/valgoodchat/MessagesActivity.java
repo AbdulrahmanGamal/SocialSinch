@@ -106,14 +106,14 @@ public class MessagesActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        DataManager.updateLastSeenFieldInRemote();
+        DataManager.updatePresenceInRemote(true);
         SocialSinchApplication.activityResumed();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        DataManager.updateLastSeenFieldInRemote();
+        DataManager.updatePresenceInRemote(false);
         SocialSinchApplication.activityPaused();
     }
 

@@ -60,5 +60,6 @@
     <string name="status_online">Online</string>
     <string name="gif_galley_title">GIF Gallery</string>
     <string name="search_title">Search</string>
-
+    <string name="sign_in_label">Sign In</string>
+    <string name="sign_up_label">Sign Up</string>
 </resources>

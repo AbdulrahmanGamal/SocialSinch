@@ -23,8 +23,8 @@ public class TabActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //subscribe to events sent from this user
-        PublishSubscribeHandler.
-                getInstance(this, LoggedUser.getInstance().getUserIdLogged()).subscribe();
+//        PublishSubscribeHandler.
+//                getInstance(this, LoggedUser.getInstance().getUserIdLogged()).subscribe();
 
         final TabOptionsViewModel tabOptionsViewModel =
                 new TabOptionsViewModel(getSupportFragmentManager());
@@ -94,16 +94,26 @@ public class TabActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
-        DataManager.updateLastSeenFieldInRemote();
+        DataManager.updatePresenceInRemote(true);
         SocialSinchApplication.activityResumed();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        DataManager.updateLastSeenFieldInRemote();
+        DataManager.updatePresenceInRemote(false);
         SocialSinchApplication.activityPaused();
     }
 

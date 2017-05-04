@@ -10,6 +10,7 @@ public class UserInfo implements Serializable{
 	private String mPhoneNumber;
     private String mProfilePicture;
 	private String mLastSeen;
+	private boolean mOnline;
 	
 	public String getPhoneNumber() {
 		return mPhoneNumber;
@@ -57,5 +58,13 @@ public class UserInfo implements Serializable{
 
 	public void setLastSeen(String lastSeen) {
 		this.mLastSeen = lastSeen;
+	}
+
+	public boolean isOnline() {
+		return mOnline;
+	}
+
+	public void setOnline(boolean online) {
+		this.mOnline = online;
 	}
 }

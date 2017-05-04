@@ -32,6 +32,7 @@ import rx.schedulers.Schedulers;
 public class DataManager {
 
     private static final String LAST_SEEN_PROPERTY = "last_seen";
+    private static final String ONLINE_PROPERTY = "online";
     private static final String TAG = "DataManager";
 
     /**
@@ -106,23 +107,24 @@ public class DataManager {
         }).subscribeOn(Schedulers.io());
     }
     /**
-     * Update the last seen filed in the remote sever
+     * Update the last seen field in the remote sever
      */
-    public static void updateLastSeenFieldInRemote() {
+    public static void updatePresenceInRemote(boolean online) {
         BackendlessUser currentUser = LoggedUser.getInstance().getUserLogged();
         if (currentUser != null) {
             Date lastSeenDate = Calendar.getInstance(Locale.getDefault()).getTime();
             currentUser.setProperty(LAST_SEEN_PROPERTY, lastSeenDate);
+            currentUser.setProperty(ONLINE_PROPERTY, online);
             Backendless.UserService.update(currentUser, new AsyncCallback<BackendlessUser>() {
                 @Override
                 public void handleResponse(BackendlessUser response) {
-                    Log.d(TAG, "LastSeen Time updated SuccessFully!!");
+                    Log.d(TAG, "Presence updated SuccessFully!!");
                     LoggedUser.getInstance().setUserLogged(response);
                 }
 
                 @Override
                 public void handleFault(BackendlessFault fault) {
-                    Log.e(TAG, "LastSeen Time Failed: " + fault.toString());
+                    Log.e(TAG, "Presence updated Failed: " + fault.toString());
                 }
             });
         }
@@ -165,6 +167,7 @@ public class DataManager {
         user.setProfilePicture((String) backendlessUser.getProperty("avatar"));
         Date lastTimeSeen = (Date) backendlessUser.getProperty("last_seen");
         Date lastLogin = (Date) backendlessUser.getProperty("lastLogin");
+        user.setOnline((Boolean)backendlessUser.getProperty("online"));
         if (lastTimeSeen == null) {
             user.setLastSeen(DateUtils.convertDateToString(lastLogin));
         } else {

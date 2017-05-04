@@ -43,41 +43,41 @@ public class PublishSubscribeHandler {
     /**
      * Subscribes ti the default channel
      */
-    public void subscribe() {
-        SubscriptionOptions subscriptionOptions = new SubscriptionOptions();
-        subscriptionOptions.setSelector(Constants.RECIPIENT_KEY + " = '" + mUserLogged + "'");
-        Backendless.Messaging.subscribe(Constants.DEFAULT_CHANNEL,
-                new AsyncCallback<List<Message>>() {
-                    @Override
-                    public void handleResponse( List<Message> response ) {
-                        for (Message messageReceived: response) {
-                            if (messageReceived.getHeaders().get(Constants.MESSAGE_TYPE_KEY).
-                                    equals(Constants.MESSAGE_TYPE_CHAT_KEY)) {
-                                mChatMessageManager.processIncomingMessage(messageReceived);
-                            } else {
-                                mEventMessageManager.processIncomingEvent(messageReceived);
-                            }
-                        }
-                    }
-                    @Override
-                    public void handleFault( BackendlessFault fault ) {
-                        Log.e(TAG, "Fault Receiving message : " + fault);
-                    }
-                }, subscriptionOptions ,
-                new AsyncCallback<Subscription>() {
-                    @Override
-                    public void handleResponse( Subscription response )
-                    {
-                        mSubscription = response;
-                    }
-                    @Override
-                    public void handleFault( BackendlessFault fault )
-                    {
-                        Log.e(TAG, "Subscription fault : " + fault);
-                    }
-                }
-        );
-    }
+//    public void subscribe() {
+//        SubscriptionOptions subscriptionOptions = new SubscriptionOptions();
+//        subscriptionOptions.setSelector(Constants.RECIPIENT_KEY + " = '" + mUserLogged + "'");
+//        Backendless.Messaging.subscribe(Constants.DEFAULT_CHANNEL,
+//                new AsyncCallback<List<Message>>() {
+//                    @Override
+//                    public void handleResponse( List<Message> response ) {
+//                        for (Message messageReceived: response) {
+//                            if (messageReceived.getHeaders().get(Constants.MESSAGE_TYPE_KEY).
+//                                    equals(Constants.MESSAGE_TYPE_CHAT_KEY)) {
+//                                mChatMessageManager.processIncomingMessage(messageReceived);
+//                            } else {
+//                                mEventMessageManager.processIncomingEvent(messageReceived);
+//                            }
+//                        }
+//                    }
+//                    @Override
+//                    public void handleFault( BackendlessFault fault ) {
+//                        Log.e(TAG, "Fault Receiving message : " + fault);
+//                    }
+//                }, subscriptionOptions ,
+//                new AsyncCallback<Subscription>() {
+//                    @Override
+//                    public void handleResponse( Subscription response )
+//                    {
+//                        mSubscription = response;
+//                    }
+//                    @Override
+//                    public void handleFault( BackendlessFault fault )
+//                    {
+//                        Log.e(TAG, "Subscription fault : " + fault);
+//                    }
+//                }
+//        );
+//    }
 
     public void unsubscribe() {
         if (mSubscription != null) {

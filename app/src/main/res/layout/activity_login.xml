@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="android.view.View"/>
         <variable
             name="viewModel"
             type="com.social.valgoodchat.viewmodel.LoginViewViewModel"/>
@@ -58,12 +59,20 @@
                     socialsinch:password="@{viewModel}"/>
             </android.support.design.widget.TextInputLayout>
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/error_text_field"
+                android:padding="5dp"
+                android:textColor="@color/error"
+                socialsinch:generalError="@{viewModel}"/>
+
             <Button android:id="@+id/btn_signin"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Sign In"
+                android:text="@string/sign_in_label"
                 android:background="@color/ColorPrimary"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="30dp"
                 android:textColor="@android:color/white"
                 android:stateListAnimator="@animator/button_raise"
                 socialsinch:signin="@{viewModel}"/>
@@ -71,7 +80,7 @@
             <Button android:id="@+id/btn_signup"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Sign Up"
+                android:text="@string/sign_up_label"
                 android:background="@color/ColorPrimary"
                 android:layout_marginTop="40dp"
                 android:textColor="@android:color/white"

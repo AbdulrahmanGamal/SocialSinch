@@ -87,16 +87,16 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.Bindin
 		notifyDataSetChanged();
 	}
 	/**
-	 * Notifies the user that current logged user is Online
+	 * Only Notify users that are currently Online
 	 */
 	private void notifyOnlineStatus(UserInfo userInfo) {
-        if (userInfo.getLastSeen() != null && DateUtils.isSameDay(userInfo.getLastSeen())) {
+        if (userInfo.isOnline()) {
                 EventMessage eventMessage = new EventMessage(LoggedUser.getInstance().getUserIdLogged(),
                         userInfo.getObjectId(),
                         EventStatus.ONLINE.toString(),
                         EventStatus.ONLINE);
                 RxIncomingEventBus.getInstance().sendEvent(eventMessage);
-            }
+		}
 	}
 
 	public class BindingHolder extends RecyclerView.ViewHolder {

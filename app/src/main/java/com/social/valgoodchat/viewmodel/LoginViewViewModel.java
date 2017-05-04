@@ -3,6 +3,7 @@ package com.social.valgoodchat.viewmodel;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.databinding.BaseObservable;
 import android.databinding.BindingAdapter;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
@@ -27,6 +29,7 @@ import java.util.regex.Pattern;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subscriptions.CompositeSubscription;
 
@@ -40,6 +43,7 @@ public class LoginViewViewModel {
     private String mPassword;
     private TextInputLayout mEmailLayout;
     private TextInputLayout mPasswordLayout;
+    private TextView mErrorLayout;
     private Button mSignIn;
     private boolean mShowEmailError;
     private boolean mShowPasswordError;
@@ -85,7 +89,7 @@ public class LoginViewViewModel {
         // Checks for validity of the email input field
         Subscription emailSubscription = emailChangeObservable
                 .doOnNext(charSequence -> showEmailError(false))
-                .debounce(400, TimeUnit.MILLISECONDS)
+                .debounce(400, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
                 .filter(charSequence -> !TextUtils.isEmpty(charSequence))
                 .observeOn(AndroidSchedulers.mainThread()) // UI Thread
                 .subscribe(charSequence -> {
@@ -105,7 +109,7 @@ public class LoginViewViewModel {
         // Checks for validity of the password input field
         Subscription passwordSubscription = passwordChangeObservable
                 .doOnNext(charSequence -> showPasswordError(false))
-                .debounce(400, TimeUnit.MILLISECONDS)
+                .debounce(600, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
                 .filter(charSequence -> !TextUtils.isEmpty(charSequence))
                 .observeOn(AndroidSchedulers.mainThread()) // UI Thread
                 .subscribe(charSequence -> {
@@ -125,14 +129,9 @@ public class LoginViewViewModel {
                                         Observable<CharSequence> passwordChangeObservable) {
         // Checks for validity of all input fields
         Subscription signInFieldsSubscription = Observable.
-                combineLatest(emailChangeObservable,
-                        passwordChangeObservable,
-                        (email, password) -> {
-                            boolean isEmailValid = validateEmail(email.toString());
-                            boolean isPasswordValid = validatePassword(password.toString());
-
-                            return isEmailValid && isPasswordValid;
-                        }).observeOn(AndroidSchedulers.mainThread()) // UI Thread
+                combineLatest(emailChangeObservable, passwordChangeObservable,
+                        (email, password) -> validateEmail(email.toString()) && validatePassword(password.toString()))
+                .observeOn(AndroidSchedulers.mainThread()) // UI Thread
                 .subscribe(validFields -> {
                     if (validFields) {
                         enableSignIn();
@@ -146,7 +145,10 @@ public class LoginViewViewModel {
 
     private void initSignInListener(Observable<Void> signInClickObservable) {
         signInClickObservable
-                .doOnSubscribe(() -> disableSignIn())
+                .doOnNext(aVoid -> {
+                    disableSignIn();
+                    disableInputs();
+                })
                 .flatMap(new Func1<Void, Observable<OperationResponse>>() {
                     @Override
                     public Observable<OperationResponse> call(Void aVoid) {
@@ -156,12 +158,14 @@ public class LoginViewViewModel {
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     enableSignIn();
+                    enableInputs();
                     if (response.getOpCode().equals(Constants.SUCCESS_CODE)) {
                         Log.e(TAG, "Backendless user successfully logged: ");
                         loadMainUserList();
                         ((Activity)mContext).finish();
                     } else {
                         Log.e(TAG, "Error retrieving the user: " + response.getError());
+                        setGeneralError(response.getError());
                     }
                 });
     }
@@ -191,6 +195,7 @@ public class LoginViewViewModel {
     private void enableSignIn(){
         mSignIn.setEnabled(true);
         mSignIn.setBackgroundColor(ContextCompat.getColor(mContext, R.color.ColorPrimary));
+        clearGeneralError();
     }
 
     private void disableSignIn(){
@@ -198,6 +203,15 @@ public class LoginViewViewModel {
         mSignIn.setBackgroundColor(ContextCompat.getColor(mContext, R.color.dark_gray));
     }
 
+    private void disableInputs() {
+        mEmailLayout.setEnabled(false);
+        mPasswordLayout.setEnabled(false);
+    }
+
+    private void enableInputs() {
+        mEmailLayout.setEnabled(true);
+        mPasswordLayout.setEnabled(true);
+    }
     public void showEmailError(boolean showEmailError){
         this.mShowEmailError = showEmailError;
         if (mShowEmailError) {
@@ -275,10 +289,30 @@ public class LoginViewViewModel {
         this.mSignIn = signIn;
     }
 
+    public void setErrorLayout(TextView mErrorLayout) {
+        this.mErrorLayout = mErrorLayout;
+    }
+
+    @BindingAdapter("generalError")
+    public static void setGeneralError(TextView errorTextView, LoginViewViewModel model) {
+        model.setErrorLayout(errorTextView);
+    }
+
+    public void setGeneralError(String generalError) {
+        if (mErrorLayout != null) {
+            mErrorLayout.setText(generalError);
+        }
+    }
+
+    public void clearGeneralError() {
+        if (mErrorLayout != null) {
+            mErrorLayout.setText("");
+        }
+    }
     public void hookObservables() {
-     initEmailSubscription(getEmailChangeObservable());
-     initPasswordSubscription(getPasswordChangeObservable());
-     initSignInSubscription(getEmailChangeObservable(), getPasswordChangeObservable());
+         initEmailSubscription(getEmailChangeObservable());
+         initPasswordSubscription(getPasswordChangeObservable());
+         initSignInSubscription(getEmailChangeObservable(), getPasswordChangeObservable());
     }
 
         /**
