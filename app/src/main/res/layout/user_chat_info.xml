@@ -16,8 +16,9 @@
             android:orientation="horizontal"
             android:weightSum="2"
             android:layout_marginTop="5dp"
-            android:layout_alignTop="@+id/imgPanel"
-            android:layout_toEndOf="@+id/imgPanel">
+            android:layout_alignTop="@+id/imgUser"
+            android:layout_toEndOf="@+id/imgUser">
+
             <TextView
                 android:id="@+id/name"
                 android:layout_width="0dp"
@@ -44,24 +45,16 @@
                 android:textColor="@color/soft_grey"
                 android:text="@{viewModel.lastMessageDate}"/>
         </LinearLayout>
-        <LinearLayout
-            android:id="@+id/imgPanel"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="12dp"
-            android:layout_marginStart="14dp"
-            android:layout_gravity="center_horizontal"
-            android:orientation="vertical" >
 
-        <com.facebook.drawee.view.SimpleDraweeView
+        <ImageView
             android:id="@+id/imgUser"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            app:roundAsCircle="true"
+            android:layout_width="@dimen/contact_profile_pic_list_width"
+            android:layout_height="@dimen/contact_profile_pic_list_height"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="@dimen/contact_profile_pic_margin_top"
+            android:layout_marginStart="@dimen/contact_profile_pic_margin_start"
+            android:layout_gravity="center_horizontal"
             app:avatarUrl="@{viewModel.userAvatar}"/>
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -69,9 +62,10 @@
             android:orientation="horizontal"
             android:weightSum="2"
             android:layout_below="@+id/name_panel"
-            android:layout_toEndOf="@+id/imgPanel"
+            android:layout_toEndOf="@+id/imgUser"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp">
+
             <ImageView
                 android:id="@+id/user_reply_status"
                 android:layout_width="wrap_content"
@@ -96,7 +90,5 @@
                 android:text="@{viewModel.lastMessage}"/>
 
         </LinearLayout>
-
-
     </RelativeLayout>
 </layout>

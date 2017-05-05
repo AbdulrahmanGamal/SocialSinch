@@ -2,7 +2,6 @@ package com.social.valgoodchat;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -15,18 +14,17 @@ import android.widget.TextView;
 
 import com.social.backendless.bus.RxOutgoingEventBus;
 import com.social.backendless.data.DataManager;
-import com.social.backendless.model.EventMessage;
 import com.social.backendless.model.EventStatus;
 import com.social.backendless.utils.DateUtils;
 import com.social.valgoodchat.app.SocialSinchApplication;
 import com.social.valgoodchat.custom.TypeWriter;
 import com.social.valgoodchat.databinding.ActivityChatMainBinding;
 import com.social.valgoodchat.utils.Constants;
+import com.social.valgoodchat.utils.ImageLoading;
 import com.social.valgoodchat.utils.Utils;
 import com.social.valgoodchat.viewmodel.MessageViewModel;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 
 public class MessagesActivity extends AppCompatActivity {
     private static final String TAG = "MessagesActivity";
@@ -58,8 +56,7 @@ public class MessagesActivity extends AppCompatActivity {
         DataManager.getUserInformationObservable(userId)
                 .subscribe(userInfo -> {
                     //toolbar settings
-                    Uri imageUri = Uri.parse(userInfo.getProfilePicture());
-                    profilePic.setImageURI(imageUri);
+                    ImageLoading.loadContactPicture(userInfo.getProfilePicture(), profilePic);
                     userNameTextView.setText(userInfo.getFullName());
 
                     activityChatMainBinding.toolbarChats.setOnClickListener(v -> {
@@ -116,17 +113,15 @@ public class MessagesActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        DataManager.updatePresenceInRemote(true);
-        SocialSinchApplication.notifyRealTimePresence(EventStatus.ONLINE);
         SocialSinchApplication.activityResumed();
+        SocialSinchApplication.notifyRealTimePresence(EventStatus.ONLINE);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        DataManager.updatePresenceInRemote(false);
-        SocialSinchApplication.notifyRealTimePresence(EventStatus.OFFLINE);
         SocialSinchApplication.activityPaused();
+        SocialSinchApplication.notifyRealTimePresence(EventStatus.OFFLINE);
     }
 
 	@Override

@@ -4,17 +4,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.databinding.BaseObservable;
 import android.databinding.BindingAdapter;
-import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.social.backendless.model.ChatStatus;
 import com.social.backendless.utils.DateUtils;
 import com.social.valgoodchat.MessagesActivity;
 import com.social.valgoodchat.model.UserViewInfoMessage;
 import com.social.valgoodchat.utils.Constants;
+import com.social.valgoodchat.utils.ImageLoading;
 import com.social.valgoodchat.utils.Utils;
+
+import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 /**
  * View Model to populate the user calls information in the calls recycler view
@@ -47,8 +51,7 @@ public class UserCallsItemViewModel extends BaseObservable {
 
     @BindingAdapter("avatarUrl")
     public static void setImageUrl(ImageView imageView, String url) {
-        Uri imageUri = Uri.parse(url);
-        imageView.setImageURI(imageUri);
+        ImageLoading.loadContactPicture(url, imageView);
     }
     public String getUserAvatar() {
         return mUserInfo.getUserInfo().getProfilePicture();

@@ -9,14 +9,10 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import com.social.backendless.bus.RxIncomingEventBus;
 import com.social.backendless.bus.RxOutgoingMessageBus;
 import com.social.backendless.database.ChatBriteDataSource;
 import com.social.backendless.model.ChatMessage;
-import com.social.backendless.model.EventMessage;
-import com.social.backendless.model.EventStatus;
 import com.social.backendless.model.UserInfo;
-import com.social.backendless.utils.DateUtils;
 import com.social.backendless.utils.LoggedUser;
 import com.social.valgoodchat.R;
 import com.social.valgoodchat.databinding.UserChatInfoBinding;
@@ -73,7 +69,6 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.Bindin
             UserViewInfoMessage userVM =
                     new UserViewInfoMessage(userInfo, new ViewMessage(lastChatMessage));
             mUserChats.add(userVM);
-			notifyOnlineStatus(userInfo);
         }
         notifyDataSetChanged();
     }
@@ -85,18 +80,6 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.Bindin
 			userVM.updateLastMessage(lastChatMessage);
 		}
 		notifyDataSetChanged();
-	}
-	/**
-	 * Only Notify users that are currently Online
-	 */
-	private void notifyOnlineStatus(UserInfo userInfo) {
-        if (userInfo.isOnline()) {
-                EventMessage eventMessage = new EventMessage(LoggedUser.getInstance().getUserIdLogged(),
-                        userInfo.getObjectId(),
-                        EventStatus.ONLINE.toString(),
-                        EventStatus.ONLINE);
-                RxIncomingEventBus.getInstance().sendEvent(eventMessage);
-		}
 	}
 
 	public class BindingHolder extends RecyclerView.ViewHolder {
@@ -115,7 +98,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.Bindin
 		RxOutgoingMessageBus.getInstance().getMessageObservable()
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe(chatMessage -> {
-                    Log.e(TAG, "RECEIVED MESSAGE FROM BUS!!!: " + chatMessage);
+                    Log.d(TAG, "RECEIVED MESSAGE FROM BUS!!!: " + chatMessage);
 					processIncomingMessage(chatMessage);
 					notifyDataSetChanged();
                 });

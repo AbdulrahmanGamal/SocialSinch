@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.social.backendless.model.ChatMessage;
 import com.social.backendless.model.ChatStatus;
+import com.social.backendless.model.UserInfo;
 import com.social.backendless.utils.DateUtils;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
@@ -223,7 +224,62 @@ public class ChatBriteDataSource {
         }
     }
 
-    public void closeDatabase() {
-        mChatBriteDB.close();
+    /**
+     * Obtains a contact's last modified date using its Id
+     * @param id
+     * @return
+     * @throws SQLException
+     */
+    public String getLastModifiedDateByContactId(final String id) throws SQLException {
+        String result = null;
+        String queryLastModifiedContact = String.valueOf("SELECT " +
+                ChatSQLiteHelper.COLUMN_MODIFIED + " FROM " +
+                ChatSQLiteHelper.TABLE_CONTACTS + " WHERE " +
+                ChatSQLiteHelper.COLUMN_ID_CONTACT + " = ?");
+        Cursor cursor = mChatBriteDB.query(queryLastModifiedContact, id);
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            result = cursor.getString(0);
+        }
+        return result;
     }
+
+    /**
+     * Obtains a contact's information using its Id
+     * @param id
+     * @return
+     * @throws SQLException
+     */
+    public UserInfo getContactById(final String id) throws SQLException {
+        UserInfo result = null;
+        String queryLastModifiedContact = String.valueOf("SELECT * FROM " +
+                ChatSQLiteHelper.TABLE_CONTACTS + " WHERE " +
+                ChatSQLiteHelper.COLUMN_ID_CONTACT + " = ?");
+        Cursor cursor = mChatBriteDB.query(queryLastModifiedContact, id);
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            result = new UserInfo();
+            result.setObjectId(cursor.getString(0));
+            result.setFullName(cursor.getString(1));
+            result.setProfilePicture(cursor.getString(2));
+            result.setModifiedDate(cursor.getString(3));
+
+        }
+        return result;
+    }
+    /**
+     * Adds the relevant contact information into the local DB
+     * @param contact
+     */
+    public void addContactInformation(UserInfo contact) {
+        mChatBriteDB.execute(
+                "INSERT OR REPLACE INTO " + ChatSQLiteHelper.TABLE_CONTACTS +
+                        " ( " + ChatSQLiteHelper.COLUMN_ID_CONTACT + ", " +
+                        ChatSQLiteHelper.COLUMN_NAME + ", " +
+                        ChatSQLiteHelper.COLUMN_PICTURE + ", " +
+                        ChatSQLiteHelper.COLUMN_MODIFIED
+                        + " ) VALUES ( ?, ?, ? , ? ) ",
+                contact.getObjectId(), contact.getFullName(), contact.getProfilePicture(), contact.getModifiedDate());
+    }
+
 }

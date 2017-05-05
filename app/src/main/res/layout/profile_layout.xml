@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/chat_coordinator_layout"
     android:layout_width="match_parent"
@@ -202,19 +201,18 @@
         </LinearLayout>
     </android.support.v7.widget.Toolbar>
 
-    <com.facebook.drawee.view.SimpleDraweeView
+    <ImageView
         android:id="@+id/avatar"
         android:layout_width="@dimen/avatar_big_width"
         android:layout_height="@dimen/avatar_big_height"
         android:layout_gravity="center"
-        app:layout_behavior="com.parse.sinch.social.custom.AvatarBehavior"
-        fresco:roundAsCircle="true" />
+        app:layout_behavior="com.social.valgoodchat.custom.AvatarBehavior"/>
 
-    <com.parse.sinch.social.custom.ProfileHeaderView
+    <com.social.valgoodchat.custom.ProfileHeaderView
         android:id="@+id/float_header_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_behavior="com.parse.sinch.social.custom.ProfileHeaderBehavior" />
+        app:layout_behavior="com.social.valgoodchat.custom.ProfileHeaderBehavior" />
 
     <!--<LinearLayout-->
         <!--android:layout_width="match_parent"-->

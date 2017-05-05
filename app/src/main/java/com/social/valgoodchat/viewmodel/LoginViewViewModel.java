@@ -156,6 +156,7 @@ public class LoginViewViewModel {
                     }
                 })
                 .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     enableSignIn();
                     enableInputs();

@@ -165,6 +165,8 @@ public class DataManager {
         user.setFullName((String) backendlessUser.getProperty("full_name"));
         user.setPhoneNumber((String) backendlessUser.getProperty("phone"));
         user.setProfilePicture((String) backendlessUser.getProperty("avatar"));
+        Date detailsChangeDate = (Date) backendlessUser.getProperty("details_change");
+        user.setModifiedDate(DateUtils.convertDateToString(detailsChangeDate));
         Date lastTimeSeen = (Date) backendlessUser.getProperty("last_seen");
         Date lastLogin = (Date) backendlessUser.getProperty("lastLogin");
         user.setOnline((Boolean)backendlessUser.getProperty("online"));

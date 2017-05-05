@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
 import com.social.backendless.bus.RxIncomingEventBus;
 import com.social.backendless.data.DataManager;
 import com.social.backendless.model.EventMessage;
@@ -28,7 +27,6 @@ public class SocialSinchApplication extends Application {
 		super.onCreate();
 
 		ApplicationUtils.init(this);
-		Fresco.initialize(this);
 	}
 
     public static boolean isActivityVisible() {
@@ -37,10 +35,12 @@ public class SocialSinchApplication extends Application {
 
 	public static void activityResumed() {
 		activityVisible = true;
+		DataManager.updatePresenceInRemote(true);
 	}
 
 	public static void activityPaused() {
 		activityVisible = false;
+        DataManager.updatePresenceInRemote(false);
 	}
 
 	public static void closeApplicationMessage(Activity activity) {

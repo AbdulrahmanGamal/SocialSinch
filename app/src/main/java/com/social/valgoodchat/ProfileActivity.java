@@ -1,21 +1,19 @@
 package com.social.valgoodchat;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.social.backendless.model.UserInfo;
 import com.social.valgoodchat.app.SocialSinchApplication;
 import com.social.valgoodchat.custom.ProfileHeaderView;
 import com.social.valgoodchat.utils.Constants;
+import com.social.valgoodchat.utils.ImageLoading;
 
 /**
  * Created by valgood on 3/25/2017.
@@ -26,19 +24,18 @@ public class ProfileActivity extends AppCompatActivity
 
     private static final float PERCENTAGE_TO_SHOW_TITLE_AT_TOOLBAR  = 0.7f;
 
-    private boolean mIsTheTitleVisible          = false;
+    private boolean mIsTheTitleVisible = false;
 
     private AppBarLayout appbar;
     private ImageView coverImage;
     private Toolbar toolbar;
-    private SimpleDraweeView avatar;
+    private ImageView avatar;
 
     private void findViews() {
         appbar = (AppBarLayout)findViewById( R.id.chat_bar_layout );
-        CollapsingToolbarLayout collapsing = (CollapsingToolbarLayout) findViewById(R.id.chat_collapsing_toolbar);
         coverImage = (ImageView)findViewById( R.id.profile_placeholder );
         toolbar = (Toolbar)findViewById( R.id.toolbar );
-        avatar = (SimpleDraweeView) findViewById(R.id.avatar);
+        avatar = (ImageView) findViewById(R.id.avatar);
     }
 
 
@@ -69,8 +66,7 @@ public class ProfileActivity extends AppCompatActivity
         headerView.bindTo(recipientInfo.getFullName(),
                           recipientInfo.getLastSeen());
         //set avatar and cover
-        Uri imageUri = Uri.parse(recipientInfo.getProfilePicture());
-        avatar.setImageURI(imageUri);
+        ImageLoading.loadContactPicture(recipientInfo.getProfilePicture(), avatar);
         coverImage.setImageResource(R.drawable.profile_background);
     }
 

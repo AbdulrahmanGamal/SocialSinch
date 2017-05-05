@@ -1,6 +1,7 @@
 package com.social.backendless.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class UserInfo implements Serializable{
 
@@ -10,6 +11,7 @@ public class UserInfo implements Serializable{
 	private String mPhoneNumber;
     private String mProfilePicture;
 	private String mLastSeen;
+	private String mModifiedDate;
 	private boolean mOnline;
 	
 	public String getPhoneNumber() {
@@ -66,5 +68,13 @@ public class UserInfo implements Serializable{
 
 	public void setOnline(boolean online) {
 		this.mOnline = online;
+	}
+
+	public String getModifiedDate() {
+		return mModifiedDate;
+	}
+
+	public void setModifiedDate(String mModifiedDate) {
+		this.mModifiedDate = mModifiedDate;
 	}
 }

@@ -44,7 +44,7 @@ public class PublishSubscriberHandlerTest {
     public void publishMessage() throws InterruptedException {
         Object result = DataManager.getLoginObservable("condorito@gmail.com", "123456789", true).toBlocking().first();
         if (result instanceof BackendlessUser) {
-            PublishSubscribeHandler.getInstance(mMockContext,"8E4B12A7-2B39-778B-FF00-9715DF18DA00").subscribe();
+            //PublishSubscribeHandler.getInstance(mMockContext,"8E4B12A7-2B39-778B-FF00-9715DF18DA00").subscribe();
             //send message to the same user
             RxIncomingMessageBus.getInstance().sendMessage(new ChatMessage("8E4B12A7-2B39-778B-FF00-9715DF18DA00", "hello"));
             //wait while we receive the message back

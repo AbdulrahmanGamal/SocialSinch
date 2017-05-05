@@ -2,7 +2,6 @@ package com.social.backendless.utils;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.backendless.Backendless;
 import com.backendless.async.callback.AsyncCallback;

@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import com.social.backendless.data.ContactInformationManager;
 import com.social.backendless.model.CurrentChatsEvent;
 import com.social.backendless.utils.LoggedUser;
 import com.social.backendless.bus.RxIncomingEventBus;
@@ -32,6 +33,7 @@ public class ListUserChatViewModel {
     private Context mContext;
     private UserChatAdapter mUserCallsAdapter;
     private List<String> mUserContactIds;
+    private ContactInformationManager mContactInformationManager;
     private boolean mShowPanel;
 
     private static final String TAG = "ListUserCallViewModel";
@@ -40,6 +42,7 @@ public class ListUserChatViewModel {
         this.mContext = context;
         this.mUserCallsAdapter = new UserChatAdapter(context);
         this.mUserContactIds = new ArrayList<>();
+        this.mContactInformationManager = new ContactInformationManager(context);
     }
     private UserChatAdapter getAdapter() {
         return mUserCallsAdapter;
@@ -87,6 +90,7 @@ public class ListUserChatViewModel {
 
     private void processResponse(final RecyclerView callsRecyclerView, CurrentChatsEvent data) {
         if (data.getCode().equals(com.social.backendless.utils.Constants.SUCCESS_CODE)) {
+            mContactInformationManager.verifyContactInformationChanges(data.getCharUserInfo());
             mUserCallsAdapter.setUserCalls(data.getCharUserInfo());
         } else {
             //reset the previous list of calls

@@ -17,8 +17,15 @@ public class ChatSQLiteHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "chat.db";
     private static final int DATABASE_VERSION = 1;
 
+    public static final String TABLE_CONTACTS = "contacts";
     public static final String TABLE_TOTAL_MESSAGES = "total_message";
     public static final String TABLE_MESSAGES = "messages";
+
+    //Columns for Contacts Table
+    public static final String COLUMN_ID_CONTACT = "id";
+    public static final String COLUMN_NAME = "name";
+    public static final String COLUMN_PICTURE = "picture";
+    public static final String COLUMN_MODIFIED = "timestamp";
 
     //Columns for Total Messages table
     public static final String COLUMN_ID = "id";
@@ -31,6 +38,14 @@ public class ChatSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_FROM = "sender";
     public static final String COLUMN_DATE = "timestamp";
     public static final String COLUMN_STATUS = "status";
+
+    //SQL statement to create table CONTACTS
+    private static final String CREATE_TABLE_CONTACTS = "create table "
+            + TABLE_CONTACTS + "( " + COLUMN_ID_CONTACT
+            + " text primary key, " + COLUMN_NAME
+            + " text not null, " + COLUMN_PICTURE
+            + " text not null, " + COLUMN_MODIFIED
+            + " text not null);";
 
     //SQL statement to create table TOTAL_MESSAGES
     private static final String CREATE_TABLE_TOTAL_MESSAGES = "create table "
@@ -56,6 +71,7 @@ public class ChatSQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase database) {
+        database.execSQL(CREATE_TABLE_CONTACTS);
         database.execSQL(CREATE_TABLE_TOTAL_MESSAGES);
         database.execSQL(CREATE_TABLE_MESSAGES);
     }
@@ -65,6 +81,7 @@ public class ChatSQLiteHelper extends SQLiteOpenHelper {
         Log.w(ChatSQLiteHelper.class.getName(),
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TOTAL_MESSAGES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGES);
         onCreate(db);

@@ -19,4 +19,8 @@
     <dimen name="toolbar_gif_search_padding_start">0dp</dimen>
     <dimen name="toolbar_gif_search_padding_end">8dp</dimen>
     <dimen name="toolbar_gif_search_autocomplete_text_size">20sp</dimen>
+    <dimen name="contact_profile_pic_list_width">52dp</dimen>
+    <dimen name="contact_profile_pic_list_height">52dp</dimen>
+    <dimen name="contact_profile_pic_margin_top">12dp</dimen>
+    <dimen name="contact_profile_pic_margin_start">14dp</dimen>
 </resources>

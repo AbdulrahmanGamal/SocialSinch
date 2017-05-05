@@ -11,20 +11,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
-import com.social.backendless.bus.RxIncomingEventBus;
-import com.social.backendless.data.DataManager;
-import com.social.backendless.model.EventMessage;
-import com.social.backendless.model.EventStatus;
-import com.social.backendless.utils.Constants;
-import com.social.backendless.utils.DateUtils;
-import com.social.backendless.utils.LoggedUser;
 import com.social.valgoodchat.app.SocialSinchApplication;
 import com.social.valgoodchat.databinding.ActivityOptionsTabBinding;
 import com.social.valgoodchat.viewmodel.TabOptionsViewModel;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 public class TabActivity extends AppCompatActivity {
 
@@ -100,16 +89,12 @@ public class TabActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        DataManager.updatePresenceInRemote(true);
-        SocialSinchApplication.notifyRealTimePresence(EventStatus.ONLINE);
         SocialSinchApplication.activityResumed();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        DataManager.updatePresenceInRemote(false);
-        SocialSinchApplication.notifyRealTimePresence(EventStatus.OFFLINE);
         SocialSinchApplication.activityPaused();
     }
 

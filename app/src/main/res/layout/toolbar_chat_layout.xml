@@ -1,30 +1,20 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="?actionBarSize"
     android:background="?attr/selectableItemBackgroundBorderless">
 
-    <LinearLayout
-        android:id="@+id/conversation_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:orientation="horizontal">
+    <ImageView
+        android:id="@+id/conversation_contact_photo"
+        android:layout_width="@dimen/avatar_small_width"
+        android:layout_height="@dimen/avatar_small_height"
+        android:layout_centerVertical="true"/>
 
-        <com.facebook.drawee.view.SimpleDraweeView
-            android:id="@+id/conversation_contact_photo"
-            android:layout_width="@dimen/avatar_small_width"
-            android:layout_height="@dimen/avatar_small_height"
-            android:scaleType="centerCrop"
-            app:roundAsCircle="true" />
-
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_toEndOf="@id/conversation_image"
+        android:layout_toEndOf="@id/conversation_contact_photo"
         android:orientation="vertical"
         android:paddingBottom="2.0dip"
         android:paddingEnd="0.0dip"

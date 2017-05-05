@@ -5,17 +5,33 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import com.backendless.push.BackendlessPushService;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.FutureTarget;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.NotificationTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.social.backendless.PublishSubscribeHandler;
 import com.social.backendless.bus.RxOutgoingMessageBus;
+import com.social.backendless.database.ChatBriteDataSource;
 import com.social.backendless.model.ChatMessage;
+import com.social.backendless.model.UserInfo;
 import com.social.backendless.utils.Constants;
+import com.social.backendless.utils.DateUtils;
 import com.social.backendless.utils.LoggedUser;
 import com.social.valgoodchat.MessagesActivity;
 import com.social.valgoodchat.R;
 import com.social.valgoodchat.app.SocialSinchApplication;
+import com.social.valgoodchat.utils.ImageLoading;
+
+import java.util.concurrent.ExecutionException;
 
 import io.reactivex.disposables.Disposable;
 
@@ -25,9 +41,17 @@ import io.reactivex.disposables.Disposable;
 public class SocialPushService extends BackendlessPushService {
     private static final String TAG = "SocialPushService";
     private Disposable mDisposable;
-    private static PublishSubscribeHandler mSubscriberHandler;
+    private Handler mHandler;
+    private PublishSubscribeHandler mSubscriberHandler;
+
 
     private static final int NOTIFICATION_ID = 1;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mHandler = new Handler();
+    }
 
     @Override
     public void onRegistered(Context context, String registrationId) {
@@ -35,13 +59,15 @@ public class SocialPushService extends BackendlessPushService {
         initSubscriber(context);
     }
 
-    private void initSubscriber(Context context) {
+    private void initSubscriber(final Context context) {
         mDisposable = RxOutgoingMessageBus.getInstance().getMessageObservable().subscribe(chatMessage -> {
             //if there's no activity visible, show the notification
-            if (!SocialSinchApplication.isActivityVisible()) {
+            if (!SocialSinchApplication.isActivityVisible() &&
+                LoggedUser.getInstance().getUserIdLogged().equals(chatMessage.getRecipientId())) {
                 NotificationManager mNotificationManager =
                         (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                mNotificationManager.notify(NOTIFICATION_ID, createNotification(true, chatMessage));
+                UserInfo senderInfo = ChatBriteDataSource.getInstance(context).getContactById(chatMessage.getSenderId());
+                mNotificationManager.notify(NOTIFICATION_ID, createNotification(context, true, senderInfo, chatMessage));
             }
         });
         mSubscriberHandler = new PublishSubscribeHandler(context);
@@ -85,12 +111,35 @@ public class SocialPushService extends BackendlessPushService {
         Log.e(TAG, "Error registering device: " + message);
     }
 
-   private Notification createNotification(boolean makeHeadsUpNotification, ChatMessage messageReceived) {
-        Notification.Builder notificationBuilder = new Notification.Builder(this)
+   private Notification createNotification(Context context,
+                                           boolean makeHeadsUpNotification,
+                                           UserInfo senderInfo,
+                                           ChatMessage messageReceived) {
+
+       final RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.new_message_notification);
+       try {
+           Bitmap bitmap = Glide.with(context.getApplicationContext()) // safer!
+                   .load(senderInfo.getProfilePicture())
+                   .asBitmap().into(-1,-1).get();
+           if(!bitmap.isRecycled()) {
+               Bitmap roundedBitmap = ImageLoading.getCircleBitmap(bitmap);
+               rv.setImageViewBitmap(R.id.notification_icon, roundedBitmap);
+           }
+       } catch (InterruptedException | ExecutionException e) {
+           e.printStackTrace();
+           rv.setImageViewResource(R.id.notification_icon, R.drawable.ic_launcher);
+       }
+
+       rv.setTextViewText(R.id.notification_headline, senderInfo.getFullName());
+       rv.setTextViewText(R.id.notification_message, messageReceived.getTextBody());
+       rv.setTextViewText(R.id.notification_date, DateUtils.convertChatDate(messageReceived.getTimestamp()));
+
+       NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setPriority(Notification.PRIORITY_DEFAULT)
-                .setContentTitle(messageReceived.getSenderId())
-                .setContentText(messageReceived.getTextBody());
+                .setContentTitle(senderInfo.getFullName())
+                .setContentText(messageReceived.getTextBody())
+                .setContent(rv);
 
         notificationBuilder.setCategory(Notification.CATEGORY_MESSAGE);
         if (makeHeadsUpNotification) {
@@ -104,6 +153,27 @@ public class SocialPushService extends BackendlessPushService {
                     .setContentText(messageReceived.getTextBody())
                     .setFullScreenIntent(fullScreenPendingIntent, true);
         }
-        return notificationBuilder.build();
-    }
+
+        Notification notification = notificationBuilder.build();
+
+       NotificationTarget notificationTarget = new NotificationTarget(context, rv,
+               R.id.notification_icon,
+               notification,
+               NOTIFICATION_ID);
+
+
+       mHandler.post(() -> {
+//           Glide.with(context.getApplicationContext()) // safer!
+//                   .load(senderInfo.getProfilePicture())
+//                   .asBitmap().into(new SimpleTarget<Bitmap>(100,100) {
+//               @Override
+//               public void onResourceReady(Bitmap resource, GlideAnimation glideAnimation) {
+//                   Bitmap roundedBitmap = ImageLoading.getCircleBitmap(resource);
+//                   rv.setImageViewBitmap(R.id.notification_icon, roundedBitmap);
+//                   //Glide.with(context.getApplicationContext()).load(roundedBitmap).asBitmap().into(notificationTarget);
+//               }
+//           });
+       });
+       return notification;
+   }
 }
