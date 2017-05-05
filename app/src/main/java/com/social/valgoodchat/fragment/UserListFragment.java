@@ -36,14 +36,6 @@ public class UserListFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Date currentTime = Calendar.getInstance(Locale.getDefault()).getTime();
-        mListUserCallViewModel.
-                notifyConnectionStatus(DateUtils.convertDateToString(currentTime));
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         mListUserCallViewModel.refreshLastMessage();

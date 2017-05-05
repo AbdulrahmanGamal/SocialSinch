@@ -35,4 +35,14 @@ public class EventMessage {
     public String getRecipientId() {
         return mRecipientId;
     }
+
+    @Override
+    public String toString() {
+        return "EventMessage{" +
+                "mPublisherId='" + mPublisherId + '\'' +
+                ", mRecipientId='" + mRecipientId + '\'' +
+                ", mEventMessage='" + mEventMessage + '\'' +
+                ", mEventStatus=" + mEventStatus +
+                '}';
+    }
 }

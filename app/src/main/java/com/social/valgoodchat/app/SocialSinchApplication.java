@@ -5,8 +5,19 @@ import android.app.AlertDialog;
 import android.app.Application;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.social.backendless.bus.RxIncomingEventBus;
+import com.social.backendless.data.DataManager;
+import com.social.backendless.model.EventMessage;
+import com.social.backendless.model.EventStatus;
 import com.social.backendless.utils.ApplicationUtils;
+import com.social.backendless.utils.Constants;
+import com.social.backendless.utils.DateUtils;
+import com.social.backendless.utils.LoggedUser;
 import com.social.valgoodchat.R;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class SocialSinchApplication extends Application {
 
@@ -20,7 +31,7 @@ public class SocialSinchApplication extends Application {
 		Fresco.initialize(this);
 	}
 
-	public static boolean isActivityVisible() {
+    public static boolean isActivityVisible() {
 		return activityVisible;
 	}
 
@@ -44,4 +55,18 @@ public class SocialSinchApplication extends Application {
 				.setNegativeButton(R.string.cancelar, null)
 				.show();
 	}
+
+    public static void notifyRealTimePresence(EventStatus status) {
+        String eventContent = status.toString();
+        if (status.equals(EventStatus.OFFLINE)) {
+            Date currentTime = Calendar.getInstance(Locale.getDefault()).getTime();
+            eventContent = DateUtils.convertDateToString(currentTime);
+        }
+
+        EventMessage eventMessage = new EventMessage(LoggedUser.getInstance().getUserIdLogged(),
+                Constants.PUBLISH_ALL,
+                eventContent,
+                status);
+        RxIncomingEventBus.getInstance().sendEvent(eventMessage);
+    }
 }

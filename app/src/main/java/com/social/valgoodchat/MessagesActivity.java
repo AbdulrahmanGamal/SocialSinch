@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.social.backendless.bus.RxOutgoingEventBus;
 import com.social.backendless.data.DataManager;
 import com.social.backendless.model.EventMessage;
+import com.social.backendless.model.EventStatus;
 import com.social.backendless.utils.DateUtils;
 import com.social.valgoodchat.app.SocialSinchApplication;
 import com.social.valgoodchat.custom.TypeWriter;
@@ -24,6 +25,7 @@ import com.social.valgoodchat.utils.Constants;
 import com.social.valgoodchat.utils.Utils;
 import com.social.valgoodchat.viewmodel.MessageViewModel;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 
 public class MessagesActivity extends AppCompatActivity {
@@ -69,10 +71,16 @@ public class MessagesActivity extends AppCompatActivity {
                         startActivity(intent1);
                     });
 
-                    Utils.formatLastTimeSeenText(MessagesActivity.this,
-                                     DateUtils.convertDateToLastSeenFormat(userInfo.getLastSeen()), lastTimeSeenTV);
+                    if (userInfo.isOnline()) {
+                        lastTimeSeenTV.setText(getResources().getString(R.string.status_online));
+                    } else {
+                        Utils.formatLastTimeSeenText(MessagesActivity.this,
+                                DateUtils.convertDateToLastSeenFormat(userInfo.getLastSeen()),
+                                lastTimeSeenTV);
+                    }
+
                     //subscribe to the global event bus to receive events from this user
-                    subscribeToLastSeenEvents(lastTimeSeenTV);
+                    subscribeToLastSeenEvents(lastTimeSeenTV, userInfo.getObjectId());
 
                 });
 	}
@@ -81,12 +89,15 @@ public class MessagesActivity extends AppCompatActivity {
      * Last seen listener to update the last seen text
      * @param lastTimeSeenTV
      */
-    private void subscribeToLastSeenEvents(final TextView lastTimeSeenTV) {
+    private void subscribeToLastSeenEvents(final TextView lastTimeSeenTV, final String recipientId) {
         //subscribe to the global event bus to receive events from this user
-        RxOutgoingEventBus.getInstance().getMessageObservable().subscribe(new Consumer<EventMessage>() {
-            @Override
-            public void accept(EventMessage eventMessage) throws Exception {
+        RxOutgoingEventBus.getInstance().getMessageObservable()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(eventMessage -> {
                 Log.e(TAG, "Received this EVENT: " + eventMessage);
+                if (!eventMessage.getPublisherId().equals(recipientId)) {
+                    return;
+                }
                 switch (eventMessage.getEventStatus()) {
                     case ONLINE:
                         lastTimeSeenTV.setText(getResources().getString(R.string.status_online));
@@ -100,13 +111,13 @@ public class MessagesActivity extends AppCompatActivity {
                         lastTimeSeenTV.setText("");
                         break;
                 }
-            }
         });
     }
     @Override
     protected void onResume() {
         super.onResume();
         DataManager.updatePresenceInRemote(true);
+        SocialSinchApplication.notifyRealTimePresence(EventStatus.ONLINE);
         SocialSinchApplication.activityResumed();
     }
 
@@ -114,6 +125,7 @@ public class MessagesActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         DataManager.updatePresenceInRemote(false);
+        SocialSinchApplication.notifyRealTimePresence(EventStatus.OFFLINE);
         SocialSinchApplication.activityPaused();
     }
 

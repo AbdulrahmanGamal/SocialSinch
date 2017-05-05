@@ -10,5 +10,8 @@ public interface Constants {
     String MESSAGE_TYPE_CHAT_KEY = "chat";
     String MESSAGE_TYPE_EVENT_KEY = "event";
     String RECIPIENT_KEY = "recipient";
+    String PUBLISHER_KEY = "from";
+    String MESSAGE_KEY = "message";
     String SUCCESS_CODE = "200";
+    String PUBLISH_ALL = "all";
 }

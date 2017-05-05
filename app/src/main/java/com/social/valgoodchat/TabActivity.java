@@ -11,21 +11,25 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
+import com.social.backendless.bus.RxIncomingEventBus;
 import com.social.backendless.data.DataManager;
+import com.social.backendless.model.EventMessage;
+import com.social.backendless.model.EventStatus;
+import com.social.backendless.utils.Constants;
+import com.social.backendless.utils.DateUtils;
 import com.social.backendless.utils.LoggedUser;
-import com.social.backendless.PublishSubscribeHandler;
 import com.social.valgoodchat.app.SocialSinchApplication;
 import com.social.valgoodchat.databinding.ActivityOptionsTabBinding;
 import com.social.valgoodchat.viewmodel.TabOptionsViewModel;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class TabActivity extends AppCompatActivity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //subscribe to events sent from this user
-//        PublishSubscribeHandler.
-//                getInstance(this, LoggedUser.getInstance().getUserIdLogged()).subscribe();
-
         final TabOptionsViewModel tabOptionsViewModel =
                 new TabOptionsViewModel(getSupportFragmentManager());
         ActivityOptionsTabBinding activityOptionsTabBinding =
@@ -94,19 +98,10 @@ public class TabActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         DataManager.updatePresenceInRemote(true);
+        SocialSinchApplication.notifyRealTimePresence(EventStatus.ONLINE);
         SocialSinchApplication.activityResumed();
     }
 
@@ -114,9 +109,23 @@ public class TabActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         DataManager.updatePresenceInRemote(false);
+        SocialSinchApplication.notifyRealTimePresence(EventStatus.OFFLINE);
         SocialSinchApplication.activityPaused();
     }
 
+//    private void notifyRealTimePresence(EventStatus status) {
+//        String eventContent = status.toString();
+//        if (status.equals(EventStatus.OFFLINE)) {
+//            Date currentTime = Calendar.getInstance(Locale.getDefault()).getTime();
+//            eventContent = DateUtils.convertDateToString(currentTime);
+//        }
+//
+//        EventMessage eventMessage = new EventMessage(LoggedUser.getInstance().getUserIdLogged(),
+//                Constants.PUBLISH_ALL,
+//                eventContent,
+//                status);
+//        RxIncomingEventBus.getInstance().sendEvent(eventMessage);
+//    }
 //    public void mostrarDialogo(int resId){
 //        AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //        // Get the layout inflater

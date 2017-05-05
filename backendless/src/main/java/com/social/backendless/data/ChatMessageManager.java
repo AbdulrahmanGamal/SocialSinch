@@ -3,9 +3,6 @@ package com.social.backendless.data;
 import android.content.Context;
 import android.util.Log;
 
-import com.backendless.Backendless;
-import com.backendless.Subscription;
-import com.backendless.messaging.Message;
 import com.backendless.services.messaging.MessageStatus;
 import com.google.gson.Gson;
 import com.social.backendless.bus.RxIncomingMessageBus;
@@ -14,6 +11,7 @@ import com.social.backendless.database.ChatBriteDataSource;
 import com.social.backendless.model.ChatMessage;
 import com.social.backendless.model.ChatStatus;
 import com.social.backendless.utils.Constants;
+import com.social.backendless.utils.LoggedUser;
 import com.social.backendless.utils.ObservableUtils;
 
 import java.util.Calendar;
@@ -29,15 +27,13 @@ import rx.functions.Func1;
  */
 
 public class ChatMessageManager {
-    private String mUserLogged;
     private ChatBriteDataSource mDataSource;
-    private Disposable mSubscription;
+    private Disposable mDisposable;
 
     private static final String TAG = "ChatMessageManager";
 
-    public ChatMessageManager(Context context, String userLogged) {
+    public ChatMessageManager(Context context) {
         this.mDataSource = ChatBriteDataSource.getInstance(context);
-        this.mUserLogged = userLogged;
         configureIncomingMessageBus();
     }
 
@@ -45,11 +41,12 @@ public class ChatMessageManager {
      * Listen for messages coming from the Views
      */
     private void configureIncomingMessageBus() {
-       mSubscription = RxIncomingMessageBus.getInstance().getMessageObservable().subscribe(new Consumer<ChatMessage>() {
-            @Override
-            public void accept(ChatMessage chatMessage) throws Exception {
-                processOutgoingMessage(chatMessage, ChatStatus.SEND);
-            }
+       mDisposable = RxIncomingMessageBus.getInstance().
+               getMessageObservable().subscribe(new Consumer<ChatMessage>() {
+                @Override
+                public void accept(ChatMessage chatMessage) throws Exception {
+                    processOutgoingMessage(chatMessage, ChatStatus.SEND);
+                }
         });
     }
     /**
@@ -91,27 +88,23 @@ public class ChatMessageManager {
      * Process the receive message and execute the according action depending of the status
      * @param message
      */
-    public void processIncomingMessage(Message message) {
+    public void processIncomingMessage(String message) {
         final Gson gson = new Gson();
-        //Process only if its CHAT
-        if (message.getHeaders().get(Constants.MESSAGE_TYPE_KEY).equals(Constants.MESSAGE_TYPE_CHAT_KEY)) {
-            Log.e(TAG, "Received message : " + message);
-            ChatMessage messageReceived = gson.fromJson((String) message.getData(), ChatMessage.class);
-            switch (messageReceived.getStatus()) {
-                case SEND:
-                    ChatMessage deliveredMessage = new ChatMessage(messageReceived.getSenderId(), "");
-                    deliveredMessage.setMessageId(messageReceived.getMessageId());
-                    processOutgoingMessage(deliveredMessage, ChatStatus.DELIVERED);
-                    notifyViews(messageReceived, ChatStatus.RECEIVED);
-                    break;
-                case DELIVERED:
-                    notifyViews(messageReceived, ChatStatus.DELIVERED);
-                    break;
-                //TODO consider the other type of cases
-                default:
-                    break;
+        ChatMessage messageReceived = gson.fromJson(message, ChatMessage.class);
+        switch (messageReceived.getStatus()) {
+            case SEND:
+                ChatMessage deliveredMessage = new ChatMessage(messageReceived.getSenderId(), "");
+                deliveredMessage.setMessageId(messageReceived.getMessageId());
+                processOutgoingMessage(deliveredMessage, ChatStatus.DELIVERED);
+                notifyViews(messageReceived, ChatStatus.RECEIVED);
+                break;
+            case DELIVERED:
+                notifyViews(messageReceived, ChatStatus.DELIVERED);
+                break;
+            //TODO consider the other type of cases
+            default:
+                break;
 
-            }
         }
     }
     /**
@@ -148,7 +141,7 @@ public class ChatMessageManager {
      * @return
      */
     private ChatMessage completeChatMessage(ChatMessage message,  ChatStatus status) {
-        message.setSenderId(mUserLogged);
+        message.setSenderId( LoggedUser.getInstance().getUserIdLogged());
         message.setTimestamp(Calendar.getInstance(Locale.getDefault()).getTime());
         message.setStatus(status);
 
@@ -162,8 +155,8 @@ public class ChatMessageManager {
     }
 
     public void dispose() {
-        if (mSubscription != null) {
-            mSubscription.dispose();
+        if (mDisposable != null) {
+            mDisposable.dispose();
         }
     }
 }
