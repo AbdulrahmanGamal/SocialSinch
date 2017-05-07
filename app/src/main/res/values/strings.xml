@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SocialSinchParse</string>
+    <string name="app_name">ValgoodChat</string>
     <string name="login_activity_label">Sinch Social</string>
     <string name="login">Usuario</string>
     <string name="password">Contraseña</string>
@@ -62,8 +62,9 @@
     <string name="search_title">Search</string>
     <string name="sign_in_label">Sign In</string>
     <string name="sign_up_label">Sign Up</string>
-    <plurals name="new_messages_received_label">
+    <plurals name="single_user_new_messages_received_label">
         <item quantity="one">%1$d new Message</item>
         <item quantity="other">%1$d new Messages</item>
     </plurals>
+    <string name="multiple_user_new_messages_received_label">%1$d Conversations %2$d new Messages</string>
 </resources>

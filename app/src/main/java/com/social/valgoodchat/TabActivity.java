@@ -11,7 +11,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
-import com.social.backendless.PublishSubscribeHandler;
 import com.social.valgoodchat.app.SocialSinchApplication;
 import com.social.valgoodchat.databinding.ActivityOptionsTabBinding;
 import com.social.valgoodchat.viewmodel.TabOptionsViewModel;
@@ -20,8 +19,6 @@ public class TabActivity extends AppCompatActivity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //reset notification information
-        SocialSinchApplication.clearNotificationPreference(this);
         final TabOptionsViewModel tabOptionsViewModel =
                 new TabOptionsViewModel(getSupportFragmentManager());
         ActivityOptionsTabBinding activityOptionsTabBinding =
@@ -93,6 +90,8 @@ public class TabActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         SocialSinchApplication.activityResumed();
+        //reset notification information
+        SocialSinchApplication.clearNotifications(this);
     }
 
     @Override

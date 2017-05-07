@@ -6,8 +6,8 @@ import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.support.v4.app.NotificationCompat;
 
@@ -20,7 +20,8 @@ import com.social.valgoodchat.R;
 import com.social.valgoodchat.TabActivity;
 import com.social.valgoodchat.app.SocialSinchApplication;
 
-import static android.content.Context.MODE_PRIVATE;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Encapsulates all the process of showing an offline message and showing a notification.
@@ -52,75 +53,117 @@ public class NotificationUtils {
             ChatMessage messageReceived = new Gson().fromJson(chatMessage, ChatMessage.class);
             NotificationManager mNotificationManager =
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            UserInfo senderInfo = ChatBriteDataSource.getInstance(context).
-                    getContactById(messageReceived.getSenderId());
-            //get the global notification preference
-            SharedPreferences sharedPreferences =
-                    context.getSharedPreferences("notifications", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            int msjCount = 1;
-            if (sharedPreferences.getString(String.valueOf(NOTIFICATION_ID), null) != null) {
-                msjCount = sharedPreferences.getInt(senderInfo.getObjectId(), 0) + 1;
-                editor.putInt(senderInfo.getObjectId(), msjCount);
-            } else {
-                editor.putInt(senderInfo.getObjectId(), msjCount);
-            }
-            mNotificationManager.notify(NOTIFICATION_ID,
-                    NotificationUtils.getInstance().
-                            getNotificationBuilder(context, senderInfo, messageReceived, msjCount));
-            editor.putString(String.valueOf(NOTIFICATION_ID), "notifications");
-            editor.apply();
+            //saved the message in DB as a notification message
+            ChatBriteDataSource.getInstance(context).
+                    addNotificationMessage(messageReceived.getSenderId(),
+                                           messageReceived.getTextBody());
+            mNotificationManager.notify(NOTIFICATION_ID, NotificationUtils.getInstance().
+                                                                    getNotificationBuilder(context));
         }
     }
 
     /**
      * Obtains the notification object
      * @param context
-     * @param senderInfo
-     * @param messageReceived
-     * @param msjCounter
      * @return
      */
-    private Notification getNotificationBuilder(Context context,
-                                                              UserInfo senderInfo,
-                                                              ChatMessage messageReceived,
-                                                              int msjCounter) {
-        Bitmap roundedBitmap =
-                ImageLoading.getPictureForNotification(context, senderInfo.getProfilePicture());
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setLargeIcon(roundedBitmap)
-                .setPriority(Notification.PRIORITY_HIGH)
-                .setContentTitle(senderInfo.getFullName())
-                .setContentText(messageReceived.getTextBody())
-                .setLights(Color.GREEN, 1000, 5000)
-                .setDefaults(Notification.DEFAULT_VIBRATE |
-                        Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS)
-                .setAutoCancel(true);
+    private Notification getNotificationBuilder(Context context) {
+        Map<String, List<String>> notifications =
+                ChatBriteDataSource.getInstance(context).getNotifications();
 
-        if (msjCounter == 1) {
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
+        int totalConversations = 0;
+        int totalMessages = 0;
+        //if more then 1 user talking
+        if (notifications.size() > 1) {
             mInboxStyle = new NotificationCompat.InboxStyle();
-            mInboxStyle.addLine(messageReceived.getTextBody());
-            makeHeadsUpNotification(context, senderInfo.getObjectId(),
-                    messageReceived.getTextBody(), notificationBuilder);
+            for (String senderId: notifications.keySet()) {
+                totalConversations++;
+                List<String> messages = notifications.get(senderId);
+                totalMessages += messages.size();
+                UserInfo userInfo = ChatBriteDataSource.getInstance(context).getContactById(senderId);
+                for (String message : messages) {
+                    mInboxStyle.addLine(userInfo.getFullName() + ": " + message);
+                }
+            }
+            Object vars[] = {totalConversations, totalMessages};
+            String contentText = context.getResources().
+                    getString(R.string.multiple_user_new_messages_received_label, vars);
+            String contentTitle = context.getResources().
+                    getString(R.string.app_name);
+            Bitmap largeIcon = BitmapFactory.
+                    decodeResource(context.getResources(), R.drawable.ic_launcher);
+            notificationBuilder
+                    .setSmallIcon(R.drawable.ic_launcher)
+                    .setLargeIcon(largeIcon)
+                    .setPriority(Notification.PRIORITY_HIGH)
+                    .setContentTitle(contentTitle)
+                    .setContentText(contentText)
+                    .setLights(Color.GREEN, 1000, 5000)
+                    .setDefaults(Notification.DEFAULT_VIBRATE |
+                            Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS)
+                    .setAutoCancel(true);
+
+            mInboxStyle.setBigContentTitle(contentTitle);
+            mInboxStyle.setSummaryText(contentText);
+            makeHeadsUpMultipleNotification(context, contentText, notificationBuilder);
         } else {
-            String msjCounterText = context.getResources().getQuantityString(
-                    R.plurals.new_messages_received_label,
-                    msjCounter,
-                    msjCounter);
-            mInboxStyle.setBigContentTitle(senderInfo.getFullName());
-            mInboxStyle.addLine(messageReceived.getTextBody());
-            mInboxStyle.setSummaryText(msjCounterText);
-            makeHeadsUpNotification(context, senderInfo.getObjectId(),
-                    msjCounterText, notificationBuilder);
+            //just 1 person talking
+            for (String senderId : notifications.keySet()) {
+                UserInfo senderInfo = ChatBriteDataSource.getInstance(context).getContactById(senderId);
+                Bitmap roundedBitmap =
+                        ImageLoading.getPictureForNotification(context, senderInfo.getProfilePicture());
+                List<String> message = notifications.get(senderId);
+                mInboxStyle = new NotificationCompat.InboxStyle();
+                if (message.size() == 1) {
+                    mInboxStyle.addLine(message.get(0));
+                    notificationBuilder
+                            .setSmallIcon(R.drawable.ic_launcher)
+                            .setLargeIcon(roundedBitmap)
+                            .setPriority(Notification.PRIORITY_HIGH)
+                            .setContentTitle(senderInfo.getFullName())
+                            .setContentText(message.get(0))
+                            .setLights(Color.GREEN, 1000, 5000)
+                            .setDefaults(Notification.DEFAULT_VIBRATE |
+                                    Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS)
+                            .setAutoCancel(true);
+
+                    makeHeadsUpNotification(context, senderInfo.getObjectId(),
+                            message.get(0), notificationBuilder);
+                } else {
+                    String msjCounterText = context.getResources().getQuantityString(
+                            R.plurals.single_user_new_messages_received_label,
+                            message.size(),
+                            message.size());
+                    mInboxStyle.setBigContentTitle(senderInfo.getFullName());
+                    for (String messageReceived : message) {
+                        mInboxStyle.addLine(messageReceived);
+                    }
+                    mInboxStyle.setSummaryText(msjCounterText);
+                    notificationBuilder
+                            .setSmallIcon(R.drawable.ic_launcher)
+                            .setLargeIcon(roundedBitmap)
+                            .setPriority(Notification.PRIORITY_HIGH)
+                            .setContentTitle(senderInfo.getFullName())
+                            .setContentText(msjCounterText)
+                            .setLights(Color.GREEN, 1000, 5000)
+                            .setDefaults(Notification.DEFAULT_VIBRATE |
+                                    Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS)
+                            .setAutoCancel(true);
+
+                    makeHeadsUpNotification(context, senderInfo.getObjectId(),
+                            msjCounterText, notificationBuilder);
+                }
+            }
         }
+
         notificationBuilder.setCategory(Notification.CATEGORY_MESSAGE);
         notificationBuilder.setStyle(mInboxStyle);
         return notificationBuilder.build();
     }
 
     /**
-     * Adds capability of heads up
+     * Adds capability of heads up for 1 conversation
      * @param context
      * @param recipientId
      * @param message
@@ -144,4 +187,25 @@ public class NotificationUtils {
                 .setContentText(message)
                 .setContentIntent(pendingIntent);
     }
+
+    /**
+     * Adds capability of heads up for more then 1 conversations
+     * @param context
+     * @param contentText
+     * @param notificationBuilder
+     */
+    private void makeHeadsUpMultipleNotification(Context context,
+                                                 String contentText,
+                                                 NotificationCompat.Builder notificationBuilder) {
+        Intent push = new Intent();
+        push.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        push.setClass(context, TabActivity.class);
+
+        PendingIntent pendingIntent =
+                PendingIntent.getActivity(context, 0, push, PendingIntent.FLAG_CANCEL_CURRENT);
+        notificationBuilder
+                .setContentText(contentText)
+                .setContentIntent(pendingIntent);
+    }
+
 }

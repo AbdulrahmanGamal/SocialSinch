@@ -35,8 +35,6 @@ public class MessagesActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		final ActivityChatMainBinding activityChatMainBinding =
                 DataBindingUtil.setContentView(this, R.layout.activity_chat_main);
-        //reset notification information
-        SocialSinchApplication.clearNotificationPreference(this);
         //get recipient information from the intent
         Intent intent = getIntent();
         String userId = intent.getStringExtra(Constants.RECIPIENT_ID);
@@ -118,6 +116,9 @@ public class MessagesActivity extends AppCompatActivity {
         super.onResume();
         SocialSinchApplication.activityResumed();
         SocialSinchApplication.notifyRealTimePresence(EventStatus.ONLINE);
+        //reset notification information
+        SocialSinchApplication.clearNotifications(this);
+
     }
 
     @Override

@@ -14,7 +14,9 @@ import com.squareup.sqlbrite.SqlBrite;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import rx.schedulers.Schedulers;
 
@@ -91,6 +93,7 @@ public class ChatBriteDataSource {
             cursor.moveToFirst();
             result = cursor.getLong(0);
         }
+        cursor.close();
         return result;
     }
     /**
@@ -241,6 +244,7 @@ public class ChatBriteDataSource {
             cursor.moveToFirst();
             result = cursor.getString(0);
         }
+        cursor.close();
         return result;
     }
 
@@ -265,6 +269,7 @@ public class ChatBriteDataSource {
             result.setModifiedDate(cursor.getString(3));
 
         }
+        cursor.close();
         return result;
     }
     /**
@@ -279,7 +284,58 @@ public class ChatBriteDataSource {
                         ChatSQLiteHelper.COLUMN_PICTURE + ", " +
                         ChatSQLiteHelper.COLUMN_MODIFIED
                         + " ) VALUES ( ?, ?, ? , ? ) ",
-                contact.getObjectId(), contact.getFullName(), contact.getProfilePicture(), contact.getModifiedDate());
+                contact.getObjectId(), contact.getFullName(), contact.getProfilePicture(),
+                contact.getModifiedDate());
     }
 
+    /**
+     * Addds new notification message
+     * @param senderId
+     * @param message
+     */
+    public void addNotificationMessage(String senderId, String message) {
+        mChatBriteDB.execute(
+                "INSERT INTO " + ChatSQLiteHelper.TABLE_NOTIFICATIONS +
+                        " ( " + ChatSQLiteHelper.COLUMN_SENDER_ID + ", " +
+                        ChatSQLiteHelper.COLUMN_MESSAGE_NOTIFICATION
+                        + " ) VALUES ( ?, ? ) ",
+                senderId, message);
+    }
+
+    /**
+     * Obtains the total messages received by different users to show a notification
+     * @return
+     * @throws SQLException
+     */
+    public Map<String, List<String>> getNotifications() throws SQLException {
+        Map<String, List<String>> result = new HashMap<>();
+        String queryNotifications = String.valueOf("SELECT * FROM " +
+                ChatSQLiteHelper.TABLE_NOTIFICATIONS + " ORDER BY " +
+                ChatSQLiteHelper.COLUMN_SENDER_ID);
+        Cursor cursor = mChatBriteDB.query(queryNotifications);
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                String senderId = cursor.getString(0);
+                List<String> messages;
+                if (result.containsKey(senderId)) {
+                    messages = result.get(senderId);
+                } else {
+                    messages = new ArrayList<>();
+                }
+                messages.add(cursor.getString(1));
+                result.put(senderId, messages);
+                cursor.moveToNext();
+            }
+        }
+        cursor.close();
+        return result;
+    }
+
+    /**
+     * Removes all notification messages after the user have seen them
+     */
+    public void deleteNotifications() {
+        mChatBriteDB.execute("DELETE FROM " + ChatSQLiteHelper.TABLE_NOTIFICATIONS);
+    }
 }

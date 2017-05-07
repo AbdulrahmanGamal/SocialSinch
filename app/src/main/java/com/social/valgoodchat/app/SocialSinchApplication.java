@@ -1,7 +1,5 @@
 package com.social.valgoodchat.app;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,14 +7,13 @@ import android.content.SharedPreferences;
 import com.social.backendless.PublishSubscribeHandler;
 import com.social.backendless.bus.RxIncomingEventBus;
 import com.social.backendless.data.DataManager;
+import com.social.backendless.database.ChatBriteDataSource;
 import com.social.backendless.model.EventMessage;
 import com.social.backendless.model.EventStatus;
 import com.social.backendless.utils.ApplicationUtils;
 import com.social.backendless.utils.Constants;
 import com.social.backendless.utils.DateUtils;
 import com.social.backendless.utils.LoggedUser;
-import com.social.valgoodchat.R;
-import com.social.valgoodchat.utils.NotificationUtils;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -31,6 +28,7 @@ public class SocialSinchApplication extends Application {
 		super.onCreate();
 
 		ApplicationUtils.init(this);
+        PublishSubscribeHandler.initialize(this);
 	}
 
     public static boolean isActivityVisible() {
@@ -47,13 +45,9 @@ public class SocialSinchApplication extends Application {
         DataManager.updatePresenceInRemote(false);
 	}
 
-	public static void clearNotificationPreference(Context context) {
-		SharedPreferences sharedPreferences = context.getSharedPreferences("notifications", MODE_PRIVATE);
-		SharedPreferences.Editor editor = sharedPreferences.edit();
-		editor.clear();
-		editor.apply();
-		//force attachment to the receivers
-		PublishSubscribeHandler.initialize(context);
+	public static void clearNotifications(Context context) {
+		//Remove Notifications from DB
+        ChatBriteDataSource.getInstance(context).deleteNotifications();
 	}
 
 //	public static void closeApplicationMessage(Activity activity) {

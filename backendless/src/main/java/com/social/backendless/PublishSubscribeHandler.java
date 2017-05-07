@@ -1,6 +1,8 @@
 package com.social.backendless;
 
 import android.content.Context;
+import android.util.Log;
+
 import com.social.backendless.data.ChatMessageManager;
 import com.social.backendless.data.EventMessageManager;
 import com.social.backendless.utils.Constants;
@@ -26,6 +28,7 @@ public class PublishSubscribeHandler {
         }
     }
     private PublishSubscribeHandler(Context context) {
+        Log.e(TAG, "Creating instance of PublishSubscribeHandler");
         this.mChatMessageManager = new ChatMessageManager(context);
         this.mEventMessageManager = new EventMessageManager();
     }

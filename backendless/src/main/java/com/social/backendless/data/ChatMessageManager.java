@@ -45,6 +45,7 @@ public class ChatMessageManager {
                getMessageObservable().subscribe(new Consumer<ChatMessage>() {
                 @Override
                 public void accept(ChatMessage chatMessage) throws Exception {
+                    Log.d(TAG,"Bus going to send the message");
                     processOutgoingMessage(chatMessage, ChatStatus.SEND);
                 }
         });
