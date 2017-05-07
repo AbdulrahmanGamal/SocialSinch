@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
+import com.social.backendless.PublishSubscribeHandler;
 import com.social.valgoodchat.app.SocialSinchApplication;
 import com.social.valgoodchat.databinding.ActivityOptionsTabBinding;
 import com.social.valgoodchat.viewmodel.TabOptionsViewModel;
@@ -19,6 +20,8 @@ public class TabActivity extends AppCompatActivity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //reset notification information
+        SocialSinchApplication.clearNotificationPreference(this);
         final TabOptionsViewModel tabOptionsViewModel =
                 new TabOptionsViewModel(getSupportFragmentManager());
         ActivityOptionsTabBinding activityOptionsTabBinding =
@@ -139,7 +142,7 @@ public class TabActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK ) {
-            SocialSinchApplication.closeApplicationMessage(this);
+            finish();
         }
         return false;
     }

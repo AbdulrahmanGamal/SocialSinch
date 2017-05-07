@@ -131,6 +131,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         viewMessageToSend.setViewMessageId((long) mViewMessages.size() + 1);
         Utils.changeStatusIcon(viewMessageToSend, chatMessage.getStatus());
         addMessage(viewMessageToSend);
+        Log.d(TAG, "Sending Message written to RxIncomingMessageBus");
         RxIncomingMessageBus.getInstance().sendMessage(chatMessage);
     }
 

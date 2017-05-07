@@ -1,5 +1,7 @@
 package com.social.backendless.utils;
 
+import android.util.Log;
+
 import com.backendless.Backendless;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
@@ -16,6 +18,7 @@ import rx.functions.Action1;
 
 public class ObservableUtils {
 
+    private static final String TAG = "ObservableUtils";
     /**
      * Observable that publishes private messages to an specific recipient
      * @return
@@ -39,6 +42,7 @@ public class ObservableUtils {
 
                     @Override
                     public void handleFault(BackendlessFault backendlessFault) {
+                        Log.e(TAG, "Error sending message: " + backendlessFault.getMessage());
                         emitter.onNext(backendlessFault);
                     }
                 });

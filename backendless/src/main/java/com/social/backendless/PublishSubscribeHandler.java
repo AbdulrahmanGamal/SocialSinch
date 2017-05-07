@@ -11,18 +11,21 @@ import com.social.backendless.utils.Constants;
 public class PublishSubscribeHandler {
 
     private static final String TAG = "PublishSubscribeHandler";
-//    private static PublishSubscribeHandler sPublishSubscriberHandler;
+    private static PublishSubscribeHandler sPublishSubscriberHandler;
     private ChatMessageManager mChatMessageManager;
     private EventMessageManager mEventMessageManager;
 
-//    public static PublishSubscribeHandler getInstance(Context context) {
-//        if (sPublishSubscriberHandler == null) {
-//           sPublishSubscriberHandler = new PublishSubscribeHandler(context);
-//        }
-//        return sPublishSubscriberHandler;
-//    }
+    public static PublishSubscribeHandler getInstance(Context context) {
+        initialize(context);
+        return sPublishSubscriberHandler;
+    }
 
-    public PublishSubscribeHandler(Context context) {
+    public static void initialize(Context context) {
+        if (sPublishSubscriberHandler == null) {
+            sPublishSubscriberHandler = new PublishSubscribeHandler(context);
+        }
+    }
+    private PublishSubscribeHandler(Context context) {
         this.mChatMessageManager = new ChatMessageManager(context);
         this.mEventMessageManager = new EventMessageManager();
     }
