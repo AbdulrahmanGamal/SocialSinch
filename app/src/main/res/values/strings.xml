@@ -66,5 +66,5 @@
         <item quantity="one">%1$d new Message</item>
         <item quantity="other">%1$d new Messages</item>
     </plurals>
-    <string name="multiple_user_new_messages_received_label">%1$d Conversations %2$d new Messages</string>
+    <string name="multiple_user_new_messages_received_label">%2$d messages from %1$d chats</string>
 </resources>

@@ -45,10 +45,10 @@ public class PublishSubscribeHandler {
         }
     }
 
-    public void dispose() {
-        mChatMessageManager.dispose();
-        mEventMessageManager.dispose();
-    }
+//    public void dispose() {
+//        mChatMessageManager.dispose();
+//        mEventMessageManager.dispose();
+//    }
     /**
      * Subscribes ti the default channel
      */

@@ -90,8 +90,6 @@ public class TabActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         SocialSinchApplication.activityResumed();
-        //reset notification information
-        SocialSinchApplication.clearNotifications(this);
     }
 
     @Override

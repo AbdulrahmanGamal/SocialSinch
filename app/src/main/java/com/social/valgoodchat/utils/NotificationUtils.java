@@ -3,7 +3,6 @@ package com.social.valgoodchat.utils;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -91,22 +90,13 @@ public class NotificationUtils {
                     getString(R.string.multiple_user_new_messages_received_label, vars);
             String contentTitle = context.getResources().
                     getString(R.string.app_name);
-            Bitmap largeIcon = BitmapFactory.
-                    decodeResource(context.getResources(), R.drawable.ic_launcher);
-            notificationBuilder
-                    .setSmallIcon(R.drawable.ic_launcher)
-                    .setLargeIcon(largeIcon)
-                    .setPriority(Notification.PRIORITY_HIGH)
-                    .setContentTitle(contentTitle)
-                    .setContentText(contentText)
-                    .setLights(Color.GREEN, 1000, 5000)
-                    .setDefaults(Notification.DEFAULT_VIBRATE |
-                            Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS)
-                    .setAutoCancel(true);
-
             mInboxStyle.setBigContentTitle(contentTitle);
             mInboxStyle.setSummaryText(contentText);
-            makeHeadsUpMultipleNotification(context, contentText, notificationBuilder);
+
+            Bitmap largeIcon = BitmapFactory.
+                    decodeResource(context.getResources(), R.drawable.ic_launcher);
+            transformNotificationbuilder(notificationBuilder, largeIcon, contentTitle, contentText);
+            makeHeadsUpNotification(context, null, contentText, true, notificationBuilder);
         } else {
             //just 1 person talking
             for (String senderId : notifications.keySet()) {
@@ -117,19 +107,11 @@ public class NotificationUtils {
                 mInboxStyle = new NotificationCompat.InboxStyle();
                 if (message.size() == 1) {
                     mInboxStyle.addLine(message.get(0));
-                    notificationBuilder
-                            .setSmallIcon(R.drawable.ic_launcher)
-                            .setLargeIcon(roundedBitmap)
-                            .setPriority(Notification.PRIORITY_HIGH)
-                            .setContentTitle(senderInfo.getFullName())
-                            .setContentText(message.get(0))
-                            .setLights(Color.GREEN, 1000, 5000)
-                            .setDefaults(Notification.DEFAULT_VIBRATE |
-                                    Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS)
-                            .setAutoCancel(true);
 
+                    transformNotificationbuilder(notificationBuilder, roundedBitmap,
+                                                 senderInfo.getFullName(), message.get(0));
                     makeHeadsUpNotification(context, senderInfo.getObjectId(),
-                            message.get(0), notificationBuilder);
+                            message.get(0), false, notificationBuilder);
                 } else {
                     String msjCounterText = context.getResources().getQuantityString(
                             R.plurals.single_user_new_messages_received_label,
@@ -140,19 +122,11 @@ public class NotificationUtils {
                         mInboxStyle.addLine(messageReceived);
                     }
                     mInboxStyle.setSummaryText(msjCounterText);
-                    notificationBuilder
-                            .setSmallIcon(R.drawable.ic_launcher)
-                            .setLargeIcon(roundedBitmap)
-                            .setPriority(Notification.PRIORITY_HIGH)
-                            .setContentTitle(senderInfo.getFullName())
-                            .setContentText(msjCounterText)
-                            .setLights(Color.GREEN, 1000, 5000)
-                            .setDefaults(Notification.DEFAULT_VIBRATE |
-                                    Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS)
-                            .setAutoCancel(true);
 
+                    transformNotificationbuilder(notificationBuilder, roundedBitmap,
+                                                 senderInfo.getFullName(), msjCounterText);
                     makeHeadsUpNotification(context, senderInfo.getObjectId(),
-                            msjCounterText, notificationBuilder);
+                            msjCounterText, false, notificationBuilder);
                 }
             }
         }
@@ -162,50 +136,47 @@ public class NotificationUtils {
         return notificationBuilder.build();
     }
 
+    private void transformNotificationbuilder(NotificationCompat.Builder notificationBuilder,
+                                              Bitmap largeIcon,
+                                              String contentTitle,
+                                              String contentText) {
+        notificationBuilder
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setLargeIcon(largeIcon)
+                .setPriority(Notification.PRIORITY_HIGH)
+                .setContentTitle(contentTitle)
+                .setContentText(contentText)
+                .setLights(Color.GREEN, 1000, 5000)
+                .setDefaults(Notification.DEFAULT_VIBRATE |
+                        Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS)
+                .setAutoCancel(true);
+    }
     /**
      * Adds capability of heads up for 1 conversation
      * @param context
      * @param recipientId
      * @param message
+     * @param isMultiple
      * @param notificationBuilder
      */
     private void makeHeadsUpNotification(Context context,
                                          String recipientId,
                                          String message,
+                                         boolean isMultiple,
                                          NotificationCompat.Builder notificationBuilder) {
         Intent push = new Intent();
         push.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        push.putExtra(Constants.RECIPIENT_ID, recipientId);
-        push.setClass(context, MessagesActivity.class);
+        if (isMultiple) {
+            push.setClass(context, TabActivity.class);
+        } else {
+            push.putExtra(Constants.RECIPIENT_ID, recipientId);
+            push.setClass(context, MessagesActivity.class);
+        }
 
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        stackBuilder.addParentStack(TabActivity.class);
-        stackBuilder.addNextIntent(push);
         PendingIntent pendingIntent =
                 PendingIntent.getActivity(context, 0, push, PendingIntent.FLAG_CANCEL_CURRENT);
         notificationBuilder
                 .setContentText(message)
                 .setContentIntent(pendingIntent);
     }
-
-    /**
-     * Adds capability of heads up for more then 1 conversations
-     * @param context
-     * @param contentText
-     * @param notificationBuilder
-     */
-    private void makeHeadsUpMultipleNotification(Context context,
-                                                 String contentText,
-                                                 NotificationCompat.Builder notificationBuilder) {
-        Intent push = new Intent();
-        push.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        push.setClass(context, TabActivity.class);
-
-        PendingIntent pendingIntent =
-                PendingIntent.getActivity(context, 0, push, PendingIntent.FLAG_CANCEL_CURRENT);
-        notificationBuilder
-                .setContentText(contentText)
-                .setContentIntent(pendingIntent);
-    }
-
 }

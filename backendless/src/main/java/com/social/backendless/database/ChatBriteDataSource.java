@@ -110,6 +110,18 @@ public class ChatBriteDataSource {
         mChatBriteDB.execute(queryUpdateMessage, status.name(), String.valueOf(messageId));
     }
 
+    /**
+     * Changes the read field for a message
+     * @param messageId
+     * @throws SQLException
+     */
+    public void updateMessageRead(Long messageId) throws SQLException {
+        String queryUpdateMessage = String.valueOf("UPDATE " +
+                ChatSQLiteHelper.TABLE_MESSAGES + " SET " +
+                ChatSQLiteHelper.COLUMN_READ + " = 1  WHERE " +
+                ChatSQLiteHelper.COLUMN_ID_MSG + " = ? ");
+        mChatBriteDB.execute(queryUpdateMessage, String.valueOf(messageId));
+    }
     public Long addNewMessage(ChatMessage chatMessage) throws SQLException {
         synchronized (mObjectLock) {
             //first increase total message between the users
@@ -131,11 +143,12 @@ public class ChatBriteDataSource {
                             ChatSQLiteHelper.COLUMN_MESSAGE + ", " +
                             ChatSQLiteHelper.COLUMN_FROM + ", " +
                             ChatSQLiteHelper.COLUMN_DATE + ", " +
-                            ChatSQLiteHelper.COLUMN_STATUS
-                            + " ) VALUES ( ?, ?, ? , ? , ?, ? ) ",
+                            ChatSQLiteHelper.COLUMN_STATUS + ", " +
+                            ChatSQLiteHelper.COLUMN_READ
+                            + " ) VALUES ( ?, ?, ? , ? , ?, ?, ? ) ",
                     totalMessages, identifier, chatMessage.getTextBody(),
                     chatMessage.getSenderId(),
-                    DateUtils.convertDateToString(chatMessage.getTimestamp()), chatMessage.getStatus());
+                    DateUtils.convertDateToString(chatMessage.getTimestamp()), chatMessage.getStatus(), chatMessage.getRead());
             return totalMessages;
         }
     }
@@ -173,6 +186,7 @@ public class ChatBriteDataSource {
                         chatMessage.setSenderId(fromUser);
                         chatMessage.setTimestamp(DateUtils.convertStringToDate(cursor.getString(4)));
                         chatMessage.setStatus(ChatStatus.fromString(cursor.getString(5)));
+                        chatMessage.setRead(cursor.getInt(6));
                         listConversations.add(chatMessage);
                         cursor.moveToNext();
                     }
@@ -219,6 +233,7 @@ public class ChatBriteDataSource {
                 chatMessage.setSenderId(fromUser);
                 chatMessage.setTimestamp(DateUtils.convertStringToDate(cursor.getString(4)));
                 chatMessage.setStatus(ChatStatus.fromString(cursor.getString(5)));
+                chatMessage.setRead(cursor.getInt(6));
             } else {
                 chatMessage = new ChatMessage(user2, "");
             }

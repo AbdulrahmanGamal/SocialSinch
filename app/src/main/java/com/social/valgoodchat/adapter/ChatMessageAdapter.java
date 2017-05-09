@@ -116,6 +116,11 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
             ViewMessage viewMessage = new ViewMessage(oldChatMessage);
             Utils.changeStatusIcon(viewMessage, oldChatMessage.getStatus());
             viewMessage.setViewMessageId((long) mViewMessages.size() + 1);
+            //when the status is received and read flag is false, update it to true
+            if (oldChatMessage.getStatus().equals(ChatStatus.RECEIVED) && oldChatMessage.getRead() == 0) {
+                //tell bus to send a READ message
+                RxIncomingMessageBus.getInstance().sendMessage(oldChatMessage);
+            }
             addMessage(viewMessage);
         }
     }

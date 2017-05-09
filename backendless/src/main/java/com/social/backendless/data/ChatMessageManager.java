@@ -46,7 +46,11 @@ public class ChatMessageManager {
                 @Override
                 public void accept(ChatMessage chatMessage) throws Exception {
                     Log.d(TAG,"Bus going to send the message");
-                    processOutgoingMessage(chatMessage, ChatStatus.SEND);
+                    if (chatMessage.getStatus().equals(ChatStatus.READ)) {
+                        processOutgoingMessage(chatMessage, chatMessage.getStatus());
+                    } else {
+                        processOutgoingMessage(chatMessage, ChatStatus.SEND);
+                    }
                 }
         });
     }
@@ -76,10 +80,20 @@ public class ChatMessageManager {
             public void call(Object result) {
                 if (result instanceof MessageStatus) {
                     Log.e(TAG, "Message was published " + result);
-                    notifyViews(chatMessageInfo, ChatStatus.SENT);
+                    if (chatMessageInfo.getStatus().equals(ChatStatus.SEND)) {
+                        notifyViews(chatMessageInfo, ChatStatus.SENT);
+                    } else {
+                        //case when is read
+                        notifyViews(chatMessageInfo, chatMessageInfo.getStatus());
+                    }
                 } else {
                     Log.e(TAG, "Message was not published: " + result);
-                    notifyViews(chatMessageInfo, ChatStatus.FAILED);
+                    if (chatMessageInfo.getStatus().equals(ChatStatus.SEND)) {
+                        notifyViews(chatMessageInfo, ChatStatus.FAILED);
+                    } else {
+                        //case when is read
+                        notifyViews(chatMessageInfo, chatMessageInfo.getStatus());
+                    }
                 }
             }
         });
@@ -96,14 +110,22 @@ public class ChatMessageManager {
             case SEND:
                 ChatMessage deliveredMessage = new ChatMessage(messageReceived.getSenderId(), "");
                 deliveredMessage.setMessageId(messageReceived.getMessageId());
-                processOutgoingMessage(deliveredMessage, ChatStatus.DELIVERED);
+                if (!RxOutgoingMessageBus.getInstance().hasObservers()) {
+                    processOutgoingMessage(deliveredMessage, ChatStatus.DELIVERED);
+                } else {
+                    processOutgoingMessage(deliveredMessage, ChatStatus.READ);
+                }
                 notifyViews(messageReceived, ChatStatus.RECEIVED);
                 break;
             case DELIVERED:
                 notifyViews(messageReceived, ChatStatus.DELIVERED);
                 break;
+            case READ:
+                notifyViews(messageReceived, ChatStatus.READ);
+                break;
             //TODO consider the other type of cases
             default:
+                Log.e(TAG, "Received INCOMING MESSAGE WITH STATUS: " + messageReceived.getStatus());
                 break;
 
         }
@@ -125,12 +147,17 @@ public class ChatMessageManager {
                 break;
             case DELIVERED:
                 //change the status in DB to flag the previous SENT now to DELIVERED
+                //or from SENT to READ
                 mDataSource.updateMessageStatus(message.getMessageId(), status);
                 break;
         }
         RxOutgoingMessageBus messageBus = RxOutgoingMessageBus.getInstance();
         if (messageBus.hasObservers()) {
             message.setStatus(status);
+            //if there's
+            if (status.equals(ChatStatus.RECEIVED)) {
+                mDataSource.updateMessageRead(message.getMessageId());
+            }
             messageBus.setMessage(message);
         }
     }

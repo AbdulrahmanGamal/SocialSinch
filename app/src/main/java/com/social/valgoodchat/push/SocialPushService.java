@@ -36,8 +36,7 @@ public class SocialPushService extends BackendlessPushService {
 
         String recipient = intent.getStringExtra(Constants.RECIPIENT_KEY);
         if (recipient != null &&
-            (recipient.equals(LoggedUser.getInstance().getUserIdLogged()) ||
-                    recipient.equals(Constants.PUBLISH_ALL))) {
+            (recipient.equals(LoggedUser.getInstance().getUserIdLogged()) || recipient.equals(Constants.PUBLISH_ALL))) {
             String messageType = intent.getStringExtra(Constants.MESSAGE_TYPE_KEY);
             String message = intent.getStringExtra(Constants.MESSAGE_KEY);
             PublishSubscribeHandler.getInstance(context).processIncomingMessage(messageType, message);
