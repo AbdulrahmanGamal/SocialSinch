@@ -9,18 +9,12 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.social.backendless.data.ContactInformationManager;
+import com.social.backendless.data.DataManager;
 import com.social.backendless.model.CurrentChatsEvent;
 import com.social.backendless.utils.LoggedUser;
-import com.social.backendless.bus.RxIncomingEventBus;
-import com.social.backendless.data.DataManager;
-import com.social.backendless.model.EventMessage;
-import com.social.backendless.model.EventStatus;
 import com.social.valgoodchat.LoginActivity;
 import com.social.valgoodchat.adapter.UserChatAdapter;
 import com.social.valgoodchat.utils.Constants;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -32,7 +26,6 @@ import rx.android.schedulers.AndroidSchedulers;
 public class ListUserChatViewModel {
     private Context mContext;
     private UserChatAdapter mUserCallsAdapter;
-    private List<String> mUserContactIds;
     private ContactInformationManager mContactInformationManager;
     private boolean mShowPanel;
 
@@ -41,7 +34,6 @@ public class ListUserChatViewModel {
     public ListUserChatViewModel(Context context) {
         this.mContext = context;
         this.mUserCallsAdapter = new UserChatAdapter(context);
-        this.mUserContactIds = new ArrayList<>();
         this.mContactInformationManager = new ContactInformationManager(context);
     }
     private UserChatAdapter getAdapter() {
@@ -65,6 +57,10 @@ public class ListUserChatViewModel {
         recyclerView.setAdapter(viewModel.getAdapter());
         recyclerView.setLayoutManager(viewModel.createLayoutManager());
     }
+    /**
+     * Get all the users information from the backend
+     * @param callsRecyclerView
+     */
     private void getUserChats(final RecyclerView callsRecyclerView) {
         DataManager.getFetchAllUsersObservable(LoggedUser.getInstance().getUserIdLogged())
                 .doOnSubscribe(() -> setShowPanel(true)).observeOn(AndroidSchedulers.mainThread())
@@ -87,11 +83,15 @@ public class ListUserChatViewModel {
                     }
                 });
     }
-
+    /**
+     * Fill in the adapter with the information obtained from the backend
+     * @param callsRecyclerView
+     * @param data
+     */
     private void processResponse(final RecyclerView callsRecyclerView, CurrentChatsEvent data) {
         if (data.getCode().equals(com.social.backendless.utils.Constants.SUCCESS_CODE)) {
             mContactInformationManager.verifyContactInformationChanges(data.getCharUserInfo());
-            mUserCallsAdapter.setUserCalls(data.getCharUserInfo());
+            mUserCallsAdapter.setUserChats(data.getCharUserInfo());
         } else {
             //reset the previous list of calls
             mUserCallsAdapter = new UserChatAdapter(mContext);
@@ -99,9 +99,13 @@ public class ListUserChatViewModel {
         }
         callsRecyclerView.setAdapter(mUserCallsAdapter);
     }
+    /**
+     * Method called by the fragment to force a last message update
+     */
     public void refreshLastMessage() {
         mUserCallsAdapter.refreshLastMessage();
     }
+
     /**
      * After an error getting the users, redirect to login screen
      */
@@ -111,17 +115,6 @@ public class ListUserChatViewModel {
         mContext.startActivity(intent);
         if (mContext instanceof Activity) {
             ((Activity) mContext).finish();
-        }
-    }
-
-    public void notifyConnectionStatus(String message) {
-        EventMessage eventMessage;
-        for (String contactId : mUserContactIds) {
-            eventMessage = new EventMessage(LoggedUser.getInstance().getUserIdLogged(),
-                    contactId,
-                    message,
-                    EventStatus.OFFLINE);
-            RxIncomingEventBus.getInstance().sendEvent(eventMessage);
         }
     }
 }

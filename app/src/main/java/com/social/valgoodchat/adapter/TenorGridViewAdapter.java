@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by valgood on 4/9/2017.
+ * Adapter class to display the GIF images from Tenor or Giphy
  */
 
 public class TenorGridViewAdapter extends ArrayAdapter<Result> {
@@ -25,7 +25,6 @@ public class TenorGridViewAdapter extends ArrayAdapter<Result> {
 
     public TenorGridViewAdapter(Context mContext, List<Result> mGridData) {
         super(mContext, R.layout.giphy_item_view, mGridData);
-        //this.mGridData = mGridData;
     }
 
 
@@ -42,6 +41,7 @@ public class TenorGridViewAdapter extends ArrayAdapter<Result> {
         this.mGridData.clear();
         notifyDataSetChanged();
     }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -81,7 +81,7 @@ public class TenorGridViewAdapter extends ArrayAdapter<Result> {
         return position;
     }
 
-    static class ViewHolder{
+    static class ViewHolder {
         ImageView imageInListView;
     }
 }

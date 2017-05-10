@@ -28,7 +28,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.Bindin
 	private List<UserViewInfoMessage> mUserChats;
     private ChatBriteDataSource mDataSource;
 
-	private static final String TAG = "UserCallsAdapter";
+	private static final String TAG = "UserChatAdapter";
 	
 	public UserChatAdapter(Context context){
 		this.mContext = context;
@@ -36,32 +36,11 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.Bindin
         this.mDataSource = ChatBriteDataSource.getInstance(context);
         configureMessageBus();
 	}
-	
-    @Override
-	public BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        UserChatInfoBinding userChatBinding = DataBindingUtil.inflate(
-                         LayoutInflater.from(parent.getContext()),
-                         R.layout.user_chat_info, parent, false);
-		return new BindingHolder(userChatBinding);
-	}
-
-	@Override
-	public void onBindViewHolder(BindingHolder holder, int position) {
-        UserChatInfoBinding userChatBinding = holder.binding;
-        userChatBinding.setViewModel(new UserCallsItemViewModel(mContext, mUserChats.get(position)));
-	}
-
-	@Override
-	public long getItemId(int position) {
-		return position;
-	}
-
-	@Override
-	public int getItemCount() {
-		return mUserChats.size();
-	}
-
-    public void setUserCalls(List<UserInfo> userChats) {
+	/**
+	 * Populates the list of user
+	 * @param userChats
+	 */
+    public void setUserChats(List<UserInfo> userChats) {
         for (UserInfo userInfo : userChats) {
             ChatMessage lastChatMessage =
                     mDataSource.retrieveLastMessage(LoggedUser.getInstance().getUserIdLogged(),
@@ -72,7 +51,10 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.Bindin
         }
         notifyDataSetChanged();
     }
-    public void refreshLastMessage() {
+	/**
+	 * Update the last message sent or received
+	 */
+	public void refreshLastMessage() {
 		for (UserViewInfoMessage userVM : mUserChats) {
 			ChatMessage lastChatMessage =
 					mDataSource.retrieveLastMessage(LoggedUser.getInstance().getUserIdLogged(),
@@ -80,15 +62,6 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.Bindin
 			userVM.updateLastMessage(lastChatMessage);
 		}
 		notifyDataSetChanged();
-	}
-
-	public class BindingHolder extends RecyclerView.ViewHolder {
-        private UserChatInfoBinding binding;
-
-        BindingHolder(UserChatInfoBinding binding) {
-			super(binding.userElement);
-            this.binding = binding;
-		}
 	}
 	/**
 	 * Attach this class with the bus so it can receive notification about the
@@ -115,4 +88,35 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.Bindin
             }
         }
     }
+	public class BindingHolder extends RecyclerView.ViewHolder {
+        private UserChatInfoBinding binding;
+
+        BindingHolder(UserChatInfoBinding binding) {
+			super(binding.userElement);
+            this.binding = binding;
+		}
+	}
+    @Override
+	public BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        UserChatInfoBinding userChatBinding = DataBindingUtil.inflate(
+                         LayoutInflater.from(parent.getContext()),
+                         R.layout.user_chat_info, parent, false);
+		return new BindingHolder(userChatBinding);
+	}
+
+	@Override
+	public void onBindViewHolder(BindingHolder holder, int position) {
+        UserChatInfoBinding userChatBinding = holder.binding;
+        userChatBinding.setViewModel(new UserCallsItemViewModel(mContext, mUserChats.get(position)));
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
+
+	@Override
+	public int getItemCount() {
+		return mUserChats.size();
+	}
 }

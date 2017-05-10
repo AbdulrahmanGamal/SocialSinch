@@ -1,7 +1,7 @@
 package com.social.backendless.utils;
 
 /**
- * Created by valgood on 3/16/2017.
+ * Encapsulate all the constants used across the application
  */
 
 public interface Constants {

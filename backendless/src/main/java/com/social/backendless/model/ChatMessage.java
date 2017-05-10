@@ -10,11 +10,11 @@ import java.util.Date;
 public class ChatMessage implements Serializable{
     private Long mMessageId;
     private String mTextBody;
+    private String mFile;
     private String mRecipientId;
     private String mSenderId;
     private Date mTimestamp;
     private ChatStatus mStatus;
-//    private int mRead;
 
 
     public ChatMessage(String recipientId, String textBody) {
@@ -50,10 +50,6 @@ public class ChatMessage implements Serializable{
         return mRecipientId;
     }
 
-    public void setRecipientIds(String recipientId) {
-        this.mRecipientId = recipientId;
-    }
-
     public String getSenderId() {
         return mSenderId;
     }
@@ -70,12 +66,21 @@ public class ChatMessage implements Serializable{
         this.mTimestamp = mTimestamp;
     }
 
+    public String getFile() {
+        return mFile;
+    }
+
+    public void setFile(String mFile) {
+        this.mFile = mFile;
+    }
+
     @Override
     public String toString() {
         return "ChatMessage{" +
                 "mMessageId=" + mMessageId +
                 ", mTextBody='" + mTextBody + '\'' +
-                ", mRecipientId=" + mRecipientId +
+                ", mFile='" + mFile + '\'' +
+                ", mRecipientId='" + mRecipientId + '\'' +
                 ", mSenderId='" + mSenderId + '\'' +
                 ", mTimestamp=" + mTimestamp +
                 ", mStatus=" + mStatus +
@@ -97,12 +102,4 @@ public class ChatMessage implements Serializable{
     public int hashCode() {
         return mMessageId.hashCode();
     }
-
-//    public int getRead() {
-//        return mRead;
-//    }
-//
-//    public void setRead(int read) {
-//        this.mRead = read;
-//    }
 }
