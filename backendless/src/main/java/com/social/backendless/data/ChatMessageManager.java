@@ -73,27 +73,19 @@ public class ChatMessageManager {
             public Boolean call(Object result) {
                 //skip the notification received for DELIVERED messages
                 return  result instanceof MessageStatus &&
-                        !chatMessageInfo.getStatus().equals(ChatStatus.DELIVERED);
+                        !chatMessageInfo.getStatus().equals(ChatStatus.DELIVERED) &&
+                        !chatMessageInfo.getStatus().equals(ChatStatus.READ);
             }
         }).subscribe(new Action1<Object>() {
             @Override
             public void call(Object result) {
+                //ignore READ message that was sent to the other user
                 if (result instanceof MessageStatus) {
                     Log.e(TAG, "Message was published " + result);
-                    if (chatMessageInfo.getStatus().equals(ChatStatus.SEND)) {
-                        notifyViews(chatMessageInfo, ChatStatus.SENT);
-                    } else {
-                        //case when is read
-                        notifyViews(chatMessageInfo, chatMessageInfo.getStatus());
-                    }
+                    notifyViews(chatMessageInfo, ChatStatus.SENT);
                 } else {
                     Log.e(TAG, "Message was not published: " + result);
-                    if (chatMessageInfo.getStatus().equals(ChatStatus.SEND)) {
-                        notifyViews(chatMessageInfo, ChatStatus.FAILED);
-                    } else {
-                        //case when is read
-                        notifyViews(chatMessageInfo, chatMessageInfo.getStatus());
-                    }
+                    notifyViews(chatMessageInfo, ChatStatus.FAILED);
                 }
             }
         });
@@ -110,7 +102,7 @@ public class ChatMessageManager {
             case SEND:
                 ChatMessage deliveredMessage = new ChatMessage(messageReceived.getSenderId(), "");
                 deliveredMessage.setMessageId(messageReceived.getMessageId());
-                if (!RxOutgoingMessageBus.getInstance().hasObservers()) {
+                if (mDataSource.getTotalNotifications() > 0) {
                     processOutgoingMessage(deliveredMessage, ChatStatus.DELIVERED);
                 } else {
                     processOutgoingMessage(deliveredMessage, ChatStatus.READ);
@@ -137,6 +129,7 @@ public class ChatMessageManager {
     public synchronized void notifyViews(ChatMessage message, ChatStatus status) {
         switch (status) {
             case SENT:
+            case DELIVERED:
             case FAILED:
                 mDataSource.updateMessageStatus(message.getMessageId(), status);
                 break;
@@ -145,19 +138,13 @@ public class ChatMessageManager {
                 Long messageId = mDataSource.addNewMessage(message);
                 message.setMessageId(messageId);
                 break;
-            case DELIVERED:
-                //change the status in DB to flag the previous SENT now to DELIVERED
-                //or from SENT to READ
-                mDataSource.updateMessageStatus(message.getMessageId(), status);
+            case READ:
+                mDataSource.updateMessageStatus(message.getMessageId(), ChatStatus.SENT_READ);
                 break;
         }
         RxOutgoingMessageBus messageBus = RxOutgoingMessageBus.getInstance();
         if (messageBus.hasObservers()) {
             message.setStatus(status);
-            //if there's
-            if (status.equals(ChatStatus.RECEIVED)) {
-                mDataSource.updateMessageRead(message.getMessageId());
-            }
             messageBus.setMessage(message);
         }
     }

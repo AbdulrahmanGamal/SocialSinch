@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.social.backendless.bus.RxOutgoingEventBus;
 import com.social.backendless.utils.LoggedUser;
 import com.social.backendless.bus.RxIncomingMessageBus;
 import com.social.backendless.bus.RxOutgoingMessageBus;
@@ -39,8 +40,9 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     private NewItemInserted mItemInsertedListener;
     private ChatBriteDataSource mDataSource;
     private int mLastMessageType;
-
     private static final String TAG = "ChatMessageAdapter";
+
+    private static final int MAX_CHATS_UPDATE_ANSWER = 20;
 
     public ChatMessageAdapter(Context context,
                               String recipientId,
@@ -51,6 +53,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         this.mLastMessageType = -1;
         setHasStableIds(true);
         retrieveOldMessages(recipientId);
+        configureOnlineEvents(context, recipientId);
         configureMessageBus();
 
     }
@@ -73,6 +76,52 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
                 });
     }
 
+    private void configureOnlineEvents(Context context, String recipientId) {
+        //subscribe to the global event bus to receive events from this user
+        RxOutgoingEventBus.getInstance().getMessageObservable()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(eventMessage -> {
+                    if (!eventMessage.getPublisherId().equals(recipientId)) {
+                        return;
+                    }
+                    switch (eventMessage.getEventStatus()) {
+                        case ONLINE:
+                            updateMessagesSent(context);
+                            break;
+                        default:
+                            break;
+                    }
+                });
+    }
+
+    /**
+     * When an online is received from the currecnt recipient, update all the pending chats for read
+     * answer and only the latest in the UI.
+     * @param context
+     */
+    private void updateMessagesSent(Context context) {
+        String currentUser = LoggedUser.getInstance().getUserIdLogged();
+        ChatBriteDataSource ds = ChatBriteDataSource.getInstance(context);
+        if (ds.getMessagesSentWithNoAnswer(currentUser) > 0) {
+            ds.updateAllMessagesSent(currentUser);
+            //only update the latest 15 messages in the UI
+            for (int i = mViewMessages.size() - 1, j = 0; i >= 0; i--) {
+                if (j > MAX_CHATS_UPDATE_ANSWER) {
+                    break;
+                }
+                ChatStatus status = mViewMessages.get(i).
+                        getChatMessage().getStatus();
+
+                if (status.equals(ChatStatus.SENT) ||
+                        status.equals(ChatStatus.DELIVERED)) {
+                    Utils.changeStatusIcon(mViewMessages.get(i),
+                            ChatStatus.SENT_READ);
+                    notifyItemChanged(i);
+                    j++;
+                }
+            }
+        }
+    }
     /**
      * Assign a secuential id based on the messages size and add it to the RV
      * @param viewMessage
@@ -116,11 +165,6 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
             ViewMessage viewMessage = new ViewMessage(oldChatMessage);
             Utils.changeStatusIcon(viewMessage, oldChatMessage.getStatus());
             viewMessage.setViewMessageId((long) mViewMessages.size() + 1);
-            //when the status is received and read flag is false, update it to true
-            if (oldChatMessage.getStatus().equals(ChatStatus.RECEIVED) && oldChatMessage.getRead() == 0) {
-                //tell bus to send a READ message
-                RxIncomingMessageBus.getInstance().sendMessage(oldChatMessage);
-            }
             addMessage(viewMessage);
         }
     }

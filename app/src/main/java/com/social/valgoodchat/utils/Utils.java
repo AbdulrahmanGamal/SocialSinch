@@ -112,6 +112,7 @@ public class Utils {
 				break;
 			case RECEIVED:
 			case READ:
+			case SENT_READ:
 				viewMessage.setResourceId(R.drawable.message_got_read_receipt_from_target);
 				break;
 			case WAITING:

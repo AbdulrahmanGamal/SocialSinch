@@ -14,7 +14,8 @@ public enum ChatStatus {
     READ,
     ONLINE,
     OFFLINE,
-    TYPING;
+    TYPING,
+    SENT_READ;
 
     /**
      * Returns the ChatStatus based on the String value provided

@@ -39,7 +39,6 @@ public class ChatSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_FROM = "sender";
     public static final String COLUMN_DATE = "timestamp";
     public static final String COLUMN_STATUS = "status";
-    public static final String COLUMN_READ = "read";
 
     //Columns for Notifications table
     public static final String COLUMN_SENDER_ID = "sender_id";
@@ -67,7 +66,6 @@ public class ChatSQLiteHelper extends SQLiteOpenHelper {
             + " text not null, " + COLUMN_FROM
             + " text null, " + COLUMN_DATE
             + " text not null, " + COLUMN_STATUS
-            + " integer not null, " + COLUMN_READ
             + " text not null, PRIMARY KEY ( " + COLUMN_ID_MSG + ", " + COLUMN_PARTICIPANTS + " ));";
 
     //SQL statement to create table NOTIFICATIONS

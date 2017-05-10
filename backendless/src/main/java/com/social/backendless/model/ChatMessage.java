@@ -14,7 +14,7 @@ public class ChatMessage implements Serializable{
     private String mSenderId;
     private Date mTimestamp;
     private ChatStatus mStatus;
-    private int mRead;
+//    private int mRead;
 
 
     public ChatMessage(String recipientId, String textBody) {
@@ -98,11 +98,11 @@ public class ChatMessage implements Serializable{
         return mMessageId.hashCode();
     }
 
-    public int getRead() {
-        return mRead;
-    }
-
-    public void setRead(int read) {
-        this.mRead = read;
-    }
+//    public int getRead() {
+//        return mRead;
+//    }
+//
+//    public void setRead(int read) {
+//        this.mRead = read;
+//    }
 }

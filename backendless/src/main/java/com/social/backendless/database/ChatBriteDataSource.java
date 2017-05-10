@@ -110,18 +110,6 @@ public class ChatBriteDataSource {
         mChatBriteDB.execute(queryUpdateMessage, status.name(), String.valueOf(messageId));
     }
 
-    /**
-     * Changes the read field for a message
-     * @param messageId
-     * @throws SQLException
-     */
-    public void updateMessageRead(Long messageId) throws SQLException {
-        String queryUpdateMessage = String.valueOf("UPDATE " +
-                ChatSQLiteHelper.TABLE_MESSAGES + " SET " +
-                ChatSQLiteHelper.COLUMN_READ + " = 1  WHERE " +
-                ChatSQLiteHelper.COLUMN_ID_MSG + " = ? ");
-        mChatBriteDB.execute(queryUpdateMessage, String.valueOf(messageId));
-    }
     public Long addNewMessage(ChatMessage chatMessage) throws SQLException {
         synchronized (mObjectLock) {
             //first increase total message between the users
@@ -143,12 +131,12 @@ public class ChatBriteDataSource {
                             ChatSQLiteHelper.COLUMN_MESSAGE + ", " +
                             ChatSQLiteHelper.COLUMN_FROM + ", " +
                             ChatSQLiteHelper.COLUMN_DATE + ", " +
-                            ChatSQLiteHelper.COLUMN_STATUS + ", " +
-                            ChatSQLiteHelper.COLUMN_READ
-                            + " ) VALUES ( ?, ?, ? , ? , ?, ?, ? ) ",
+                            ChatSQLiteHelper.COLUMN_STATUS
+                            + " ) VALUES ( ?, ?, ? , ? , ?, ?) ",
                     totalMessages, identifier, chatMessage.getTextBody(),
                     chatMessage.getSenderId(),
-                    DateUtils.convertDateToString(chatMessage.getTimestamp()), chatMessage.getStatus(), chatMessage.getRead());
+                    DateUtils.convertDateToString(chatMessage.getTimestamp()),
+                    chatMessage.getStatus());
             return totalMessages;
         }
     }
@@ -186,7 +174,6 @@ public class ChatBriteDataSource {
                         chatMessage.setSenderId(fromUser);
                         chatMessage.setTimestamp(DateUtils.convertStringToDate(cursor.getString(4)));
                         chatMessage.setStatus(ChatStatus.fromString(cursor.getString(5)));
-                        chatMessage.setRead(cursor.getInt(6));
                         listConversations.add(chatMessage);
                         cursor.moveToNext();
                     }
@@ -233,7 +220,6 @@ public class ChatBriteDataSource {
                 chatMessage.setSenderId(fromUser);
                 chatMessage.setTimestamp(DateUtils.convertStringToDate(cursor.getString(4)));
                 chatMessage.setStatus(ChatStatus.fromString(cursor.getString(5)));
-                chatMessage.setRead(cursor.getInt(6));
             } else {
                 chatMessage = new ChatMessage(user2, "");
             }
@@ -346,11 +332,59 @@ public class ChatBriteDataSource {
         cursor.close();
         return result;
     }
-
+    /**
+     * Obtains the total messages in notifications waiting to be read
+     * @return
+     * @throws SQLException
+     */
+    public int getTotalNotifications() throws SQLException {
+        int result = 0;
+        String queryTotalNotifications = String.valueOf("SELECT count(*) FROM " +
+                ChatSQLiteHelper.TABLE_NOTIFICATIONS);
+        Cursor cursor = mChatBriteDB.query(queryTotalNotifications);
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            result = cursor.getInt(0);
+        }
+        cursor.close();
+        return result;
+    }
     /**
      * Removes all notification messages after the user have seen them
      */
     public void deleteNotifications() {
         mChatBriteDB.execute("DELETE FROM " + ChatSQLiteHelper.TABLE_NOTIFICATIONS);
+    }
+
+    public void updateAllMessagesSent(String senderId) {
+        String queryUpdateMessage = String.valueOf("UPDATE " +
+                ChatSQLiteHelper.TABLE_MESSAGES + " SET " +
+                ChatSQLiteHelper.COLUMN_STATUS + " = ?  WHERE " +
+                ChatSQLiteHelper.COLUMN_FROM + " = ? AND " +
+                ChatSQLiteHelper.COLUMN_STATUS + " IN ( ? ,? ) ");
+        mChatBriteDB.execute(queryUpdateMessage, ChatStatus.SENT_READ.name(),
+                             senderId, ChatStatus.SENT.name(), ChatStatus.DELIVERED.name());
+    }
+
+    /**
+     * Get the number of messages without answer
+     * @param senderId
+     * @return
+     */
+    public int getMessagesSentWithNoAnswer(String senderId) {
+        int result = 0;
+        String queryTotalMessagesSent = String.valueOf("SELECT COUNT(*) FROM " +
+                ChatSQLiteHelper.TABLE_MESSAGES  + "  WHERE " +
+                ChatSQLiteHelper.COLUMN_FROM + " = ? AND " +
+                ChatSQLiteHelper.COLUMN_STATUS + " IN ( ? ,? ) ");
+        Cursor cursor = mChatBriteDB.query(queryTotalMessagesSent,
+                                           senderId, ChatStatus.SENT.name(),
+                                           ChatStatus.DELIVERED.name());
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            result = cursor.getInt(0);
+        }
+        cursor.close();
+        return result;
     }
 }
