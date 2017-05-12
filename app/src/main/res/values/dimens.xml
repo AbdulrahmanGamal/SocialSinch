@@ -23,4 +23,5 @@
     <dimen name="contact_profile_pic_list_height">52dp</dimen>
     <dimen name="contact_profile_pic_margin_top">12dp</dimen>
     <dimen name="contact_profile_pic_margin_start">14dp</dimen>
+    <dimen name="emoji_size_message">21sp</dimen>
 </resources>

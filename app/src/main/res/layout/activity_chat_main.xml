@@ -74,7 +74,7 @@
                     android:src="@drawable/input_emoji"
                     android:onClick="@{viewModel.onClickEmoji}"/>
 
-                <EditText
+                <com.vanniktech.emoji.EmojiEditText
                     android:id="@+id/chat_edit_text1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -86,9 +86,11 @@
                     android:textSize="16sp"
                     android:textColorHint="@color/hint_type"
                     android:background="@null"
-                    android:text="@{viewModel}">
+                    android:text="@{viewModel}"
+                    android:onClick="@{viewModel.onMessageTypeClicked()}"
+                    app:emojiSize="26sp">
                         <requestFocus />
-                    </EditText>
+                    </com.vanniktech.emoji.EmojiEditText>
 
             </LinearLayout>
 

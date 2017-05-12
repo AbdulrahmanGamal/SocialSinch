@@ -311,7 +311,9 @@ public class ChatBriteDataSource {
     public Map<String, List<String>> getNotifications() throws SQLException {
         Map<String, List<String>> result = new HashMap<>();
         String queryNotifications = String.valueOf("SELECT * FROM " +
-                ChatSQLiteHelper.TABLE_NOTIFICATIONS + " ORDER BY " +
+                ChatSQLiteHelper.TABLE_NOTIFICATIONS + " WHERE " +
+                ChatSQLiteHelper.COLUMN_MESSAGE_NOTIFICATION + " IS NOT NULL AND " +
+                ChatSQLiteHelper.COLUMN_MESSAGE_NOTIFICATION + " != \"\" ORDER BY " +
                 ChatSQLiteHelper.COLUMN_SENDER_ID);
         Cursor cursor = mChatBriteDB.query(queryNotifications);
         if (cursor.getCount() > 0) {

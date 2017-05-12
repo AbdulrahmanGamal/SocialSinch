@@ -37,7 +37,7 @@ public class MessagesActivity extends AppCompatActivity {
         //get recipient information from the intent
         Intent intent = getIntent();
         String userId = intent.getStringExtra(Constants.RECIPIENT_ID);
-        MessageViewModel messageViewModel = new MessageViewModel(MessagesActivity.this, userId);
+        MessageViewModel messageViewModel = new MessageViewModel(MessagesActivity.this, userId, activityChatMainBinding.getRoot());
         activityChatMainBinding.setViewModel(messageViewModel);
 
         final ImageView profilePic = (ImageView) activityChatMainBinding.

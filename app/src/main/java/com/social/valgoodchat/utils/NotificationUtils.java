@@ -56,8 +56,10 @@ public class NotificationUtils {
             ChatBriteDataSource.getInstance(context).
                     addNotificationMessage(messageReceived.getSenderId(),
                                            messageReceived.getTextBody());
-            mNotificationManager.notify(NOTIFICATION_ID, NotificationUtils.getInstance().
-                                                                    getNotificationBuilder(context));
+            Notification notification = NotificationUtils.getInstance().getNotificationBuilder(context);
+            if (notification != null) {
+                mNotificationManager.notify(NOTIFICATION_ID, notification);
+            }
         }
     }
 
@@ -97,7 +99,7 @@ public class NotificationUtils {
                     decodeResource(context.getResources(), R.drawable.ic_launcher);
             transformNotificationbuilder(notificationBuilder, largeIcon, contentTitle, contentText);
             makeHeadsUpNotification(context, null, contentText, true, notificationBuilder);
-        } else {
+        } else if (notifications.size() == 1) {
             //just 1 person talking
             for (String senderId : notifications.keySet()) {
                 UserInfo senderInfo = ChatBriteDataSource.getInstance(context).getContactById(senderId);
@@ -131,9 +133,13 @@ public class NotificationUtils {
             }
         }
 
-        notificationBuilder.setCategory(Notification.CATEGORY_MESSAGE);
-        notificationBuilder.setStyle(mInboxStyle);
-        return notificationBuilder.build();
+        if (notifications.size() > 0) {
+            notificationBuilder.setCategory(Notification.CATEGORY_MESSAGE);
+            notificationBuilder.setStyle(mInboxStyle);
+            return notificationBuilder.build();
+        }
+
+        return null;
     }
 
     private void transformNotificationbuilder(NotificationCompat.Builder notificationBuilder,

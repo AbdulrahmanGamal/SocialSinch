@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
             name="viewModel"
@@ -28,14 +29,14 @@
                 style="@style/chat_timings"
                 android:layout_gravity="bottom|end"/>
 
-            <TextView
+            <com.vanniktech.emoji.EmojiTextView
                 android:id="@+id/textview_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"
                 android:layout_marginBottom="20dp"
-                android:autoLink="web"
+                app:emojiSize="@dimen/emoji_size_message"
                 android:text="@{viewModel.viewChatMessage.chatMessage.textBody}"
                 style="@style/chat_text_message_style"/>
 

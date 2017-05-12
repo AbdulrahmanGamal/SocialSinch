@@ -1,7 +1,6 @@
 package com.social.valgoodchat.viewmodel;
 
 import android.content.Context;
-import android.content.Intent;
 import android.databinding.BindingAdapter;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,8 +8,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.social.valgoodchat.TenorGridActivity;
 import com.social.valgoodchat.adapter.ChatMessageAdapter;
+import com.vanniktech.emoji.EmojiEditText;
+import com.vanniktech.emoji.EmojiPopup;
 
 
 /**
@@ -23,11 +23,14 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
     private EditText mMessage;
     private RecyclerView mChatRecyclerView;
     private String mRecipientId;
+    private EmojiPopup.Builder mEmojiPopupBuilder;
+    private EmojiPopup mEmojiPopup;
 
-    public MessageViewModel(Context context, String recipientInfo) {
+    public MessageViewModel(Context context, String recipientInfo, View rootView) {
         this.mContext = context;
         this.mRecipientId = recipientInfo;
         this.mChatMessageAdapter = new ChatMessageAdapter(context, recipientInfo, this);
+        this.mEmojiPopupBuilder = EmojiPopup.Builder.fromRootView(rootView);
     }
 
     public View.OnClickListener onClickSend() {
@@ -42,14 +45,23 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
     }
 
     public View.OnClickListener onClickEmoji() {
-        return v -> mContext.startActivity(new Intent(mContext, TenorGridActivity.class));
+        return v -> mEmojiPopup.toggle();//mContext.startActivity(new Intent(mContext, TenorGridActivity.class));
     }
-    public void setMessage(EditText message) {
+
+    public View.OnClickListener onMessageTypeClicked() {
+        return v -> {
+            if (mEmojiPopup.isShowing()) {
+                mEmojiPopup.toggle();
+            }
+        };
+    }
+    public void setMessage(EmojiEditText message) {
         this.mMessage = message;
+        this.mEmojiPopup = mEmojiPopupBuilder.build(message);
     }
 
     @BindingAdapter("android:text")
-    public static void setMessageEditText(EditText messageEditText, MessageViewModel viewModel) {
+    public static void setMessageEditText(EmojiEditText messageEditText, MessageViewModel viewModel) {
         viewModel.setMessage(messageEditText);
     }
 

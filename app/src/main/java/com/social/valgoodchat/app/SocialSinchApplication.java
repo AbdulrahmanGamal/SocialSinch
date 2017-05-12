@@ -14,6 +14,8 @@ import com.social.backendless.utils.ApplicationUtils;
 import com.social.backendless.utils.Constants;
 import com.social.backendless.utils.DateUtils;
 import com.social.backendless.utils.LoggedUser;
+import com.vanniktech.emoji.EmojiManager;
+import com.vanniktech.emoji.ios.IosEmojiProvider;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -28,6 +30,7 @@ public class SocialSinchApplication extends Application {
 		super.onCreate();
 
 		ApplicationUtils.init(this);
+		EmojiManager.install(new IosEmojiProvider());
         PublishSubscribeHandler.initialize(this);
 	}
 

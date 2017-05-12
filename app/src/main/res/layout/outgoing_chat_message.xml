@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
             name="viewModel"
@@ -44,14 +45,14 @@
 
             </LinearLayout>
 
-            <TextView
+            <com.vanniktech.emoji.EmojiTextView
                 android:id="@+id/text_view_message"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:layout_marginBottom="15dp"
-                android:autoLink="web"
+                app:emojiSize="@dimen/emoji_size_message"
                 android:text="@{viewModel.viewChatMessage.chatMessage.textBody}"
                 style="@style/chat_text_message_style"/>
 

@@ -7,7 +7,7 @@ import java.util.Date;
  * Chat Message model to store the information exchange between users
  */
 
-public class ChatMessage implements Serializable{
+public class ChatMessage implements Serializable {
     private Long mMessageId;
     private String mTextBody;
     private String mFile;
