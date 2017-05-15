@@ -28,27 +28,28 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class MessagesActivity extends AppCompatActivity {
     private static final String TAG = "MessagesActivity";
+    private ActivityChatMainBinding mActivityChatMainBinding;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		final ActivityChatMainBinding activityChatMainBinding =
-                DataBindingUtil.setContentView(this, R.layout.activity_chat_main);
+		mActivityChatMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_chat_main);
         //get recipient information from the intent
         Intent intent = getIntent();
         String userId = intent.getStringExtra(Constants.RECIPIENT_ID);
-        MessageViewModel messageViewModel = new MessageViewModel(MessagesActivity.this, userId, activityChatMainBinding.getRoot());
-        activityChatMainBinding.setViewModel(messageViewModel);
+        MessageViewModel messageViewModel = new MessageViewModel(MessagesActivity.this, userId,
+                                                                    mActivityChatMainBinding.getRoot());
+        mActivityChatMainBinding.setViewModel(messageViewModel);
 
-        final ImageView profilePic = (ImageView) activityChatMainBinding.
+        final ImageView profilePic = (ImageView) mActivityChatMainBinding.
                 toolbarChats.findViewById(R.id.conversation_contact_photo);
         final TextView userNameTextView =
-                ((TextView)activityChatMainBinding.toolbarChats.findViewById(R.id.action_bar_title_1));
+                ((TextView)mActivityChatMainBinding.toolbarChats.findViewById(R.id.action_bar_title_1));
         final TypeWriter lastTimeSeenTV =
-                ((TypeWriter) activityChatMainBinding.toolbarChats.findViewById(R.id.action_bar_title_2));
+                ((TypeWriter) mActivityChatMainBinding.toolbarChats.findViewById(R.id.action_bar_title_2));
 
         getWindow().setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.background));
-        setSupportActionBar(activityChatMainBinding.toolbarChats);
+        setSupportActionBar(mActivityChatMainBinding.toolbarChats);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
@@ -59,7 +60,7 @@ public class MessagesActivity extends AppCompatActivity {
                     ImageLoading.loadContactPicture(userInfo.getProfilePicture(), profilePic);
                     userNameTextView.setText(userInfo.getFullName());
 
-                    activityChatMainBinding.toolbarChats.setOnClickListener(v -> {
+                    mActivityChatMainBinding.toolbarChats.setOnClickListener(v -> {
                         Intent intent1 = new Intent(MessagesActivity.this, ProfileActivity.class);
                         intent1.putExtra(Constants.RECIPIENT_ID, userInfo.getObjectId());
                         intent1.putExtra(Constants.RECIPIENT_AVATAR, userInfo.getProfilePicture());
@@ -150,4 +151,11 @@ public class MessagesActivity extends AppCompatActivity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
+
+    @Override
+    public void onBackPressed() {
+        if (mActivityChatMainBinding.getViewModel().isCloseAll()) {
+            super.onBackPressed();
+        }
+    }
 }

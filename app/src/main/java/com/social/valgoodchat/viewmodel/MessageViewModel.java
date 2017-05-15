@@ -4,12 +4,13 @@ import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.social.valgoodchat.adapter.ChatMessageAdapter;
-import com.vanniktech.emoji.EmojiEditText;
+import com.social.valgoodchat.custom.EmojiEditText;
 import com.vanniktech.emoji.EmojiPopup;
 
 
@@ -25,6 +26,7 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
     private String mRecipientId;
     private EmojiPopup.Builder mEmojiPopupBuilder;
     private EmojiPopup mEmojiPopup;
+    private boolean mCloseAll;
 
     public MessageViewModel(Context context, String recipientInfo, View rootView) {
         this.mContext = context;
@@ -45,19 +47,33 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
     }
 
     public View.OnClickListener onClickEmoji() {
-        return v -> mEmojiPopup.toggle();//mContext.startActivity(new Intent(mContext, TenorGridActivity.class));
+        return v ->  mEmojiPopup.toggle();//mContext.startActivity(new Intent(mContext, TenorGridActivity.class));
     }
 
     public View.OnClickListener onMessageTypeClicked() {
-        return v -> {
-            if (mEmojiPopup.isShowing()) {
-                mEmojiPopup.toggle();
-            }
-        };
+        return v -> closeEmojiPopup();
+    }
+
+    public void closeEmojiPopup() {
+        if (mEmojiPopup.isShowing()) {
+            mEmojiPopup.dismiss();
+            mCloseAll = false;
+        } else {
+            mCloseAll = true;
+        }
+    }
+
+    public boolean isCloseAll() {
+        return mCloseAll;
     }
     public void setMessage(EmojiEditText message) {
         this.mMessage = message;
         this.mEmojiPopup = mEmojiPopupBuilder.build(message);
+        ((EmojiEditText)this.mMessage).setKeyImeChangeListener((keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+                closeEmojiPopup();
+            }
+        });
     }
 
     @BindingAdapter("android:text")
@@ -101,4 +117,6 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
             }, 100);
         }
     }
+
+
 }

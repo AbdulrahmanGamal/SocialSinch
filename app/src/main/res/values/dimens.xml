@@ -23,5 +23,13 @@
     <dimen name="contact_profile_pic_list_height">52dp</dimen>
     <dimen name="contact_profile_pic_margin_top">12dp</dimen>
     <dimen name="contact_profile_pic_margin_start">14dp</dimen>
-    <dimen name="emoji_size_message">21sp</dimen>
+    <dimen name="emoji_size_message">25sp</dimen>
+    <dimen name="emoji_size_message_two">30sp</dimen>
+    <dimen name="emoji_size_message_three">40sp</dimen>
+    <dimen name="emoji_heart_size_message">80sp</dimen>
+    <dimen name="outgoing_message_default_padding_left">3dp</dimen>
+    <dimen name="outgoing_message_default_padding_right">3dp</dimen>
+    <dimen name="outgoing_message_default_padding_top">3dp</dimen>
+    <dimen name="outgoing_message_default_padding_bottom">20dp</dimen>
+    <dimen name="outgoing_message_padding_right_few_chars">75dp</dimen>
 </resources>
