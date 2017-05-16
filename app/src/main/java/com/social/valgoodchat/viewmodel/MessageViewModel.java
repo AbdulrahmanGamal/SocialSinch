@@ -1,6 +1,7 @@
 package com.social.valgoodchat.viewmodel;
 
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.BindingAdapter;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.social.valgoodchat.TenorGridActivity;
 import com.social.valgoodchat.adapter.ChatMessageAdapter;
 import com.social.valgoodchat.custom.EmojiEditText;
 import com.vanniktech.emoji.EmojiPopup;
@@ -47,7 +49,11 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
     }
 
     public View.OnClickListener onClickEmoji() {
-        return v ->  mEmojiPopup.toggle();//mContext.startActivity(new Intent(mContext, TenorGridActivity.class));
+        return v ->  mEmojiPopup.toggle();
+    }
+
+    public View.OnClickListener onClickGif() {
+        return v ->  mContext.startActivity(new Intent(mContext, TenorGridActivity.class));
     }
 
     public View.OnClickListener onMessageTypeClicked() {
