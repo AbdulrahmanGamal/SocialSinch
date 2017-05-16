@@ -7,7 +7,7 @@
             type="com.social.valgoodchat.viewmodel.ChatOutgoingViewModel"/>
     </data>
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <FrameLayout
             android:id="@+id/outgoing_layout_bubble"
@@ -23,24 +23,23 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_gravity="bottom|end"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="5dp">
+                style="@style/chat_timings">
 
                 <TextView
                     android:id="@+id/textview_time"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
-                    android:layout_marginEnd="4dp"
-                    android:text="@{viewModel.formattedTime}"
-                    style="@style/chat_timings"/>
+                    android:layout_marginEnd="5dp"
+                    android:paddingBottom="3dp"
+                    android:text="@{viewModel.formattedTime}"/>
 
                 <ImageView
                     android:id="@+id/user_reply_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
-                    android:paddingBottom="3dp"
+                    android:layout_marginEnd="8dp"
+                    android:paddingBottom="7dp"
                     android:src="@{viewModel}"/>
 
             </LinearLayout>
@@ -49,7 +48,6 @@
                 android:id="@+id/text_view_message"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:layout_marginBottom="15dp"
                 app:emojiSize="@dimen/emoji_size_message"
                 android:text="@{viewModel}"
                 style="@style/chat_text_message_style"/>
