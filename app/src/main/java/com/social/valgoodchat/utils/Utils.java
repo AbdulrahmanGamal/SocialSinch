@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.util.TypedValue;
 import android.widget.FrameLayout;
 
 import com.social.backendless.model.ChatStatus;
@@ -198,4 +199,13 @@ public class Utils {
         editText.requestLayout();
         editText.setText(chatMessage);
 	}
+
+    public static int getToolbarHeight(Context context) {
+		int result = 0;
+        TypedValue tv = new TypedValue();
+        if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            result = TypedValue.complexToDimensionPixelSize(tv.data, context.getResources().getDisplayMetrics());
+        }
+        return result;
+    }
 }

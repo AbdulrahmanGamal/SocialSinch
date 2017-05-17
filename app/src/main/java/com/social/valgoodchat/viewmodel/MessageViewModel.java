@@ -1,7 +1,6 @@
 package com.social.valgoodchat.viewmodel;
 
 import android.content.Context;
-import android.content.Intent;
 import android.databinding.BindingAdapter;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,9 +9,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.social.valgoodchat.TenorGridActivity;
 import com.social.valgoodchat.adapter.ChatMessageAdapter;
 import com.social.valgoodchat.custom.EmojiEditText;
+import com.social.valgoodchat.custom.GifPopup;
 import com.vanniktech.emoji.EmojiPopup;
 
 
@@ -28,6 +27,7 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
     private String mRecipientId;
     private EmojiPopup.Builder mEmojiPopupBuilder;
     private EmojiPopup mEmojiPopup;
+    private GifPopup mGifPopup;
     private boolean mCloseAll;
 
     public MessageViewModel(Context context, String recipientInfo, View rootView) {
@@ -35,6 +35,7 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
         this.mRecipientId = recipientInfo;
         this.mChatMessageAdapter = new ChatMessageAdapter(context, recipientInfo, this);
         this.mEmojiPopupBuilder = EmojiPopup.Builder.fromRootView(rootView);
+        this.mGifPopup = new GifPopup(rootView);
     }
 
     public View.OnClickListener onClickSend() {
@@ -53,7 +54,7 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
     }
 
     public View.OnClickListener onClickGif() {
-        return v ->  mContext.startActivity(new Intent(mContext, TenorGridActivity.class));
+        return v ->  mGifPopup.toggle(mMessage);//mContext.startActivity(new Intent(mContext, TenorGridActivity.class));
     }
 
     public View.OnClickListener onMessageTypeClicked() {
@@ -69,6 +70,15 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
         }
     }
 
+    public void closeGifPopUp() {
+        if (mGifPopup.isShowing()) {
+            mGifPopup.dismiss();
+            mCloseAll = false;
+        } else {
+            mCloseAll = true;
+        }
+    }
+
     public boolean isCloseAll() {
         return mCloseAll;
     }
@@ -78,6 +88,7 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
         ((EmojiEditText)this.mMessage).setKeyImeChangeListener((keyCode, event) -> {
             if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
                 closeEmojiPopup();
+                closeGifPopUp();
             }
         });
     }
