@@ -1,6 +1,7 @@
 package com.social.valgoodchat.custom;
 
 import android.content.Context;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.Toolbar;
@@ -8,13 +9,16 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.social.tenor.data.DataManager;
 import com.social.valgoodchat.R;
 import com.social.valgoodchat.adapter.TenorGridViewAdapter;
+import com.social.valgoodchat.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -65,11 +69,12 @@ public class GIFView extends FrameLayout {
         setBackgroundColor(ContextCompat.getColor(getContext(), com.vanniktech.emoji.R.color.emoji_background));
         GridView gridView = (GridView) findViewById(R.id.gridView);
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarBottomMenu);
+        final int mToolbarHeight = Utils.getToolbarHeight(toolbar.getContext());
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mLocale = Locale.getDefault().toString();
         mGifAdapter = new TenorGridViewAdapter(v.getContext(), new ArrayList<>());
         gridView.setAdapter(mGifAdapter);
-        gridView.setOnScrollListener(new EndlessScrollListener(getContext()) {
+        gridView.setOnScrollListener(new EndlessScrollListener() {
             @Override
             public boolean onLoadMore(int page, int totalItemsCount) {
                 if (!"".equals(mGifNext)) {
@@ -81,9 +86,15 @@ public class GIFView extends FrameLayout {
             }
 
             @Override
-            public void onMoved(int distance) {
-                Log.e(TAG, "Setting translation to: " + distance);
-                toolbar.setTranslationY(-distance);
+            public void onScrollUp() {
+                toolbar.animate().translationY(0).
+                        setInterpolator(new AccelerateInterpolator()).start();
+            }
+
+            @Override
+            public void onScrollDown() {
+                toolbar.animate().translationY(mToolbarHeight).
+                        setInterpolator(new AccelerateInterpolator()).start();
             }
         });
     }

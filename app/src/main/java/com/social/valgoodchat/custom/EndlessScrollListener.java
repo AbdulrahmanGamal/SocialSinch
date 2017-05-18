@@ -1,11 +1,6 @@
 package com.social.valgoodchat.custom;
 
-import android.content.Context;
-import android.util.Log;
 import android.widget.AbsListView;
-import android.widget.GridView;
-
-import com.social.valgoodchat.utils.Utils;
 
 /**
  * Customs Scroll listener for Infinite scroll
@@ -23,11 +18,12 @@ public abstract class EndlessScrollListener implements AbsListView.OnScrollListe
     private boolean loading = true;
     // Sets the starting page index
     private int startingPageIndex = 0;
-    private int mToolbarOffset = 0;
-    private int mToolbarHeight;
+    //keep last position visible
+    int mLast = 0;
+    //keep sync between scrolling
+    boolean mControl = true;
 
-    public EndlessScrollListener(Context context) {
-        mToolbarHeight = Utils.getToolbarHeight(context);
+    public EndlessScrollListener() {
     }
 
     public EndlessScrollListener(int visibleThreshold) {
@@ -66,32 +62,29 @@ public abstract class EndlessScrollListener implements AbsListView.OnScrollListe
         if (!loading && (firstVisibleItem + visibleItemCount + visibleThreshold) >= totalItemCount ) {
             loading = onLoadMore(currentPage + 1, totalItemCount);
         }
+
+        //Code to detect with is scrolling up or down
+        if (firstVisibleItem < mLast && !mControl) {
+            onScrollUp();
+            mControl = true;
+        } else if (firstVisibleItem > mLast && mControl) {
+            onScrollDown();
+            mControl = false;
+        }
+
+        mLast = firstVisibleItem;
     }
 
     // Defines the process for actually loading more data based on page
     // Returns true if more data is being loaded; returns false if there is no more data to load.
     public abstract boolean onLoadMore(int page, int totalItemsCount);
 
-    public abstract void onMoved(int distance);
+    public abstract void onScrollUp();
+
+    public abstract void onScrollDown();
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
         // Don't take any action on changed
-        //clipToolbarOffset();
-        onMoved(mToolbarOffset);
-        int dy = ((GIFGridView)view).computeVerticalScrollOffset();
-        //Log.e("Endless", "Vertical scroll is: " + dy);
-        if((mToolbarOffset < mToolbarHeight && dy>0) || (mToolbarOffset >0 && dy<0)) {
-            mToolbarOffset += dy;
-        }
-
-    }
-
-    private void clipToolbarOffset() {
-        if(mToolbarOffset > mToolbarHeight) {
-            mToolbarOffset = mToolbarHeight;
-        } else if(mToolbarOffset < 0) {
-            mToolbarOffset = 0;
-        }
     }
 }

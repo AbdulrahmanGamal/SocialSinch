@@ -68,7 +68,7 @@ public class TenorGridActivity extends AppCompatActivity {
         mLocale = Locale.getDefault().toString();
         mGifAdapter = new TenorGridViewAdapter(this, new ArrayList<>());
         mGridView.setAdapter(mGifAdapter);
-        mGridView.setOnScrollListener(new EndlessScrollListener(getApplicationContext()) {
+        mGridView.setOnScrollListener(new EndlessScrollListener() {
             @Override
             public boolean onLoadMore(int page, int totalItemsCount) {
                 if (!"".equals(mGifNext)) {
@@ -80,7 +80,12 @@ public class TenorGridActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onMoved(int distance) {
+            public void onScrollUp() {
+
+            }
+
+            @Override
+            public void onScrollDown() {
 
             }
         });
