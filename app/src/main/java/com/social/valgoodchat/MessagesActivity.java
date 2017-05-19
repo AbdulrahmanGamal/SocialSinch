@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -49,6 +50,8 @@ public class MessagesActivity extends AppCompatActivity {
                 ((TypeWriter) mActivityChatMainBinding.toolbarChats.findViewById(R.id.action_bar_title_2));
 
         getWindow().setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.background));
+        //avoid to show the soft keyboard the first time
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         setSupportActionBar(mActivityChatMainBinding.toolbarChats);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);

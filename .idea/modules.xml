@@ -5,6 +5,8 @@
       <module fileurl="file://$PROJECT_DIR$/SocialSinch.iml" filepath="$PROJECT_DIR$/SocialSinch.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/backendless/backendless.iml" filepath="$PROJECT_DIR$/backendless/backendless.iml" />
+      <module fileurl="file://$PROJECT_DIR$/emoji/emoji.iml" filepath="$PROJECT_DIR$/emoji/emoji.iml" />
+      <module fileurl="file://$PROJECT_DIR$/emoji-ios/emoji-ios.iml" filepath="$PROJECT_DIR$/emoji-ios/emoji-ios.iml" />
       <module fileurl="file://$PROJECT_DIR$/giphy/giphy.iml" filepath="$PROJECT_DIR$/giphy/giphy.iml" />
       <module fileurl="file://$PROJECT_DIR$/tenor/tenor.iml" filepath="$PROJECT_DIR$/tenor/tenor.iml" />
     </modules>

@@ -88,8 +88,7 @@
                     android:textColorHint="@color/hint_type"
                     android:background="@null"
                     android:text="@{viewModel}"
-                    android:onClick="@{viewModel.onMessageTypeClicked()}"
-                    app:emojiSize="26sp">
+                    android:onClick="@{viewModel.onMessageTypeClicked()}">
                         <requestFocus />
                     </com.social.valgoodchat.custom.EmojiEditText>
 

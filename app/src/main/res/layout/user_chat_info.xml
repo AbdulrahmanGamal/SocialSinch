@@ -33,13 +33,12 @@
                 android:textStyle="bold"
                 android:text="@{viewModel.fullName}"/>
 
-            <com.vanniktech.emoji.EmojiTextView
+            <TextView
                 android:id="@+id/lastMessageDate"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
                 android:textSize="13sp"
-                app:emojiSize="13sp"
                 android:layout_marginStart="0dp"
                 android:layout_marginEnd="10dp"
                 android:gravity="end"
@@ -77,7 +76,7 @@
                 android:paddingEnd="5dp"
                 android:src="@{viewModel}"/>
 
-            <com.vanniktech.emoji.EmojiTextView
+            <TextView
                 android:id="@+id/txtSubtitled"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -88,7 +87,6 @@
                 android:maxLines="1"
                 android:ellipsize="end"
                 android:textColor="@color/light_grey"
-                app:emojiSize="@dimen/emoji_size_message_small"
                 android:text="@{viewModel.lastMessage}"/>
 
         </LinearLayout>

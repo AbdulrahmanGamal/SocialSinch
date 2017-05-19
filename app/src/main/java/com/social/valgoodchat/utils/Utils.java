@@ -171,17 +171,17 @@ public class Utils {
             params.setMargins(paddingLeft, params.topMargin, paddingRight, 0);
             switch (chatMessage.length()) {
                 case 2:
-                    editText.setEmojiSize(editText.getResources().getDimensionPixelSize(R.dimen.emoji_size_message_three));
+                    //editText.setEmojiSize(editText.getResources().getDimensionPixelSize(R.dimen.emoji_size_message_three));
                     break;
                 case 1:
                     //heart emoji is the biggest
                     if (chatMessage.charAt(0) == (char)10084) {
-                        editText.setEmojiSize(editText.getResources().
-                                getDimensionPixelSize(R.dimen.emoji_heart_size_message));
+                        //editText.setEmojiSize(editText.getResources().
+                                //getDimensionPixelSize(R.dimen.emoji_heart_size_message));
                     }
                     break;
                 default:
-                    editText.setEmojiSize(editText.getResources().getDimensionPixelSize(R.dimen.emoji_size_message_two));
+                    //editText.setEmojiSize(editText.getResources().getDimensionPixelSize(R.dimen.emoji_size_message_two));
                     break;
             }
         } else {
@@ -194,7 +194,7 @@ public class Utils {
             int defaultRight =
                     editText.getResources().getDimensionPixelOffset(R.dimen.message_default_padding_right);
             params.setMargins(defaultLeft, defaultTop, defaultRight, defaultBottom);
-            editText.setEmojiSize(editText.getResources().getDimensionPixelSize(R.dimen.emoji_size_message));
+            //editText.setEmojiSize(editText.getResources().getDimensionPixelSize(R.dimen.emoji_size_message));
         }
         editText.requestLayout();
         editText.setText(chatMessage);

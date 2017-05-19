@@ -1,1 +1,1 @@
-include ':app', ':backendless', ':giphy', ':tenor'
+include ':app', ':backendless', ':giphy', ':tenor', ':emoji', ':emoji-ios'

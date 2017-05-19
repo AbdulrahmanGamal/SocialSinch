@@ -19,3 +19,78 @@ allprojects {
         jcenter()
     }
 }
+ext {
+    minSdkVersion = 21
+    compileSdkVersion = 25
+    targetSdkVersion = 25
+    buildToolsVersion = '25.0.1'
+
+    retrofitVersion = '2.2.0'
+    commonsLangVersion = '3.5'
+    rxjavaVersion = '2.0.1'
+    rxandroidVersion = '2.0.1'
+    rxbindingVersion = '1.0.0'
+    rxbindingDesignVersion = '1.0.0'
+    rxbindingRecyclerviewVersion = '1.0.0'
+    adapterRxJavaVersion = '2.2.0'
+    gsonVersion = '2.7'
+    sqlbriteVersion = '1.1.1'
+    backendlessVersion = '3.0.25'
+    converterGsonVersion = '2.2.0'
+    glideVersion = '3.7.0'
+    glideTransformationsVersion = '2.0.2'
+    emojiVersion = '0.4.0'
+    animatedGifVersion = '1.2.0'
+    constraintLayoutVersion = '1.0.1'
+    junitVersion = '4.12'
+    robolectricVersion = '3.0'
+    expressoVersion = '2.2.2'
+    shadowsMultidexVersion = '3.0'
+    supportAnnotationsVersion = '25.1.0'
+
+    supportLibraryVersion = '25.1.0'
+    leakCanaryVersion = '1.5'
+
+    retrofit = "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    commonsLang = "org.apache.commons:commons-lang3:$commonsLangVersion"
+    rxjava = "io.reactivex.rxjava2:rxjava:$rxjavaVersion"
+    rxandroid = "io.reactivex.rxjava2:rxandroid:$rxandroidVersion"
+    rxbinding = "com.jakewharton.rxbinding:rxbinding:$rxbindingVersion"
+    rxbindingDesign = "com.jakewharton.rxbinding:rxbinding-design:$rxbindingDesignVersion"
+    rxbindingRecyclerview = "com.jakewharton.rxbinding:rxbinding-recyclerview-v7:$rxbindingRecyclerviewVersion"
+    glide = "com.github.bumptech.glide:glide:$glideVersion"
+    glideTransformations = "jp.wasabeef:glide-transformations:$glideTransformationsVersion"
+    emoji = "com.vanniktech:emoji-ios:$emojiVersion"
+    animatedGif = "com.facebook.fresco:animated-gif:$animatedGifVersion"
+    constraintLayout = "com.android.support.constraint:constraint-layout:$constraintLayoutVersion"
+    adapterRxJava = "com.squareup.retrofit2:adapter-rxjava:$adapterRxJavaVersion"
+    converterGson = "com.squareup.retrofit2:converter-gson:$converterGsonVersion"
+    sqlbrite = "com.squareup.sqlbrite:sqlbrite:$sqlbriteVersion"
+    backendless = "com.backendless:backendless:$backendlessVersion"
+    gson = "com.google.code.gson:gson:$gsonVersion"
+    junit = "junit:junit:$junitVersion"
+    robolectric = "org.robolectric:robolectric:$robolectricVersion"
+    expresso = "com.android.support.test.espresso:espresso-core:$expressoVersion"
+    shadowsMultidex = "org.robolectric:shadows-multidex:$shadowsMultidexVersion"
+    supportLibrary = "com.android.support:support-annotations:$supportAnnotationsVersion"
+
+
+    supportAppCompat = "com.android.support:appcompat-v7:$supportLibraryVersion"
+    supportV4CoreUi = "com.android.support:support-core-ui:$supportLibraryVersion"
+    supportV4Compat = "com.android.support:support-compat:$supportLibraryVersion"
+    supportRecyclerView = "com.android.support:recyclerview-v7:${supportLibraryVersion}"
+    supportCardView = "com.android.support:cardview-v7:${supportLibraryVersion}"
+
+    leakCanaryDebug = "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
+    leakCanaryRelease = "com.squareup.leakcanary:leakcanary-android-no-op:$leakCanaryVersion"
+
+    testing = [
+            junit             : 'junit:junit:4.12',
+            robolectric       : 'org.robolectric:robolectric:3.2.2',
+            mockito           : 'org.mockito:mockito-core:2.7.7',
+            privateConstructor: 'com.pushtorefresh.java-private-constructor-checker:checker:1.2.0',
+            assertJ           : 'org.assertj:assertj-core:3.6.2'
+    ]
+
+    javaVersion = JavaVersion.VERSION_1_7
+}

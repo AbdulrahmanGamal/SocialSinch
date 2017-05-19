@@ -5,12 +5,11 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.backendless.Backendless;
-import com.backendless.BackendlessUser;
-import com.social.backendless.PublishSubscribeHandler;
 import com.social.backendless.bus.RxIncomingMessageBus;
 import com.social.backendless.data.DataManager;
 import com.social.backendless.database.ChatBriteDataSource;
 import com.social.backendless.model.ChatMessage;
+import com.social.backendless.model.OperationResponse;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -42,9 +41,8 @@ public class PublishSubscriberHandlerTest {
 
     @Test
     public void publishMessage() throws InterruptedException {
-        Object result = DataManager.getLoginObservable("condorito@gmail.com", "123456789", true).toBlocking().first();
-        if (result instanceof BackendlessUser) {
-            //PublishSubscribeHandler.getInstance(mMockContext,"8E4B12A7-2B39-778B-FF00-9715DF18DA00").subscribe();
+        OperationResponse result = DataManager.getLoginObservable("condorito@gmail.com", "123456789", true).toBlocking().first();
+        if (result.getOpCode().equals("200")) {
             //send message to the same user
             RxIncomingMessageBus.getInstance().sendMessage(new ChatMessage("8E4B12A7-2B39-778B-FF00-9715DF18DA00", "hello"));
             //wait while we receive the message back

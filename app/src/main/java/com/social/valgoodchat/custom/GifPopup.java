@@ -1,8 +1,8 @@
 package com.social.valgoodchat.custom;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
@@ -15,7 +15,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.PopupWindow;
 
-import com.vanniktech.emoji.*;
+import com.social.valgoodchat.utils.EmojiUtils;
 
 /**
  * Pop up to display the animated GIfs
@@ -32,32 +32,28 @@ public class GifPopup {
 
     private final ViewTreeObserver.OnGlobalLayoutListener onGlobalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
         @Override public void onGlobalLayout() {
+            final Context context = mRootView.getContext();
             final Rect rect = new Rect();
             mRootView.getWindowVisibleDisplayFrame(rect);
 
-            int heightDifference = getUsableScreenHeight() - (rect.bottom - rect.top);
+            final int heightDifference = getUsableScreenHeight() - rect.bottom;
 
-            final Resources resources = mRootView.getContext().getResources();
-            final int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
-
-            if (resourceId > 0) {
-                heightDifference -= resources.getDimensionPixelSize(resourceId);
-            }
-
-            if (heightDifference > MIN_KEYBOARD_HEIGHT) {
-                mKeyBoardHeight = heightDifference;
-                mPopupWindow.setWidth(WindowManager.LayoutParams.MATCH_PARENT);
-                mPopupWindow.setHeight(mKeyBoardHeight);
+            if (heightDifference > EmojiUtils.dpToPx(context, MIN_KEYBOARD_HEIGHT)) {
+                mPopupWindow.setHeight(heightDifference);
+                mPopupWindow.setWidth(rect.right);
 
                 isKeyboardOpen = true;
 
                 if (isPendingOpen) {
-                    mPopupWindow.showAtLocation(mRootView, Gravity.BOTTOM, 0, 0);
+                    showAtBottom();
                     isPendingOpen = false;
                 }
             } else {
                 if (isKeyboardOpen) {
                     isKeyboardOpen = false;
+
+                    dismiss();
+                    mRootView.getViewTreeObserver().removeOnGlobalLayoutListener(onGlobalLayoutListener);
                 }
             }
         }
@@ -69,9 +65,10 @@ public class GifPopup {
         mPopupWindow = new PopupWindow(mRootView.getContext());
         // To avoid borders & overdraw
         mPopupWindow.setBackgroundDrawable(new BitmapDrawable(mRootView.getContext().getResources(), (Bitmap) null));
-        mPopupWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        mPopupWindow.setInputMethodMode(PopupWindow.INPUT_METHOD_NOT_NEEDED);
         mPopupWindow.setWidth(WindowManager.LayoutParams.MATCH_PARENT);
-        mPopupWindow.setHeight((int) mRootView.getContext().getResources().getDimension(R.dimen.emoji_keyboard_height));
+        //mPopupWindow.setHeight((int) mRootView.getContext().
+          //                          getResources().getDimension(com.vanniktech.emoji.R.dimen.emoji_keyboard_height));
 
     }
 
@@ -86,6 +83,8 @@ public class GifPopup {
 
     public void toggle(EditText emojiEditText) {
         if (!mPopupWindow.isShowing()) {
+            // Remove any previous listeners to avoid duplicates.
+            mRootView.getViewTreeObserver().removeOnGlobalLayoutListener(onGlobalLayoutListener);
             mRootView.getViewTreeObserver().addOnGlobalLayoutListener(onGlobalLayoutListener);
 
             if (isKeyboardOpen) {
@@ -119,17 +118,36 @@ public class GifPopup {
         }
     }
 
+    public void closeSoftKeyboard(EditText emojiEditText) {
+        if (emojiEditText.hasFocus()) {
+            InputMethodManager imm =
+                    (InputMethodManager) emojiEditText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(emojiEditText.getWindowToken(), 0);
+            isKeyboardOpen = false;
+        }
+    }
+
+    public boolean isKeyboardOpen() {
+        return isKeyboardOpen;
+    }
     public boolean isShowing() {
         return mPopupWindow.isShowing();
     }
 
     void showAtBottom() {
         mPopupWindow.setContentView(new GIFView(mRootView.getContext()));
+        final Point desiredLocation = new Point(0, getUsableScreenHeight() - mPopupWindow.getHeight());
+
+        mPopupWindow.showAtLocation(mRootView, Gravity.NO_GRAVITY, desiredLocation.x, desiredLocation.y);
+        EmojiUtils.fixPopupLocation(mPopupWindow, desiredLocation);
         mPopupWindow.showAtLocation(mRootView, Gravity.BOTTOM, 0, 0);
     }
 
     public void dismiss() {
         mRootView.getViewTreeObserver().removeOnGlobalLayoutListener(onGlobalLayoutListener);
-        mPopupWindow.dismiss();
+        isKeyboardOpen = false;
+        mRootView.getHandler().postDelayed(() -> {
+            mPopupWindow.dismiss();
+        }, 400);
     }
 }

@@ -7,8 +7,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.social.valgoodchat.R;
 import com.social.valgoodchat.adapter.ChatMessageAdapter;
 import com.social.valgoodchat.custom.EmojiEditText;
 import com.social.valgoodchat.custom.GifPopup;
@@ -54,7 +56,15 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
     }
 
     public View.OnClickListener onClickGif() {
-        return v ->  mGifPopup.toggle(mMessage);//mContext.startActivity(new Intent(mContext, TenorGridActivity.class));
+        return v ->  {
+//            if (mGifPopup.isKeyboardOpen()) {
+//                ((ImageView)v).setImageResource(R.drawable.input_emoji);
+//            } else {
+//                ((ImageView)v).setImageResource(R.drawable.input_keyboard);
+//            }
+//            mGifPopup.toggle(mMessage);//mContext.startActivity(new Intent(mContext, TenorGridActivity.class));
+            mEmojiPopup.toggle();
+        };
     }
 
     public View.OnClickListener onMessageTypeClicked() {

@@ -2,6 +2,7 @@ package com.social.valgoodchat.viewmodel;
 
 import android.databinding.BindingAdapter;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.social.backendless.utils.DateUtils;
 import com.social.valgoodchat.R;

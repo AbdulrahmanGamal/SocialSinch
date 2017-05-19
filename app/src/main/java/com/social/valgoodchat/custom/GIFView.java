@@ -1,18 +1,14 @@
 package com.social.valgoodchat.custom;
 
 import android.content.Context;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.GridView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.social.tenor.data.DataManager;
@@ -29,7 +25,7 @@ import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
 
 /**
- * Created by jorgevalbuena on 5/17/17.
+ * Gif View that is shown inside the bottom pop up
  */
 
 public class GIFView extends FrameLayout {
@@ -66,7 +62,7 @@ public class GIFView extends FrameLayout {
     }
 
     private void init(View v) {
-        setBackgroundColor(ContextCompat.getColor(getContext(), com.vanniktech.emoji.R.color.emoji_background));
+        setBackgroundColor(ContextCompat.getColor(getContext(), R.color.greyish));
         GridView gridView = (GridView) findViewById(R.id.gridView);
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarBottomMenu);
         final int mToolbarHeight = Utils.getToolbarHeight(toolbar.getContext());
@@ -125,14 +121,12 @@ public class GIFView extends FrameLayout {
 
     @Override
     public void onDetachedFromWindow() {
-        Log.e(TAG, "View Detached from Window");
         mDisposable.unsubscribe();
         super.onDetachedFromWindow();
     }
 
     @Override
     public void onAttachedToWindow() {
-        Log.e(TAG, "View Attached to Window");
         mDisposable = new CompositeSubscription();
         attachPaginator();
         mPaginator.onNext(mGifNext);
