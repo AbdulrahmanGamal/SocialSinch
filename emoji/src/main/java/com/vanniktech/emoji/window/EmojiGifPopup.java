@@ -1,4 +1,4 @@
-package com.social.valgoodchat.custom;
+package com.vanniktech.emoji.window;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -15,13 +15,14 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.PopupWindow;
 
-import com.social.valgoodchat.utils.EmojiUtils;
+import com.vanniktech.emoji.Utils;
+import com.vanniktech.emoji.gif.GIFView;
 
 /**
  * Pop up to display the animated GIfs
  */
 
-public class GifPopup {
+public class EmojiGifPopup {
     private PopupWindow mPopupWindow;
     private View mRootView;
     private int mKeyBoardHeight;
@@ -38,7 +39,7 @@ public class GifPopup {
 
             final int heightDifference = getUsableScreenHeight() - rect.bottom;
 
-            if (heightDifference > EmojiUtils.dpToPx(context, MIN_KEYBOARD_HEIGHT)) {
+            if (heightDifference > Utils.dpToPx(context, MIN_KEYBOARD_HEIGHT)) {
                 mPopupWindow.setHeight(heightDifference);
                 mPopupWindow.setWidth(rect.right);
 
@@ -59,7 +60,7 @@ public class GifPopup {
         }
     };
 
-    public GifPopup(@NonNull final View rootView) {
+    public EmojiGifPopup(@NonNull final View rootView) {
         this.mRootView = rootView;
 
         mPopupWindow = new PopupWindow(mRootView.getContext());
@@ -139,7 +140,7 @@ public class GifPopup {
         final Point desiredLocation = new Point(0, getUsableScreenHeight() - mPopupWindow.getHeight());
 
         mPopupWindow.showAtLocation(mRootView, Gravity.NO_GRAVITY, desiredLocation.x, desiredLocation.y);
-        EmojiUtils.fixPopupLocation(mPopupWindow, desiredLocation);
+        Utils.fixPopupLocation(mPopupWindow, desiredLocation);
         mPopupWindow.showAtLocation(mRootView, Gravity.BOTTOM, 0, 0);
     }
 

@@ -24,9 +24,7 @@ import android.widget.ProgressBar;
 
 import com.social.tenor.data.DataManager;
 import com.social.tenor.model.TenorModel;
-import com.social.valgoodchat.adapter.TenorGridViewAdapter;
 import com.social.valgoodchat.app.SocialSinchApplication;
-import com.social.valgoodchat.custom.EndlessScrollListener;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -43,7 +41,7 @@ import rx.subscriptions.CompositeSubscription;
 public class TenorGridActivity extends AppCompatActivity {
     private ProgressBar mProgressBar;
     private String mGifNext;
-    private TenorGridViewAdapter mGifAdapter;
+    //private TenorGridViewAdapter mGifAdapter;
     private MenuItem mSearchItem;
     private Toolbar mToolbar;
     private String mKeywordSearch;
@@ -66,29 +64,29 @@ public class TenorGridActivity extends AppCompatActivity {
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mKeywordSearch = "";
         mLocale = Locale.getDefault().toString();
-        mGifAdapter = new TenorGridViewAdapter(this, new ArrayList<>());
-        mGridView.setAdapter(mGifAdapter);
-        mGridView.setOnScrollListener(new EndlessScrollListener() {
-            @Override
-            public boolean onLoadMore(int page, int totalItemsCount) {
-                if (!"".equals(mGifNext)) {
-                    mPaginator.onNext(mGifNext);
-                    return true;
-                }
-
-                return false;
-            }
-
-            @Override
-            public void onScrollUp() {
-
-            }
-
-            @Override
-            public void onScrollDown() {
-
-            }
-        });
+//        mGifAdapter = new TenorGridViewAdapter(this, new ArrayList<>());
+//        mGridView.setAdapter(mGifAdapter);
+//        mGridView.setOnScrollListener(new EndlessScrollListener() {
+//            @Override
+//            public boolean onLoadMore(int page, int totalItemsCount) {
+//                if (!"".equals(mGifNext)) {
+//                    mPaginator.onNext(mGifNext);
+//                    return true;
+//                }
+//
+//                return false;
+//            }
+//
+//            @Override
+//            public void onScrollUp() {
+//
+//            }
+//
+//            @Override
+//            public void onScrollDown() {
+//
+//            }
+//        });
 
         mGifNext = "";
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -180,7 +178,7 @@ public class TenorGridActivity extends AppCompatActivity {
               .filter(tenorModel -> tenorModel.getResults() != null)
               .observeOn(AndroidSchedulers.mainThread())
               .subscribe(tenorModel -> {
-                  mGifAdapter.setGridData(tenorModel.getResults());
+//                  mGifAdapter.setGridData(tenorModel.getResults());
                   mGifNext = tenorModel.getNext();
                   mProgressBar.setVisibility(View.INVISIBLE);
               })
@@ -221,9 +219,9 @@ public class TenorGridActivity extends AppCompatActivity {
 
                     @Override
                     public void onNext(TenorModel tenorModel) {
-                        mGifAdapter.clearGridData();
-                        mGifAdapter.setGridData(tenorModel.getResults());
-                        mGifNext = tenorModel.getNext();
+//                        mGifAdapter.clearGridData();
+//                        mGifAdapter.setGridData(tenorModel.getResults());
+//                        mGifNext = tenorModel.getNext();
                         mProgressBar.setVisibility(View.INVISIBLE);
 
                     }
@@ -236,7 +234,7 @@ public class TenorGridActivity extends AppCompatActivity {
     private void resetToTrending() {
         mKeywordSearch = "";
         mGifNext = "";
-        mGifAdapter.clearGridData();
+//        mGifAdapter.clearGridData();
         mPaginator.onNext(mGifNext);
     }
     /**

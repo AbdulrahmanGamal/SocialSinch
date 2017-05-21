@@ -1,4 +1,4 @@
-package com.social.valgoodchat.adapter;
+package com.vanniktech.emoji.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,7 +11,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.social.tenor.model.Result;
-import com.social.valgoodchat.R;
+import com.vanniktech.emoji.R;
 
 import java.util.ArrayList;
 import java.util.List;

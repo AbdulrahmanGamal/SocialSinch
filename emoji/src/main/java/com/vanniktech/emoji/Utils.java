@@ -8,6 +8,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.PopupWindow;
@@ -15,7 +16,7 @@ import android.widget.PopupWindow;
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.JELLY_BEAN;
 
-final class Utils {
+public final class Utils {
   static final int DONT_UPDATE_FLAG = -1;
 
   @TargetApi(JELLY_BEAN) static void removeOnGlobalLayoutListener(final View v, final ViewTreeObserver.OnGlobalLayoutListener listener) {
@@ -35,7 +36,7 @@ final class Utils {
     return reference;
   }
 
-  static int dpToPx(@NonNull final Context context, final float dp) {
+  public static int dpToPx(@NonNull final Context context, final float dp) {
     return (int) (dp * context.getResources().getDisplayMetrics().density);
   }
 
@@ -77,7 +78,7 @@ final class Utils {
     throw new IllegalArgumentException("The passed Context is not an Activity");
   }
 
-  static void fixPopupLocation(@NonNull final PopupWindow popupWindow, @NonNull final Point desiredLocation) {
+  public static void fixPopupLocation(@NonNull final PopupWindow popupWindow, @NonNull final Point desiredLocation) {
     popupWindow.getContentView().post(new Runnable() {
       @Override public void run() {
         final Point actualLocation = Utils.locationOnScreen(popupWindow.getContentView());
@@ -105,6 +106,15 @@ final class Utils {
         }
       }
     });
+  }
+
+  public static int getToolbarHeight(Context context) {
+    int result = 0;
+    TypedValue tv = new TypedValue();
+    if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+      result = TypedValue.complexToDimensionPixelSize(tv.data, context.getResources().getDisplayMetrics());
+    }
+    return result;
   }
 
   private Utils() {

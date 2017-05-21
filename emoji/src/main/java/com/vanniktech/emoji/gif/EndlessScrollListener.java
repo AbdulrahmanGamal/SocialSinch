@@ -1,4 +1,4 @@
-package com.social.valgoodchat.custom;
+package com.vanniktech.emoji.gif;
 
 import android.widget.AbsListView;
 

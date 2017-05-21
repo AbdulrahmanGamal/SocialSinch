@@ -13,8 +13,8 @@ import android.widget.Toast;
 import com.social.valgoodchat.R;
 import com.social.valgoodchat.adapter.ChatMessageAdapter;
 import com.social.valgoodchat.custom.EmojiEditText;
-import com.social.valgoodchat.custom.GifPopup;
 import com.vanniktech.emoji.EmojiPopup;
+import com.vanniktech.emoji.window.EmojiGifPopup;
 
 
 /**
@@ -29,7 +29,7 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
     private String mRecipientId;
     private EmojiPopup.Builder mEmojiPopupBuilder;
     private EmojiPopup mEmojiPopup;
-    private GifPopup mGifPopup;
+    private EmojiGifPopup mGifPopup;
     private boolean mCloseAll;
 
     public MessageViewModel(Context context, String recipientInfo, View rootView) {
@@ -37,7 +37,7 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
         this.mRecipientId = recipientInfo;
         this.mChatMessageAdapter = new ChatMessageAdapter(context, recipientInfo, this);
         this.mEmojiPopupBuilder = EmojiPopup.Builder.fromRootView(rootView);
-        this.mGifPopup = new GifPopup(rootView);
+        this.mGifPopup = new EmojiGifPopup(rootView);
     }
 
     public View.OnClickListener onClickSend() {
@@ -57,13 +57,13 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
 
     public View.OnClickListener onClickGif() {
         return v ->  {
-//            if (mGifPopup.isKeyboardOpen()) {
-//                ((ImageView)v).setImageResource(R.drawable.input_emoji);
-//            } else {
-//                ((ImageView)v).setImageResource(R.drawable.input_keyboard);
-//            }
-//            mGifPopup.toggle(mMessage);//mContext.startActivity(new Intent(mContext, TenorGridActivity.class));
-            mEmojiPopup.toggle();
+            if (mGifPopup.isKeyboardOpen()) {
+                ((ImageView)v).setImageResource(R.drawable.input_emoji);
+            } else {
+                ((ImageView)v).setImageResource(R.drawable.input_keyboard);
+            }
+            mGifPopup.toggle(mMessage);//mContext.startActivity(new Intent(mContext, TenorGridActivity.class));
+            //mEmojiPopup.toggle();
         };
     }
 

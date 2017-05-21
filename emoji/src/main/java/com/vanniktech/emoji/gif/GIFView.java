@@ -1,4 +1,4 @@
-package com.social.valgoodchat.custom;
+package com.vanniktech.emoji.gif;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
@@ -12,9 +12,9 @@ import android.widget.GridView;
 import android.widget.ProgressBar;
 
 import com.social.tenor.data.DataManager;
-import com.social.valgoodchat.R;
-import com.social.valgoodchat.adapter.TenorGridViewAdapter;
-import com.social.valgoodchat.utils.Utils;
+import com.vanniktech.emoji.R;
+import com.vanniktech.emoji.Utils;
+import com.vanniktech.emoji.adapter.TenorGridViewAdapter;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -58,12 +58,13 @@ public class GIFView extends FrameLayout {
     }
 
     private void init() {
-        init(LayoutInflater.from(getContext()).inflate(R.layout.gif_layout_view, this, true));
+        init(LayoutInflater.from(getContext()).inflate(R.layout.general_layout_view, this, true));
     }
 
     private void init(View v) {
-        setBackgroundColor(ContextCompat.getColor(getContext(), R.color.greyish));
-        GridView gridView = (GridView) findViewById(R.id.gridView);
+        setBackgroundColor(ContextCompat.getColor(getContext(), R.color.emoji_background));
+        GridView gridView = new GIFGridView(getContext());
+        addView(gridView, 0);
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarBottomMenu);
         final int mToolbarHeight = Utils.getToolbarHeight(toolbar.getContext());
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
