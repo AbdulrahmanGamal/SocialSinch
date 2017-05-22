@@ -15,8 +15,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.PopupWindow;
 
+import com.vanniktech.emoji.EmojiEditText;
 import com.vanniktech.emoji.Utils;
-import com.vanniktech.emoji.gif.GIFView;
+import com.vanniktech.emoji.custom.EmojiGIFView;
 
 /**
  * Pop up to display the animated GIfs
@@ -25,9 +26,10 @@ import com.vanniktech.emoji.gif.GIFView;
 public class EmojiGifPopup {
     private PopupWindow mPopupWindow;
     private View mRootView;
-    private int mKeyBoardHeight;
     private boolean isPendingOpen;
     private boolean isKeyboardOpen;
+    private EditText mEmojiEditText;
+    private EmojiGIFView mEmojiGifView;
 
     private static final int MIN_KEYBOARD_HEIGHT = 100;
 
@@ -62,15 +64,18 @@ public class EmojiGifPopup {
 
     public EmojiGifPopup(@NonNull final View rootView) {
         this.mRootView = rootView;
-
         mPopupWindow = new PopupWindow(mRootView.getContext());
         // To avoid borders & overdraw
         mPopupWindow.setBackgroundDrawable(new BitmapDrawable(mRootView.getContext().getResources(), (Bitmap) null));
         mPopupWindow.setInputMethodMode(PopupWindow.INPUT_METHOD_NOT_NEEDED);
         mPopupWindow.setWidth(WindowManager.LayoutParams.MATCH_PARENT);
-        //mPopupWindow.setHeight((int) mRootView.getContext().
-          //                          getResources().getDimension(com.vanniktech.emoji.R.dimen.emoji_keyboard_height));
 
+    }
+
+    public void setEmojiEditText(EditText emojiEditText) {
+        this.mEmojiEditText = emojiEditText;
+        //by default when the dialog starts, it will show the emoji view
+        mEmojiGifView = new EmojiGIFView(mRootView.getContext(), (EmojiEditText) mEmojiEditText);
     }
 
     private int getUsableScreenHeight() {
@@ -82,7 +87,7 @@ public class EmojiGifPopup {
         return metrics.heightPixels;
     }
 
-    public void toggle(EditText emojiEditText) {
+    public void toggle() {
         if (!mPopupWindow.isShowing()) {
             // Remove any previous listeners to avoid duplicates.
             mRootView.getViewTreeObserver().removeOnGlobalLayoutListener(onGlobalLayoutListener);
@@ -93,14 +98,14 @@ public class EmojiGifPopup {
                 showAtBottom();
             } else {
                 // Open the text keyboard first and immediately after that show the emoji popup
-                emojiEditText.setFocusableInTouchMode(true);
-                emojiEditText.requestFocus();
+                mEmojiEditText.setFocusableInTouchMode(true);
+                mEmojiEditText.requestFocus();
 
                 showAtBottomPending();
 
                 final InputMethodManager inputMethodManager =
                         (InputMethodManager) mRootView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputMethodManager.showSoftInput(emojiEditText, InputMethodManager.SHOW_IMPLICIT);
+                inputMethodManager.showSoftInput(mEmojiEditText, InputMethodManager.SHOW_IMPLICIT);
             }
 
         } else {
@@ -119,14 +124,14 @@ public class EmojiGifPopup {
         }
     }
 
-    public void closeSoftKeyboard(EditText emojiEditText) {
-        if (emojiEditText.hasFocus()) {
-            InputMethodManager imm =
-                    (InputMethodManager) emojiEditText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(emojiEditText.getWindowToken(), 0);
-            isKeyboardOpen = false;
-        }
-    }
+//    public void closeSoftKeyboard(EditText emojiEditText) {
+//        if (emojiEditText.hasFocus()) {
+//            InputMethodManager imm =
+//                    (InputMethodManager) emojiEditText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+//            imm.hideSoftInputFromWindow(emojiEditText.getWindowToken(), 0);
+//            isKeyboardOpen = false;
+//        }
+//    }
 
     public boolean isKeyboardOpen() {
         return isKeyboardOpen;
@@ -136,7 +141,7 @@ public class EmojiGifPopup {
     }
 
     void showAtBottom() {
-        mPopupWindow.setContentView(new GIFView(mRootView.getContext()));
+        mPopupWindow.setContentView(mEmojiGifView);
         final Point desiredLocation = new Point(0, getUsableScreenHeight() - mPopupWindow.getHeight());
 
         mPopupWindow.showAtLocation(mRootView, Gravity.NO_GRAVITY, desiredLocation.x, desiredLocation.y);
@@ -147,6 +152,7 @@ public class EmojiGifPopup {
     public void dismiss() {
         mRootView.getViewTreeObserver().removeOnGlobalLayoutListener(onGlobalLayoutListener);
         isKeyboardOpen = false;
+        mEmojiGifView = null;
         mRootView.getHandler().postDelayed(() -> {
             mPopupWindow.dismiss();
         }, 400);

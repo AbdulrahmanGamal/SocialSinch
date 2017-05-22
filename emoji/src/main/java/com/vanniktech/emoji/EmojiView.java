@@ -19,10 +19,11 @@ import android.widget.LinearLayout;
 import com.vanniktech.emoji.emoji.EmojiCategory;
 import com.vanniktech.emoji.listeners.OnEmojiBackspaceClickListener;
 import com.vanniktech.emoji.listeners.OnEmojiClickedListener;
+import com.vanniktech.emoji.listeners.OnEmojiLongClickedListener;
 import com.vanniktech.emoji.listeners.RepeatListener;
 import java.util.concurrent.TimeUnit;
 
-@SuppressLint("ViewConstructor") final class EmojiView extends LinearLayout implements ViewPager.OnPageChangeListener {
+@SuppressLint("ViewConstructor") public final class EmojiView extends LinearLayout implements ViewPager.OnPageChangeListener {
   private static final long INITIAL_INTERVAL = TimeUnit.SECONDS.toMillis(1) / 2;
   private static final int NORMAL_INTERVAL = 50;
 
@@ -36,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 
   private int emojiTabLastSelectedIndex = -1;
 
-  EmojiView(final Context context,
+  public EmojiView(final Context context,
             final OnEmojiClickedListener onEmojiClickedListener,
             final OnEmojiLongClickedListener onEmojiLongClickedListener,
             @NonNull final RecentEmoji recentEmoji) {
@@ -131,7 +132,15 @@ import java.util.concurrent.TimeUnit;
     // Don't care.
   }
 
-  static class EmojiTabsClickListener implements OnClickListener {
+    public void showView() {
+       setVisibility(VISIBLE);
+    }
+
+    public void hideView() {
+        setVisibility(INVISIBLE);
+    }
+
+    static class EmojiTabsClickListener implements OnClickListener {
     private final ViewPager emojisPager;
     private final int position;
 

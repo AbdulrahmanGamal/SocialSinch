@@ -20,7 +20,7 @@ import java.util.List;
 
 import static android.view.View.MeasureSpec.makeMeasureSpec;
 
-final class EmojiVariantPopup {
+public final class EmojiVariantPopup {
   private static final int MARGIN = 2;
 
   @NonNull private final View rootView;
@@ -28,12 +28,12 @@ final class EmojiVariantPopup {
 
   @Nullable private PopupWindow popupWindow;
 
-  EmojiVariantPopup(@NonNull final View rootView, @Nullable final OnEmojiClickedListener listener) {
+  public EmojiVariantPopup(@NonNull final View rootView, @Nullable final OnEmojiClickedListener listener) {
     this.rootView = rootView;
     this.listener = listener;
   }
 
-  void show(@NonNull final View clickedImage, @NonNull final Emoji emoji) {
+  public void show(@NonNull final View clickedImage, @NonNull final Emoji emoji) {
     dismiss();
 
     final View content = initView(clickedImage.getContext(), emoji, clickedImage.getWidth());
@@ -56,7 +56,7 @@ final class EmojiVariantPopup {
     Utils.fixPopupLocation(popupWindow, desiredLocation);
   }
 
-  void dismiss() {
+ public void dismiss() {
     if (popupWindow != null) {
       popupWindow.dismiss();
       popupWindow = null;

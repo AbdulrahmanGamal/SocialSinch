@@ -5,12 +5,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.GridView;
 import com.vanniktech.emoji.emoji.EmojiCategory;
+import com.vanniktech.emoji.gif.EndlessScrollListener;
 import com.vanniktech.emoji.listeners.OnEmojiClickedListener;
+import com.vanniktech.emoji.listeners.OnEmojiLongClickedListener;
 
-class EmojiGridView extends GridView {
+public class EmojiGridView extends GridView {
   protected EmojiArrayAdapter emojiArrayAdapter;
 
-  EmojiGridView(final Context context) {
+  public EmojiGridView(final Context context) {
     super(context);
 
     final int width = getResources().getDimensionPixelSize(R.dimen.emoji_grid_view_column_width);
@@ -23,6 +25,22 @@ class EmojiGridView extends GridView {
     setNumColumns(AUTO_FIT);
     setClipToPadding(false);
     setVerticalScrollBarEnabled(false);
+    setOnScrollListener(new EndlessScrollListener() {
+      @Override
+      public boolean onLoadMore(int page, int totalItemsCount) {
+        return false;
+      }
+
+      @Override
+      public void onScrollUp() {
+
+      }
+
+      @Override
+      public void onScrollDown() {
+
+      }
+    });
   }
 
   public EmojiGridView init(@Nullable final OnEmojiClickedListener onEmojiClickedListener,

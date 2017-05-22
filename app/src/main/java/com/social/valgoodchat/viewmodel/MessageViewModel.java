@@ -13,7 +13,6 @@ import android.widget.Toast;
 import com.social.valgoodchat.R;
 import com.social.valgoodchat.adapter.ChatMessageAdapter;
 import com.social.valgoodchat.custom.EmojiEditText;
-import com.vanniktech.emoji.EmojiPopup;
 import com.vanniktech.emoji.window.EmojiGifPopup;
 
 
@@ -27,17 +26,14 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
     private EditText mMessage;
     private RecyclerView mChatRecyclerView;
     private String mRecipientId;
-    private EmojiPopup.Builder mEmojiPopupBuilder;
-    private EmojiPopup mEmojiPopup;
-    private EmojiGifPopup mGifPopup;
+    private EmojiGifPopup mEmojiGifPopup;
     private boolean mCloseAll;
 
     public MessageViewModel(Context context, String recipientInfo, View rootView) {
         this.mContext = context;
         this.mRecipientId = recipientInfo;
         this.mChatMessageAdapter = new ChatMessageAdapter(context, recipientInfo, this);
-        this.mEmojiPopupBuilder = EmojiPopup.Builder.fromRootView(rootView);
-        this.mGifPopup = new EmojiGifPopup(rootView);
+        this.mEmojiGifPopup = new EmojiGifPopup(rootView);
     }
 
     public View.OnClickListener onClickSend() {
@@ -52,37 +48,23 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
     }
 
     public View.OnClickListener onClickEmoji() {
-        return v ->  mEmojiPopup.toggle();
-    }
-
-    public View.OnClickListener onClickGif() {
         return v ->  {
-            if (mGifPopup.isKeyboardOpen()) {
+            if (mEmojiGifPopup.isKeyboardOpen()) {
                 ((ImageView)v).setImageResource(R.drawable.input_emoji);
             } else {
                 ((ImageView)v).setImageResource(R.drawable.input_keyboard);
             }
-            mGifPopup.toggle(mMessage);//mContext.startActivity(new Intent(mContext, TenorGridActivity.class));
-            //mEmojiPopup.toggle();
+            mEmojiGifPopup.toggle();
         };
     }
 
     public View.OnClickListener onMessageTypeClicked() {
-        return v -> closeEmojiPopup();
+        return v -> closeEmojiGifPopUp();
     }
 
-    public void closeEmojiPopup() {
-        if (mEmojiPopup.isShowing()) {
-            mEmojiPopup.dismiss();
-            mCloseAll = false;
-        } else {
-            mCloseAll = true;
-        }
-    }
-
-    public void closeGifPopUp() {
-        if (mGifPopup.isShowing()) {
-            mGifPopup.dismiss();
+    public void closeEmojiGifPopUp() {
+        if (mEmojiGifPopup.isShowing()) {
+            mEmojiGifPopup.dismiss();
             mCloseAll = false;
         } else {
             mCloseAll = true;
@@ -92,13 +74,13 @@ public class MessageViewModel implements ChatMessageAdapter.NewItemInserted {
     public boolean isCloseAll() {
         return mCloseAll;
     }
+
     public void setMessage(EmojiEditText message) {
         this.mMessage = message;
-        this.mEmojiPopup = mEmojiPopupBuilder.build(message);
+        mEmojiGifPopup.setEmojiEditText(mMessage);
         ((EmojiEditText)this.mMessage).setKeyImeChangeListener((keyCode, event) -> {
             if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
-                closeEmojiPopup();
-                closeGifPopUp();
+                closeEmojiGifPopUp();
             }
         });
     }

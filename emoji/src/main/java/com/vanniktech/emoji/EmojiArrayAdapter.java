@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import com.vanniktech.emoji.emoji.Emoji;
 import com.vanniktech.emoji.listeners.OnEmojiClickedListener;
+import com.vanniktech.emoji.listeners.OnEmojiLongClickedListener;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,27 +41,22 @@ final class EmojiArrayAdapter extends ArrayAdapter<Emoji> {
     final Emoji emoji = checkNotNull(getItem(position), "emoji == null");
 
     image.setImageDrawable(null);
-    image.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(final View v) {
-        if (listener != null) {
-          listener.onEmojiClicked(getItem(position));
-        }
+    image.setOnClickListener(v -> {
+      if (listener != null) {
+        listener.onEmojiClicked(getItem(position));
       }
     });
 
     if (emoji.getBase().hasVariants()) {
       image.setHasVariants(true);
-      image.setOnLongClickListener(new View.OnLongClickListener() {
-          @Override
-          public boolean onLongClick(final View v) {
-            if (longListener != null) {
-              longListener.onEmojiLongClicked(v, emoji);
+      image.setOnLongClickListener(v -> {
+        if (longListener != null) {
+          longListener.onEmojiLongClicked(v, emoji);
 
-              return true;
-            }
+          return true;
+        }
 
-            return false;
-          }
+        return false;
       });
     } else {
       image.setHasVariants(false);

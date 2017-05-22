@@ -8,11 +8,8 @@ android {
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion as int
         targetSdkVersion rootProject.ext.targetSdkVersion as int
-        multiDexEnabled true
         versionCode 1
         versionName "1.0"
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
     buildTypes {
@@ -28,11 +25,10 @@ android {
 }
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile project(':tenor')
+    compile project(":tenor")
     compile rootProject.ext.supportAppCompat
     compile rootProject.ext.supportCardView
-    compile 'com.android.support:multidex:1.0.1'
-    compile rootProject.ext.rxjava
+    compile 'io.reactivex:rxandroid:1.2.1'
     compile rootProject.ext.glide
     compile rootProject.ext.glideTransformations
 }

@@ -4,6 +4,7 @@ import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 import com.vanniktech.emoji.listeners.OnEmojiClickedListener;
+import com.vanniktech.emoji.listeners.OnEmojiLongClickedListener;
 
 final class EmojiPagerAdapter extends PagerAdapter {
   private final OnEmojiClickedListener listener;
