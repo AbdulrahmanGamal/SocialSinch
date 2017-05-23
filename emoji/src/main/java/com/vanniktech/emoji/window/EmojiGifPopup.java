@@ -2,7 +2,6 @@ package com.vanniktech.emoji.window;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
@@ -35,13 +34,12 @@ public class EmojiGifPopup {
 
     private final ViewTreeObserver.OnGlobalLayoutListener onGlobalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
         @Override public void onGlobalLayout() {
-            final Context context = mRootView.getContext();
             final Rect rect = new Rect();
             mRootView.getWindowVisibleDisplayFrame(rect);
 
             final int heightDifference = getUsableScreenHeight() - rect.bottom;
 
-            if (heightDifference > Utils.dpToPx(context, MIN_KEYBOARD_HEIGHT)) {
+            if (heightDifference > Utils.dpToPx(mRootView.getContext(), MIN_KEYBOARD_HEIGHT)) {
                 mPopupWindow.setHeight(heightDifference);
                 mPopupWindow.setWidth(rect.right);
 
@@ -75,16 +73,7 @@ public class EmojiGifPopup {
     public void setEmojiEditText(EditText emojiEditText) {
         this.mEmojiEditText = emojiEditText;
         //by default when the dialog starts, it will show the emoji view
-        mEmojiGifView = new EmojiGIFView(mRootView.getContext(), (EmojiEditText) mEmojiEditText);
-    }
-
-    private int getUsableScreenHeight() {
-        final DisplayMetrics metrics = new DisplayMetrics();
-        final WindowManager windowManager =
-                (WindowManager) mRootView.getContext().getSystemService(Context.WINDOW_SERVICE);
-        windowManager.getDefaultDisplay().getMetrics(metrics);
-
-        return metrics.heightPixels;
+        initContentView();
     }
 
     public void toggle() {
@@ -116,13 +105,7 @@ public class EmojiGifPopup {
         mRootView.getViewTreeObserver().dispatchOnGlobalLayout();
     }
 
-    private void showAtBottomPending() {
-        if (isKeyboardOpen) {
-            showAtBottom();
-        } else {
-            isPendingOpen = true;
-        }
-    }
+
 
 //    public void closeSoftKeyboard(EditText emojiEditText) {
 //        if (emojiEditText.hasFocus()) {
@@ -140,12 +123,32 @@ public class EmojiGifPopup {
         return mPopupWindow.isShowing();
     }
 
-    void showAtBottom() {
-        mPopupWindow.setContentView(mEmojiGifView);
-        final Point desiredLocation = new Point(0, getUsableScreenHeight() - mPopupWindow.getHeight());
+    private void showAtBottomPending() {
+        if (isKeyboardOpen) {
+            showAtBottom();
+        } else {
+            isPendingOpen = true;
+        }
+    }
 
-        mPopupWindow.showAtLocation(mRootView, Gravity.NO_GRAVITY, desiredLocation.x, desiredLocation.y);
-        Utils.fixPopupLocation(mPopupWindow, desiredLocation);
+    private void initContentView() {
+        mEmojiGifView = new EmojiGIFView(mRootView, (EmojiEditText) mEmojiEditText);
+    }
+
+    private int getUsableScreenHeight() {
+        final DisplayMetrics metrics = new DisplayMetrics();
+        final WindowManager windowManager =
+                (WindowManager) mRootView.getContext().getSystemService(Context.WINDOW_SERVICE);
+        windowManager.getDefaultDisplay().getMetrics(metrics);
+
+        return metrics.heightPixels;
+    }
+
+    private void showAtBottom() {
+        if (mEmojiGifView == null) {
+            initContentView();
+        }
+        mPopupWindow.setContentView(mEmojiGifView);
         mPopupWindow.showAtLocation(mRootView, Gravity.BOTTOM, 0, 0);
     }
 

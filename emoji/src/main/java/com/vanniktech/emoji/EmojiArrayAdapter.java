@@ -18,24 +18,24 @@ import java.util.Collection;
 import static com.vanniktech.emoji.Utils.checkNotNull;
 
 final class EmojiArrayAdapter extends ArrayAdapter<Emoji> {
-  @Nullable final OnEmojiClickedListener listener;
-  @Nullable final OnEmojiLongClickedListener longListener;
+  @Nullable private final OnEmojiClickedListener listener;
+  @Nullable private final OnEmojiLongClickedListener longListener;
 
   EmojiArrayAdapter(@NonNull final Context context, @NonNull final Emoji[] emojis,
                     @Nullable final OnEmojiClickedListener listener,
                     @Nullable final OnEmojiLongClickedListener longListener) {
     super(context, 0, new ArrayList<>(Arrays.asList(emojis)));
-
     this.listener = listener;
     this.longListener = longListener;
   }
 
-  @NonNull @Override
+  @NonNull
+  @Override
   public View getView(final int position, final View convertView, @NonNull final ViewGroup parent) {
     EmojiImageView image = (EmojiImageView) convertView;
 
     if (image == null) {
-      image = (EmojiImageView) LayoutInflater.from(getContext()).inflate(R.layout.emoji_item, parent, false);
+        image = (EmojiImageView) LayoutInflater.from(getContext()).inflate(R.layout.emoji_item, parent, false);
     }
 
     final Emoji emoji = checkNotNull(getItem(position), "emoji == null");
@@ -66,7 +66,7 @@ final class EmojiArrayAdapter extends ArrayAdapter<Emoji> {
     ImageLoadingTask task = (ImageLoadingTask) image.getTag();
 
     if (task != null) {
-      task.cancel(true);
+       task.cancel(true);
     }
 
     task = new ImageLoadingTask(image);

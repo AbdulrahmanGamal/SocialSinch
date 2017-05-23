@@ -7,12 +7,11 @@ import android.view.MotionEvent;
 import android.view.View;
 
 public final class RepeatListener implements View.OnTouchListener {
-  final long normalInterval;
-  final View.OnClickListener clickListener;
-
-  final Handler handler = new Handler();
+  private final long normalInterval;
+  private final View.OnClickListener clickListener;
+  private final Handler handler = new Handler();
   private final long initialInterval;
-  View downView;
+  private View downView;
 
   private final Runnable handlerRunnable = new Runnable() {
     @Override public void run() {
@@ -25,7 +24,7 @@ public final class RepeatListener implements View.OnTouchListener {
   };
 
   public RepeatListener(final long initialInterval, final long normalInterval,
-      final View.OnClickListener clickListener) {
+    final View.OnClickListener clickListener) {
     if (clickListener == null) {
       throw new IllegalArgumentException("null runnable");
     }
@@ -39,7 +38,9 @@ public final class RepeatListener implements View.OnTouchListener {
     this.clickListener = clickListener;
   }
 
-  @Override @SuppressLint("ClickableViewAccessibility") public boolean onTouch(final View view, final MotionEvent motionEvent) {
+  @SuppressLint("ClickableViewAccessibility")
+  @Override
+  public boolean onTouch(final View view, final MotionEvent motionEvent) {
     switch (motionEvent.getAction()) {
       case MotionEvent.ACTION_DOWN:
         handler.removeCallbacks(handlerRunnable);

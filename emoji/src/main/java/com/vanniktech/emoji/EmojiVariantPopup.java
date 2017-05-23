@@ -16,16 +16,16 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import com.vanniktech.emoji.emoji.Emoji;
 import com.vanniktech.emoji.listeners.OnEmojiClickedListener;
+
 import java.util.List;
 
 import static android.view.View.MeasureSpec.makeMeasureSpec;
 
 public final class EmojiVariantPopup {
+
   private static final int MARGIN = 2;
-
   @NonNull private final View rootView;
-  @Nullable final OnEmojiClickedListener listener;
-
+  @Nullable private final OnEmojiClickedListener listener;
   @Nullable private PopupWindow popupWindow;
 
   public EmojiVariantPopup(@NonNull final View rootView, @Nullable final OnEmojiClickedListener listener) {
@@ -82,12 +82,9 @@ public final class EmojiVariantPopup {
       layoutParams.setMargins(margin, margin, margin, margin);
       emojiImage.setImageResource(variant.getResource());
 
-      emojiImage.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(final View view) {
-          if (listener != null) {
-            listener.onEmojiClicked(variant);
-          }
+      emojiImage.setOnClickListener(view -> {
+        if (listener != null) {
+          listener.onEmojiClicked(variant);
         }
       });
 

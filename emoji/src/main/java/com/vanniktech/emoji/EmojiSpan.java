@@ -23,7 +23,8 @@ final class EmojiSpan extends DynamicDrawableSpan {
     this.size = size;
   }
 
-  @Override public Drawable getDrawable() {
+  @Override
+  public Drawable getDrawable() {
     if (drawable == null) {
       drawable = checkNotNull(AppCompatResources.getDrawable(context, resourceId), "emoji drawable == null");
       drawable.setBounds(0, 0, size, size);
@@ -32,8 +33,9 @@ final class EmojiSpan extends DynamicDrawableSpan {
     return drawable;
   }
 
-  @Override public int getSize(final Paint paint, final CharSequence text, final int start,
-                               final int end, final Paint.FontMetricsInt fm) {
+  @Override
+  public int getSize(final Paint paint, final CharSequence text, final int start,
+                     final int end, final Paint.FontMetricsInt fm) {
     return size;
   }
 }

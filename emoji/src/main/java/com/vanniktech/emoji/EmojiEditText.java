@@ -13,15 +13,13 @@ public class EmojiEditText extends AppCompatEditText {
 
   public EmojiEditText(final Context context, final AttributeSet attrs) {
     super(context, attrs);
-
     init();
   }
 
   private void init() {
     if (!isInEditMode()) {
-      EmojiManager.getInstance().verifyInstalled();
+        EmojiManager.getInstance().verifyInstalled();
     }
-
     setText(getText());
   }
 

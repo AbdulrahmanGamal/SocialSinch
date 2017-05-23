@@ -1,32 +1,16 @@
 package com.vanniktech.emoji;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.PopupWindow;
 
-import static android.os.Build.VERSION.SDK_INT;
-import static android.os.Build.VERSION_CODES.JELLY_BEAN;
 
 public final class Utils {
-  static final int DONT_UPDATE_FLAG = -1;
-
-  @TargetApi(JELLY_BEAN) static void removeOnGlobalLayoutListener(final View v, final ViewTreeObserver.OnGlobalLayoutListener listener) {
-    if (SDK_INT < JELLY_BEAN) {
-      //noinspection deprecation
-      v.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
-    } else {
-      v.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
-    }
-  }
+  private static final int DONT_UPDATE_FLAG = -1;
 
   @NonNull static <T> T checkNotNull(@Nullable final T reference, final String message) {
     if (reference == null) {
@@ -40,14 +24,6 @@ public final class Utils {
     return (int) (dp * context.getResources().getDisplayMetrics().density);
   }
 
-  static int screenHeight(@NonNull final Activity context) {
-    final Point size = new Point();
-
-    context.getWindowManager().getDefaultDisplay().getSize(size);
-
-    return size.y;
-  }
-
   @NonNull static Point locationOnScreen(@NonNull final View view) {
     final int[] location = new int[2];
 
@@ -56,54 +32,30 @@ public final class Utils {
     return new Point(location[0], location[1]);
   }
 
-  @NonNull static Rect windowVisibleDisplayFrame(@NonNull final Activity context) {
-    final Rect result = new Rect();
-
-    context.getWindow().getDecorView().getWindowVisibleDisplayFrame(result);
-
-    return result;
-  }
-
-  static Activity asActivity(@NonNull final Context context) {
-    Context result = context;
-
-    while (result instanceof ContextWrapper) {
-      if (result instanceof Activity) {
-        return (Activity) context;
-      }
-
-      result = ((ContextWrapper) context).getBaseContext();
-    }
-
-    throw new IllegalArgumentException("The passed Context is not an Activity");
-  }
-
   public static void fixPopupLocation(@NonNull final PopupWindow popupWindow, @NonNull final Point desiredLocation) {
-    popupWindow.getContentView().post(new Runnable() {
-      @Override public void run() {
-        final Point actualLocation = Utils.locationOnScreen(popupWindow.getContentView());
+    popupWindow.getContentView().post(() -> {
+      final Point actualLocation = Utils.locationOnScreen(popupWindow.getContentView());
 
-        if (!(actualLocation.x == desiredLocation.x && actualLocation.y == desiredLocation.y)) {
-          final int differenceX = actualLocation.x - desiredLocation.x;
-          final int differenceY = actualLocation.y - desiredLocation.y;
+      if (!(actualLocation.x == desiredLocation.x && actualLocation.y == desiredLocation.y)) {
+        final int differenceX = actualLocation.x - desiredLocation.x;
+        final int differenceY = actualLocation.y - desiredLocation.y;
 
-          final int fixedOffsetX;
-          final int fixedOffsetY;
+        final int fixedOffsetX;
+        final int fixedOffsetY;
 
-          if (actualLocation.x > desiredLocation.x) {
-            fixedOffsetX = desiredLocation.x - differenceX;
-          } else {
-              fixedOffsetX = desiredLocation.x + differenceX;
-          }
-
-          if (actualLocation.y > desiredLocation.y) {
-            fixedOffsetY = desiredLocation.y - differenceY;
-          } else {
-              fixedOffsetY = desiredLocation.y + differenceY;
-          }
-
-          popupWindow.update(fixedOffsetX, fixedOffsetY, DONT_UPDATE_FLAG, DONT_UPDATE_FLAG);
+        if (actualLocation.x > desiredLocation.x) {
+          fixedOffsetX = desiredLocation.x - differenceX;
+        } else {
+            fixedOffsetX = desiredLocation.x + differenceX;
         }
+
+        if (actualLocation.y > desiredLocation.y) {
+          fixedOffsetY = desiredLocation.y - differenceY;
+        } else {
+            fixedOffsetY = desiredLocation.y + differenceY;
+        }
+
+        popupWindow.update(fixedOffsetX, fixedOffsetY, DONT_UPDATE_FLAG, DONT_UPDATE_FLAG);
       }
     });
   }

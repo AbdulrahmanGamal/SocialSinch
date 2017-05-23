@@ -21,7 +21,7 @@ public final class EmojiManager {
     // No instances apart from singleton.
   }
 
-  static EmojiManager getInstance() {
+  public static EmojiManager getInstance() {
     return INSTANCE;
   }
 
@@ -47,17 +47,18 @@ public final class EmojiManager {
     }
   }
 
-  EmojiCategory[] getCategories() {
+  public EmojiCategory[] getCategories() {
     verifyInstalled();
     return categories; // NOPMD
   }
 
-  @Nullable Emoji findEmoji(@NonNull final CharSequence candiate) {
+  @Nullable
+  public Emoji findEmoji(@NonNull final CharSequence candiate) {
     verifyInstalled();
     return emojiTree.findEmoji(candiate);
   }
 
-  void verifyInstalled() {
+  public void verifyInstalled() {
     if (categories == null) {
       throw new IllegalStateException("Please install an EmojiProvider through the EmojiManager.install() method first.");
     }

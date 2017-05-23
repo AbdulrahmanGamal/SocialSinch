@@ -1,24 +1,22 @@
 package com.vanniktech.emoji.custom;
 
-import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.FrameLayout;
-import android.widget.PopupWindow;
-import android.widget.ProgressBar;
 
 import com.vanniktech.emoji.EmojiEditText;
 import com.vanniktech.emoji.EmojiVariantPopup;
 import com.vanniktech.emoji.EmojiView;
 import com.vanniktech.emoji.RecentEmoji;
 import com.vanniktech.emoji.RecentEmojiManager;
-import com.vanniktech.emoji.listeners.OnEmojiLongClickedListener;
 import com.vanniktech.emoji.R;
 import com.vanniktech.emoji.Utils;
 import com.vanniktech.emoji.gif.GIFGridView;
 import com.vanniktech.emoji.listeners.OnEmojiClickedListener;
+import com.vanniktech.emoji.listeners.OnEmojiLongClickedListener;
 import com.vanniktech.emoji.listeners.OnScrollListener;
 
 /**
@@ -27,34 +25,29 @@ import com.vanniktech.emoji.listeners.OnScrollListener;
 
 public class EmojiGIFView extends FrameLayout implements OnScrollListener {
 
-    private ProgressBar mProgressBar;
     private Toolbar mToolbar;
     private int mToolbarHeight;
-    private EmojiEditText mEmojiEditText;
     private RecentEmoji mRecentEmoji;
     private EmojiVariantPopup mVariantPopup;
-    private PopupWindow mPopupWindow;
-    private EmojiView mEmojiView;
-    private GIFGridView mGifView;
 
     private static final String TAG = "EmojiGIFView";
 
-    public EmojiGIFView(Context context, EmojiEditText emojiEditText) {
-        super(context);
-        this.mEmojiEditText = emojiEditText;
-        init();
+    public EmojiGIFView(View rootView, EmojiEditText emojiEditText) {
+        super(rootView.getContext());
+        init(rootView, emojiEditText);
     }
 
-    private void init() {
+    private void init(View rootView, EmojiEditText emojiEditText) {
         LayoutInflater.from(getContext()).inflate(R.layout.general_layout_view, this, true);
         setBackgroundColor(ContextCompat.getColor(getContext(), R.color.emoji_background));
-        mEmojiView = getEmojiView();
-        addView(mEmojiView, 0);
-        mGifView = new GIFGridView(getContext(), this);
-        addView(mGifView, 1);
+
+        //index 0 add the emoji view visible
+        addView(getEmojiView(rootView, emojiEditText), 0);
+        //index 1 add the gif gird view invisible
+        addView(new GIFGridView(getContext(), this), 1);
+
         mToolbar = (Toolbar) findViewById(R.id.toolbarBottomMenu);
         mToolbarHeight = Utils.getToolbarHeight(getContext());
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         initEmojiClickListener();
         initGifClickListener();
     }
@@ -72,35 +65,36 @@ public class EmojiGIFView extends FrameLayout implements OnScrollListener {
     }
 
     public void toggle() {
-        if (mGifView.isShown()) {
-            mGifView.hideView();
-            mEmojiView.showView();
+        //based on the dynamically addition done in init, the position indexes must always match
+        EmojiView emojiView = (EmojiView) getChildAt(0);
+        GIFGridView gifGridView = (GIFGridView) getChildAt(1);
+        if (gifGridView.isShown()) {
+            gifGridView.hideView();
+            emojiView.showView();
         } else {
-            mEmojiView.hideView();
-            mGifView.showView();
+            emojiView.hideView();
+            gifGridView.showView();
         }
     }
 
-    private EmojiView getEmojiView() {
+    private EmojiView getEmojiView(View rootView, EmojiEditText emojiEditText) {
         mRecentEmoji = new RecentEmojiManager(getContext());
-        mPopupWindow = new PopupWindow(getContext());
 
         final OnEmojiLongClickedListener longClickListener = (view, emoji) -> mVariantPopup.show(view, emoji);
 
         final OnEmojiClickedListener clickListener = emoji -> {
-            mEmojiEditText.input(emoji);
+            emojiEditText.input(emoji);
             mRecentEmoji.addEmoji(emoji);
             mVariantPopup.dismiss();
         };
 
-        mVariantPopup = new EmojiVariantPopup(getRootView(), clickListener);
+        mVariantPopup = new EmojiVariantPopup(rootView, clickListener);
 
         final EmojiView emojiView = new EmojiView(getContext(), clickListener, longClickListener, mRecentEmoji);
-
-        emojiView.setOnEmojiBackspaceClickListener(v -> mEmojiEditText.backspace());
-
+        emojiView.setOnEmojiBackspaceClickListener(v -> emojiEditText.backspace());
         return emojiView;
     }
+
     @Override
     public void onScrollingUp() {
         mToolbar.animate().translationY(0).
@@ -115,17 +109,16 @@ public class EmojiGIFView extends FrameLayout implements OnScrollListener {
 
     @Override
     public void onLoadingStarted() {
-        mProgressBar.setVisibility(VISIBLE);
+        findViewById(R.id.progressBar).setVisibility(VISIBLE);
     }
 
     @Override
     public void onLoadFinished() {
-        mProgressBar.setVisibility(INVISIBLE);
+        findViewById(R.id.progressBar).setVisibility(INVISIBLE);
     }
 
     @Override
     protected void onDetachedFromWindow() {
-        mPopupWindow.dismiss();
         mVariantPopup.dismiss();
         mRecentEmoji.persist();
         super.onDetachedFromWindow();

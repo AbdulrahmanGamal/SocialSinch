@@ -8,8 +8,9 @@ import java.util.List;
 
 import static com.vanniktech.emoji.EmojiHandler.SpanRangeList.SPAN_NOT_FOUND;
 
-final class EmojiHandler {
-  static void addEmojis(final Context context, final Spannable text, final int emojiSize) {
+public final class EmojiHandler {
+
+  public static void addEmojis(final Context context, final Spannable text, final int emojiSize) {
     final SpanRangeList existingSpanRanges = new SpanRangeList(text);
     final EmojiManager emojiManager = EmojiManager.getInstance();
     int index = 0;

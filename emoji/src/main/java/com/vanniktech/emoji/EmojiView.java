@@ -82,11 +82,9 @@ import java.util.concurrent.TimeUnit;
     }
 
     emojiTabs[emojiTabs.length - 1].setOnTouchListener(
-        new RepeatListener(INITIAL_INTERVAL, NORMAL_INTERVAL, new OnClickListener() {
-          @Override public void onClick(final View view) {
-            if (onEmojiBackspaceClickListener != null) {
-              onEmojiBackspaceClickListener.onEmojiBackspaceClicked(view);
-            }
+        new RepeatListener(INITIAL_INTERVAL, NORMAL_INTERVAL, view -> {
+          if (onEmojiBackspaceClickListener != null) {
+            onEmojiBackspaceClickListener.onEmojiBackspaceClicked(view);
           }
         }));
   }
@@ -106,7 +104,8 @@ import java.util.concurrent.TimeUnit;
     return button;
   }
 
-  @Override public void onPageSelected(final int i) {
+  @Override
+  public void onPageSelected(final int i) {
     if (emojiTabLastSelectedIndex != i) {
       if (i == 0) {
         emojiPagerAdapter.invalidateRecentEmojis();
@@ -124,11 +123,13 @@ import java.util.concurrent.TimeUnit;
     }
   }
 
-  @Override public void onPageScrolled(final int i, final float v, final int i2) {
+  @Override
+  public void onPageScrolled(final int i, final float v, final int i2) {
     // Don't care.
   }
 
-  @Override public void onPageScrollStateChanged(final int i) {
+  @Override
+  public void onPageScrollStateChanged(final int i) {
     // Don't care.
   }
 
@@ -140,17 +141,18 @@ import java.util.concurrent.TimeUnit;
         setVisibility(INVISIBLE);
     }
 
-    static class EmojiTabsClickListener implements OnClickListener {
-    private final ViewPager emojisPager;
-    private final int position;
+    private static class EmojiTabsClickListener implements OnClickListener {
+        private final ViewPager emojisPager;
+        private final int position;
 
-    EmojiTabsClickListener(final ViewPager emojisPager, final int position) {
-      this.emojisPager = emojisPager;
-      this.position = position;
-    }
+        EmojiTabsClickListener(final ViewPager emojisPager, final int position) {
+          this.emojisPager = emojisPager;
+          this.position = position;
+        }
 
-    @Override public void onClick(final View v) {
-      emojisPager.setCurrentItem(position);
-    }
+        @Override
+        public void onClick(final View v) {
+          emojisPager.setCurrentItem(position);
+        }
   }
 }

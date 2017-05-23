@@ -27,7 +27,10 @@ public final class RecentEmojiManager implements RecentEmoji {
     this.context = context.getApplicationContext();
   }
 
-  @SuppressWarnings({ "PMD.AvoidDeeplyNestedIfStmts", "checkstyle:nestedifdepth" }) @NonNull @Override public Collection<Emoji> getRecentEmojis() {
+  @SuppressWarnings({ "PMD.AvoidDeeplyNestedIfStmts", "checkstyle:nestedifdepth" })
+  @NonNull
+  @Override
+  public Collection<Emoji> getRecentEmojis() {
     if (emojiList.size() == 0) {
       final String savedRecentEmojis = getPreferences().getString(RECENT_EMOJIS, "");
 
@@ -58,11 +61,13 @@ public final class RecentEmojiManager implements RecentEmoji {
     return emojiList.getEmojis();
   }
 
-  @Override public void addEmoji(@NonNull final Emoji emoji) {
+  @Override
+  public void addEmoji(@NonNull final Emoji emoji) {
     emojiList.add(emoji);
   }
 
-  @Override public void persist() {
+  @Override
+  public void persist() {
     if (emojiList.size() > 0) {
       final StringBuilder stringBuilder = new StringBuilder(emojiList.size() * EMOJI_GUESS_SIZE);
       for (final Data data : emojiList) {
@@ -133,7 +138,8 @@ public final class RecentEmojiManager implements RecentEmoji {
       return emojis.size();
     }
 
-    @Override public Iterator<Data> iterator() {
+    @Override
+    public Iterator<Data> iterator() {
       return emojis.iterator();
     }
   }

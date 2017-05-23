@@ -33,7 +33,8 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
     variantIndicatorPaint.setAntiAlias(true);
   }
 
-  @Override public void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
+  @Override
+  public void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
     final int measuredWidth = getMeasuredWidth();
@@ -41,7 +42,8 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
     setMeasuredDimension(measuredWidth, measuredWidth);
   }
 
-  @Override protected void onSizeChanged(final int w, final int h, final int oldw, final int oldh) {
+  @Override
+  protected void onSizeChanged(final int w, final int h, final int oldw, final int oldh) {
     super.onSizeChanged(w, h, oldw, oldh);
 
     variantIndicatorTop.x = w;
@@ -58,9 +60,9 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
     variantIndicatorPath.close();
   }
 
-  @Override protected void onDraw(final Canvas canvas) {
+  @Override
+  protected void onDraw(final Canvas canvas) {
     super.onDraw(canvas);
-
     if (hasVariants) {
       canvas.drawPath(variantIndicatorPath, variantIndicatorPaint);
     }
@@ -68,7 +70,6 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
   public void setHasVariants(final boolean hasVariants) {
     this.hasVariants = hasVariants;
-
     invalidate();
   }
 }

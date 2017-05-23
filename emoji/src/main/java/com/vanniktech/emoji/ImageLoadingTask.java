@@ -16,7 +16,8 @@ final class ImageLoadingTask extends AsyncTask<Integer, Void, Drawable> {
     contextReference = new WeakReference<>(imageView.getContext());
   }
 
-  @Override protected Drawable doInBackground(final Integer... resource) {
+  @Override
+  protected Drawable doInBackground(final Integer... resource) {
     final Context context = contextReference.get();
 
     if (context == null) {
@@ -26,7 +27,8 @@ final class ImageLoadingTask extends AsyncTask<Integer, Void, Drawable> {
     }
   }
 
-  @Override protected void onPostExecute(final Drawable drawable) {
+  @Override
+  protected void onPostExecute(final Drawable drawable) {
     if (!isCancelled() && drawable != null) {
       final ImageView imageView = imageViewReference.get();
 
