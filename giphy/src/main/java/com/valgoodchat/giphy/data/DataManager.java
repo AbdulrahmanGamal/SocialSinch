@@ -12,17 +12,20 @@ import rx.Observable;
 public class DataManager {
     private static final String TAG = "DataManager";
 
-    public static Observable<GiphyModel> searchGiphyByKeyword(String keyword) {
+    public static Observable<GiphyModel> searchGiphyByKeyword(String keyword,
+                                                              int limit,
+                                                              String pos,
+                                                              String locale) {
         GiphyService service =
             ServiceFactory.createRetrofitService(GiphyService.class, GiphyService.SERVICE_ENDPOINT);
 
-        return service.searchGif(keyword);
+        return service.searchGif(keyword, pos, String.valueOf(limit), locale);
     }
 
-    public static Observable<GiphyModel> getTrending(int limit) {
+    public static Observable<GiphyModel> getTrending(int limit, String pos) {
         GiphyService service =
                 ServiceFactory.createRetrofitService(GiphyService.class, GiphyService.SERVICE_ENDPOINT);
 
-        return service.trending(String.valueOf(limit));
+        return service.trending(String.valueOf(limit), pos);
     }
 }

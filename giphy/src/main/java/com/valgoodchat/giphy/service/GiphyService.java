@@ -11,11 +11,12 @@ import rx.Observable;
  */
 
 public interface GiphyService {
-    String SERVICE_ENDPOINT = "https://api.tenor.co/v1/";
+    String SERVICE_ENDPOINT = "https://api.giphy.com/v1/";
 
-    @GET("search?")
-    Observable<GiphyModel> searchGif(@Query("tag") String keyword);
+    @GET("stickers/search?")
+    Observable<GiphyModel> searchGif(@Query("q") String keyword, @Query("limit") String limit,
+                                     @Query("offset") String offset, @Query("lang") String lang);
 
-    @GET("trending?")
-    Observable<GiphyModel> trending(@Query("limit") String offset);
+    @GET("gifs/trending?")
+    Observable<GiphyModel> trending(@Query("limit") String limit, @Query("offset") String offset);
 }

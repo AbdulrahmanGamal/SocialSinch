@@ -26,6 +26,7 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(":tenor")
+    compile project(":giphy")
     compile rootProject.ext.supportAppCompat
     compile rootProject.ext.supportCardView
     compile 'io.reactivex:rxandroid:1.2.1'

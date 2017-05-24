@@ -37,5 +37,4 @@ public class RecentEmoticonGridView extends BasicGridView {
         setAdapter(new AnimatedGridViewAdapter(getContext(), recentAnimatedEmoticons, true));
     }
 
-
 }
