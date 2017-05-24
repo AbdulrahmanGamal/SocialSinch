@@ -2,6 +2,11 @@ package com.vanniktech.emoji.gif;
 
 import android.widget.AbsListView;
 
+import com.vanniktech.emoji.Constants;
+
+import rx.Observable;
+import rx.subjects.PublishSubject;
+
 /**
  * Customs Scroll listener for Infinite scroll
  */
@@ -12,30 +17,35 @@ public abstract class EndlessScrollListener implements AbsListView.OnScrollListe
     private int visibleThreshold = 5;
     // The current offset index of data you have loaded
     private int currentPage = 0;
-    // The total number of items in the dataset after the last load
+    // The total number of items in the data set after the last load
     private int previousTotalItemCount = 0;
     // True if we are still waiting for the last set of data to load.
     private boolean loading = true;
     // Sets the starting page index
     private int startingPageIndex = 0;
     //keep last position visible
-    int mLast = 0;
+    private int mLast = 0;
     //keep sync between scrolling
-    boolean mControl = true;
+    private boolean mControl = true;
+    //emit the scrolling up and bottom events
+    private static PublishSubject<Integer> scrollingDirectionSubject = PublishSubject.create();
 
     public EndlessScrollListener() {
     }
 
-    public EndlessScrollListener(int visibleThreshold) {
-        this.visibleThreshold = visibleThreshold;
-    }
+//    public EndlessScrollListener(int visibleThreshold) {
+//        this.visibleThreshold = visibleThreshold;
+//    }
+//
+//    public EndlessScrollListener(int visibleThreshold, int startPage) {
+//        this.visibleThreshold = visibleThreshold;
+//        this.startingPageIndex = startPage;
+//        this.currentPage = startPage;
+//    }
 
-    public EndlessScrollListener(int visibleThreshold, int startPage) {
-        this.visibleThreshold = visibleThreshold;
-        this.startingPageIndex = startPage;
-        this.currentPage = startPage;
+    public static Observable<Integer> getScrollingDirectionSubject() {
+        return scrollingDirectionSubject;
     }
-
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
@@ -63,12 +73,12 @@ public abstract class EndlessScrollListener implements AbsListView.OnScrollListe
             loading = onLoadMore(currentPage + 1, totalItemCount);
         }
 
-        //Code to detect with is scrolling up or down
+        //Logic to detect when is scrolling up or down
         if (firstVisibleItem < mLast && !mControl) {
-            onScrollUp();
+            scrollingDirectionSubject.onNext(Constants.SCROLLING_UP);
             mControl = true;
         } else if (firstVisibleItem > mLast && mControl) {
-            onScrollDown();
+            scrollingDirectionSubject.onNext(Constants.SCROLLING_DOWN);
             mControl = false;
         }
 
@@ -78,10 +88,6 @@ public abstract class EndlessScrollListener implements AbsListView.OnScrollListe
     // Defines the process for actually loading more data based on page
     // Returns true if more data is being loaded; returns false if there is no more data to load.
     public abstract boolean onLoadMore(int page, int totalItemsCount);
-
-    public abstract void onScrollUp();
-
-    public abstract void onScrollDown();
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {

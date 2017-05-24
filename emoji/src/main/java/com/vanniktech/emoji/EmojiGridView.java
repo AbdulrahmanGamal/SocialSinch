@@ -30,16 +30,6 @@ public class EmojiGridView extends GridView {
       public boolean onLoadMore(int page, int totalItemsCount) {
         return false;
       }
-
-      @Override
-      public void onScrollUp() {
-
-      }
-
-      @Override
-      public void onScrollDown() {
-
-      }
     });
   }
 

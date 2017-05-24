@@ -1,14 +1,18 @@
 package com.vanniktech.emoji.gif;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.Toolbar;
 import android.widget.GridLayout;
-import android.widget.GridView;
 
 import com.social.tenor.data.DataManager;
+import com.social.tenor.model.Result;
 import com.vanniktech.emoji.R;
-import com.vanniktech.emoji.adapter.TenorGridViewAdapter;
+import com.vanniktech.emoji.adapter.AnimatedGridViewAdapter;
+import com.vanniktech.emoji.custom.BasicGridView;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import rx.android.schedulers.AndroidSchedulers;
@@ -20,26 +24,22 @@ import rx.subscriptions.CompositeSubscription;
  * Custom GridView to obtain the vertical scroll offset
  */
 
-public class GIFGridView extends GridView {
+public class GIFGridView extends BasicGridView {
 
-    private TenorGridViewAdapter mGifAdapter;
+    private AnimatedGridViewAdapter mGifAdapter;
     private CompositeSubscription mDisposable;
     private String mKeywordSearch;
     private String mGifNext;
-    private com.vanniktech.emoji.listeners.OnScrollListener onScrollListener;
-
 
     private final PublishSubject<String> mPaginator = PublishSubject.create();
     private static final int MAX_RESULTS = 10;
 
-    public GIFGridView(Context context, com.vanniktech.emoji.listeners.OnScrollListener onScrollListener) {
-        super(context);
-        this.onScrollListener = onScrollListener;
+    public GIFGridView(Context context, @NonNull Toolbar bottomToolbar) {
+        super(context, bottomToolbar);
         init();
     }
 
     private void init() {
-        hideView();
         int spacingMargins = getContext().getResources().
                 getDimensionPixelSize(R.dimen.gif_spacing_and_margins);
         GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
@@ -48,15 +48,11 @@ public class GIFGridView extends GridView {
         setLayoutParams(layoutParams);
         setColumnWidth(getContext().getResources().getDimensionPixelSize(R.dimen.gif_column_width));
         setDrawSelectorOnTop(true);
-        setNumColumns(AUTO_FIT);
         setStretchMode(STRETCH_COLUMN_WIDTH);
         setVerticalSpacing(spacingMargins);
         setHorizontalSpacing(spacingMargins);
-        setFocusable(true);
-        setTranscriptMode(TRANSCRIPT_MODE_DISABLED);
-        setClickable(true);
 
-        mGifAdapter = new TenorGridViewAdapter(getContext(), new ArrayList<>());
+        mGifAdapter = new AnimatedGridViewAdapter(getContext(), new ArrayList<>(), false);
         setAdapter(mGifAdapter);
         setOnScrollListener(new EndlessScrollListener() {
             @Override
@@ -68,31 +64,8 @@ public class GIFGridView extends GridView {
 
                 return false;
             }
-
-            @Override
-            public void onScrollUp() {
-                onScrollListener.onScrollingUp();
-            }
-
-            @Override
-            public void onScrollDown() {
-                onScrollListener.onScrollingDown();
-            }
         });
 
-    }
-
-    public void showView() {
-        setVisibility(VISIBLE);
-    }
-
-    public void hideView() {
-        setVisibility(INVISIBLE);
-    }
-
-    @Override
-    public int computeVerticalScrollOffset() {
-        return super.computeVerticalScrollOffset();
     }
 
     /**
@@ -112,9 +85,12 @@ public class GIFGridView extends GridView {
                         .filter(tenorModel -> tenorModel.getResults() != null)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(tenorModel -> {
-                            mGifAdapter.setGridData(tenorModel.getResults());
+                            final List<String> results = new ArrayList<>();
+                            for (Result item: tenorModel.getResults()) {
+                                results.add(item.getMedia().get(0).getTinygif().getUrl());
+                            }
+                            mGifAdapter.setGridData(results);
                             mGifNext = tenorModel.getNext();
-                            onScrollListener.onLoadFinished();
                         })
         );
     }

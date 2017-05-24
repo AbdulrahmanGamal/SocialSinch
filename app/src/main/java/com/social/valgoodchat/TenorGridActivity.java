@@ -41,7 +41,7 @@ import rx.subscriptions.CompositeSubscription;
 public class TenorGridActivity extends AppCompatActivity {
     private ProgressBar mProgressBar;
     private String mGifNext;
-    //private TenorGridViewAdapter mGifAdapter;
+    //private AnimatedGridViewAdapter mGifAdapter;
     private MenuItem mSearchItem;
     private Toolbar mToolbar;
     private String mKeywordSearch;
@@ -64,7 +64,7 @@ public class TenorGridActivity extends AppCompatActivity {
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mKeywordSearch = "";
         mLocale = Locale.getDefault().toString();
-//        mGifAdapter = new TenorGridViewAdapter(this, new ArrayList<>());
+//        mGifAdapter = new AnimatedGridViewAdapter(this, new ArrayList<>());
 //        mGridView.setAdapter(mGifAdapter);
 //        mGridView.setOnScrollListener(new EndlessScrollListener() {
 //            @Override

@@ -31,4 +31,5 @@ dependencies {
     compile 'io.reactivex:rxandroid:1.2.1'
     compile rootProject.ext.glide
     compile rootProject.ext.glideTransformations
+    compile rootProject.ext.sqlbrite
 }

@@ -4,7 +4,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
 import android.widget.FrameLayout;
 
 import com.vanniktech.emoji.EmojiEditText;
@@ -13,20 +12,14 @@ import com.vanniktech.emoji.EmojiView;
 import com.vanniktech.emoji.RecentEmoji;
 import com.vanniktech.emoji.RecentEmojiManager;
 import com.vanniktech.emoji.R;
-import com.vanniktech.emoji.Utils;
-import com.vanniktech.emoji.gif.GIFGridView;
 import com.vanniktech.emoji.listeners.OnEmojiClickedListener;
 import com.vanniktech.emoji.listeners.OnEmojiLongClickedListener;
-import com.vanniktech.emoji.listeners.OnScrollListener;
 
 /**
  * Gif View that is shown inside the bottom pop up
  */
 
-public class EmojiGIFView extends FrameLayout implements OnScrollListener {
-
-    private Toolbar mToolbar;
-    private int mToolbarHeight;
+public class EmojiGIFView extends FrameLayout {
     private RecentEmoji mRecentEmoji;
     private EmojiVariantPopup mVariantPopup;
 
@@ -43,11 +36,12 @@ public class EmojiGIFView extends FrameLayout implements OnScrollListener {
 
         //index 0 add the emoji view visible
         addView(getEmojiView(rootView, emojiEditText), 0);
-        //index 1 add the gif gird view invisible
-        addView(new GIFGridView(getContext(), this), 1);
+        Toolbar bottomToolbar = (Toolbar) findViewById(R.id.toolbarBottomMenu);
+        //index 1 add the gif grid view invisible
+        CustomEmoticonView gifGridView = new CustomEmoticonView(getContext(), bottomToolbar);
+        gifGridView.hideView();
+        addView(gifGridView, 1);
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbarBottomMenu);
-        mToolbarHeight = Utils.getToolbarHeight(getContext());
         initEmojiClickListener();
         initGifClickListener();
     }
@@ -67,7 +61,7 @@ public class EmojiGIFView extends FrameLayout implements OnScrollListener {
     public void toggle() {
         //based on the dynamically addition done in init, the position indexes must always match
         EmojiView emojiView = (EmojiView) getChildAt(0);
-        GIFGridView gifGridView = (GIFGridView) getChildAt(1);
+        CustomEmoticonView gifGridView = (CustomEmoticonView) getChildAt(1);
         if (gifGridView.isShown()) {
             gifGridView.hideView();
             emojiView.showView();
@@ -95,27 +89,16 @@ public class EmojiGIFView extends FrameLayout implements OnScrollListener {
         return emojiView;
     }
 
-    @Override
-    public void onScrollingUp() {
-        mToolbar.animate().translationY(0).
-                setInterpolator(new AccelerateInterpolator()).start();
-    }
 
-    @Override
-    public void onScrollingDown() {
-        mToolbar.animate().translationY(mToolbarHeight).
-                setInterpolator(new AccelerateInterpolator()).start();
-    }
-
-    @Override
-    public void onLoadingStarted() {
-        findViewById(R.id.progressBar).setVisibility(VISIBLE);
-    }
-
-    @Override
-    public void onLoadFinished() {
-        findViewById(R.id.progressBar).setVisibility(INVISIBLE);
-    }
+//    @Override
+//    public void onLoadingStarted() {
+//        findViewById(R.id.progressBar).setVisibility(VISIBLE);
+//    }
+//
+//    @Override
+//    public void onLoadFinished() {
+//        findViewById(R.id.progressBar).setVisibility(INVISIBLE);
+//    }
 
     @Override
     protected void onDetachedFromWindow() {
