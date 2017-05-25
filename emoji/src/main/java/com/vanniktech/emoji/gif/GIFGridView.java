@@ -1,5 +1,6 @@
 package com.vanniktech.emoji.gif;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
@@ -23,7 +24,7 @@ import rx.subscriptions.CompositeSubscription;
 /**
  * Custom GridView to obtain the vertical scroll offset
  */
-
+@SuppressLint("ViewConstructor")
 public class GIFGridView extends BasicGridView {
 
     private AnimatedGridViewAdapter mGifAdapter;

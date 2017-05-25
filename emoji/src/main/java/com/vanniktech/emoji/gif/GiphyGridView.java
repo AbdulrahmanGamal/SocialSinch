@@ -1,5 +1,6 @@
 package com.vanniktech.emoji.gif;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
@@ -23,7 +24,7 @@ import rx.subscriptions.CompositeSubscription;
 /**
  * Custom GridView to obtain gif frmo Giphy
  */
-
+@SuppressLint("ViewConstructor")
 public class GiphyGridView extends BasicGridView {
 
     private AnimatedGridViewAdapter mGiphyAdapter;

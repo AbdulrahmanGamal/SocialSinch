@@ -1,19 +1,24 @@
 package com.vanniktech.emoji;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.widget.GridView;
+import android.support.v7.widget.Toolbar;
+
+import com.vanniktech.emoji.adapter.EmojiArrayAdapter;
+import com.vanniktech.emoji.custom.BasicGridView;
 import com.vanniktech.emoji.emoji.EmojiCategory;
 import com.vanniktech.emoji.gif.EndlessScrollListener;
 import com.vanniktech.emoji.listeners.OnEmojiClickedListener;
 import com.vanniktech.emoji.listeners.OnEmojiLongClickedListener;
 
-public class EmojiGridView extends GridView {
+@SuppressLint("ViewConstructor")
+public class EmojiGridView extends BasicGridView {
   protected EmojiArrayAdapter emojiArrayAdapter;
 
-  public EmojiGridView(final Context context) {
-    super(context);
+  public EmojiGridView(final Context context, Toolbar toolbarBottom) {
+    super(context, toolbarBottom);
 
     final int width = getResources().getDimensionPixelSize(R.dimen.emoji_grid_view_column_width);
     final int spacing = getResources().getDimensionPixelSize(R.dimen.emoji_grid_view_spacing);

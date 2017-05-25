@@ -12,7 +12,7 @@ import android.widget.PopupWindow;
 public final class Utils {
   private static final int DONT_UPDATE_FLAG = -1;
 
-  @NonNull static <T> T checkNotNull(@Nullable final T reference, final String message) {
+  public @NonNull static <T> T checkNotNull(@Nullable final T reference, final String message) {
     if (reference == null) {
       throw new IllegalArgumentException(message);
     }

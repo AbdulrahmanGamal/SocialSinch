@@ -7,11 +7,11 @@ import android.support.v7.content.res.AppCompatResources;
 import android.widget.ImageView;
 import java.lang.ref.WeakReference;
 
-final class ImageLoadingTask extends AsyncTask<Integer, Void, Drawable> {
+public final class ImageLoadingTask extends AsyncTask<Integer, Void, Drawable> {
   private final WeakReference<ImageView> imageViewReference;
   private final WeakReference<Context> contextReference;
 
-  ImageLoadingTask(final ImageView imageView) {
+  public ImageLoadingTask(final ImageView imageView) {
     imageViewReference = new WeakReference<>(imageView);
     contextReference = new WeakReference<>(imageView.getContext());
   }

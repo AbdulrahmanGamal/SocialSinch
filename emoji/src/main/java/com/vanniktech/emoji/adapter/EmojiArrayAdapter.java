@@ -1,4 +1,4 @@
-package com.vanniktech.emoji;
+package com.vanniktech.emoji.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -7,6 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+
+import com.vanniktech.emoji.EmojiImageView;
+import com.vanniktech.emoji.ImageLoadingTask;
+import com.vanniktech.emoji.R;
 import com.vanniktech.emoji.emoji.Emoji;
 import com.vanniktech.emoji.listeners.OnEmojiClickedListener;
 import com.vanniktech.emoji.listeners.OnEmojiLongClickedListener;
@@ -17,11 +21,11 @@ import java.util.Collection;
 
 import static com.vanniktech.emoji.Utils.checkNotNull;
 
-final class EmojiArrayAdapter extends ArrayAdapter<Emoji> {
+public final class EmojiArrayAdapter extends ArrayAdapter<Emoji> {
   @Nullable private final OnEmojiClickedListener listener;
   @Nullable private final OnEmojiLongClickedListener longListener;
 
-  EmojiArrayAdapter(@NonNull final Context context, @NonNull final Emoji[] emojis,
+  public EmojiArrayAdapter(@NonNull final Context context, @NonNull final Emoji[] emojis,
                     @Nullable final OnEmojiClickedListener listener,
                     @Nullable final OnEmojiLongClickedListener longListener) {
     super(context, 0, new ArrayList<>(Arrays.asList(emojis)));
@@ -76,7 +80,7 @@ final class EmojiArrayAdapter extends ArrayAdapter<Emoji> {
     return image;
   }
 
-  void updateEmojis(final Collection<Emoji> emojis) {
+  public void updateEmojis(final Collection<Emoji> emojis) {
     clear();
     addAll(emojis);
     notifyDataSetChanged();
