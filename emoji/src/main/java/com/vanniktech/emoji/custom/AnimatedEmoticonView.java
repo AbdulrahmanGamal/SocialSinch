@@ -25,10 +25,11 @@ public class AnimatedEmoticonView extends BasicEmoticonView {
         final LinearLayout emoticonTab = (LinearLayout) findViewById(R.id.emojis_tab);
         emoticonPager.addOnPageChangeListener(this);
 
-        mEmoticonTabs = new ImageButton[3];
+        mEmoticonTabs = new ImageButton[4];
         mEmoticonTabs[0] = inflateButton(context, R.drawable.emoji_recent, emoticonTab);
         mEmoticonTabs[1] = inflateButton(context, R.drawable.input_gif, emoticonTab);
         mEmoticonTabs[2] = inflateButton(context, R.drawable.ic_tenor, emoticonTab);
+        mEmoticonTabs[3] = inflateButton(context, R.drawable.ic_meme, emoticonTab);
 
         handleOnClicks(emoticonPager);
 

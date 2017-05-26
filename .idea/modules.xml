@@ -8,6 +8,7 @@
       <module fileurl="file://$PROJECT_DIR$/emoji/emoji.iml" filepath="$PROJECT_DIR$/emoji/emoji.iml" />
       <module fileurl="file://$PROJECT_DIR$/emoji-ios/emoji-ios.iml" filepath="$PROJECT_DIR$/emoji-ios/emoji-ios.iml" />
       <module fileurl="file://$PROJECT_DIR$/giphy/giphy.iml" filepath="$PROJECT_DIR$/giphy/giphy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/meme/meme.iml" filepath="$PROJECT_DIR$/meme/meme.iml" />
       <module fileurl="file://$PROJECT_DIR$/tenor/tenor.iml" filepath="$PROJECT_DIR$/tenor/tenor.iml" />
     </modules>
   </component>

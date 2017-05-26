@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import com.vanniktech.emoji.custom.RecentEmoticonGridView;
 import com.vanniktech.emoji.gif.GIFGridView;
 import com.vanniktech.emoji.gif.GiphyGridView;
+import com.vanniktech.emoji.meme.MemeGridView;
 
 /**
  * Adapter to load the emoticons in each page
@@ -33,6 +34,9 @@ public class EmoticonPagerAdapter extends PagerAdapter {
             case 1:
                 newView = new GIFGridView(pager.getContext(), mBottomToolbar);
                 break;
+            case 3:
+                newView = new MemeGridView(pager.getContext(), mBottomToolbar);
+                break;
             case 2:
             default:
                 newView = new GiphyGridView(pager.getContext(), mBottomToolbar);
@@ -54,7 +58,7 @@ public class EmoticonPagerAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;
+        return 4;
     }
 
     @Override

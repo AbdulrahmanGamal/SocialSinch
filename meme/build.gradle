@@ -11,6 +11,8 @@ android {
         versionCode 1
         versionName "1.0"
 
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
     }
     buildTypes {
         release {
@@ -23,15 +25,13 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
+
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile project(":tenor")
-    compile project(":giphy")
-    compile project(":meme")
-    compile rootProject.ext.supportAppCompat
-    compile rootProject.ext.supportCardView
-    compile 'io.reactivex:rxandroid:1.2.1'
-    compile rootProject.ext.glide
-    compile rootProject.ext.glideTransformations
-    compile rootProject.ext.sqlbrite
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile rootProject.ext.retrofit
+    compile rootProject.ext.commonsLang
+    compile rootProject.ext.rxjava
+    compile rootProject.ext.adapterRxJava
+    compile rootProject.ext.converterGson
+    testCompile rootProject.ext.junit
 }

@@ -5,7 +5,7 @@ import com.vanniktech.emoji.database.EmoticonBriteDataSource;
 import java.util.List;
 
 /**
- * Manager to comunicate with the local database to obtain or save recent animated emoticons
+ * Manager to communicate with the local database to obtain or save recent animated emoticons
  */
 public class EmoticonDataManager {
     private EmoticonBriteDataSource mEmoticonBriteData;
