@@ -63,8 +63,8 @@
     <string name="sign_in_label">Sign In</string>
     <string name="sign_up_label">Sign Up</string>
     <plurals name="single_user_new_messages_received_label">
-        <item quantity="one">%1$d new Message</item>
-        <item quantity="other">%1$d new Messages</item>
+        <item quantity="one">%1$d new message</item>
+        <item quantity="other">%1$d new messages</item>
     </plurals>
     <string name="multiple_user_new_messages_received_label">%2$d messages from %1$d chats</string>
 </resources>

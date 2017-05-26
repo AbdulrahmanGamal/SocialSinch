@@ -28,7 +28,6 @@
                 android:id="@+id/textview_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:background="@null"
                 android:text="@{viewModel}"
                 style="@style/chat_text_message_style"/>
