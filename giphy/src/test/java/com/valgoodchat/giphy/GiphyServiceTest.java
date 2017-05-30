@@ -4,6 +4,9 @@ import com.valgoodchat.giphy.data.DataManager;
 import com.valgoodchat.giphy.model.GiphyModel;
 
 import org.junit.Test;
+
+import java.util.Locale;
+
 import rx.observers.TestSubscriber;
 
 /**
@@ -15,7 +18,7 @@ public class GiphyServiceTest {
     @Test
     public void searchByKeywordTest() throws Exception {
         TestSubscriber<GiphyModel> testSubscriber = new TestSubscriber<>();
-        DataManager.searchGiphyByKeyword("love").subscribe(testSubscriber);
+        DataManager.searchGiphyByKeyword("love", 50, "0", Locale.getDefault().toString()).subscribe(testSubscriber);
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
 //        List<GiphyModel> model = testSubscriber.getOnNextEvents();

@@ -79,9 +79,9 @@ public class GIFGridView extends BasicGridView {
                 mPaginator
                         .observeOn(Schedulers.io())
                         .concatMap(next -> { if ("".equals(mKeywordSearch)) {
-                            return DataManager.getTrending(MAX_RESULTS, next);
+                            return DataManager.INSTANCE.getTrending(MAX_RESULTS, next);
                         }
-                            return DataManager.searchGiphyByKeyword(mKeywordSearch, MAX_RESULTS, next, Locale.getDefault().toString());
+                            return DataManager.INSTANCE.searchGiphyByKeyword(mKeywordSearch, MAX_RESULTS, next, Locale.getDefault().toString());
                         })
                         .filter(tenorModel -> tenorModel.getResults() != null)
                         .observeOn(AndroidSchedulers.mainThread())

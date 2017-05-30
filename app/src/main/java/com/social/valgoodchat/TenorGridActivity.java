@@ -171,9 +171,9 @@ public class TenorGridActivity extends AppCompatActivity {
             mPaginator
               .observeOn(Schedulers.io())
               .concatMap(next -> { if ("".equals(mKeywordSearch)) {
-                                     return DataManager.getTrending(MAX_RESULTS, next);
+                                     return DataManager.INSTANCE.getTrending(MAX_RESULTS, next);
                                    }
-                                   return DataManager.searchGiphyByKeyword(mKeywordSearch, MAX_RESULTS, next, mLocale);
+                                   return DataManager.INSTANCE.searchGiphyByKeyword(mKeywordSearch, MAX_RESULTS, next, mLocale);
               })
               .filter(tenorModel -> tenorModel.getResults() != null)
               .observeOn(AndroidSchedulers.mainThread())
@@ -201,7 +201,7 @@ public class TenorGridActivity extends AppCompatActivity {
                     @Override
                     public Observable<TenorModel> call(String query) {
                         mKeywordSearch = query;
-                        return DataManager.searchGiphyByKeyword(query, MAX_RESULTS, "", mLocale);
+                        return DataManager.INSTANCE.searchGiphyByKeyword(query, MAX_RESULTS, "", mLocale);
                     }
                 })
                 .filter(tenorModel -> tenorModel.getResults() != null)
