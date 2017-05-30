@@ -78,6 +78,7 @@ ext {
     expresso = "com.android.support.test.espresso:espresso-core:$expressoVersion"
     shadowsMultidex = "org.robolectric:shadows-multidex:$shadowsMultidexVersion"
     supportLibrary = "com.android.support:support-annotations:$supportAnnotationsVersion"
+    kotlin = "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
 
     supportAppCompat = "com.android.support:appcompat-v7:$supportLibraryVersion"

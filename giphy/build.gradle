@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion as int
@@ -33,5 +34,6 @@ dependencies {
     compile rootProject.ext.rxjava
     compile rootProject.ext.adapterRxJava
     compile rootProject.ext.converterGson
+    compile rootProject.ext.kotlin
     testCompile rootProject.ext.junit
 }

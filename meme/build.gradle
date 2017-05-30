@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 apply plugin: 'me.tatarka.retrolambda'
 
 android {
@@ -33,5 +34,9 @@ dependencies {
     compile rootProject.ext.rxjava
     compile rootProject.ext.adapterRxJava
     compile rootProject.ext.converterGson
+    compile rootProject.ext.kotlin
     testCompile rootProject.ext.junit
+}
+repositories {
+    mavenCentral()
 }

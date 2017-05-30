@@ -51,7 +51,7 @@ public class MemeGridView extends BasicGridView {
         setAdapter(mMemeAdapter);
 
         mDisposable = new CompositeSubscription();
-        mDisposable.add( DataManager.getTrending()
+        mDisposable.add( DataManager.INSTANCE.getTrending()
                                     .subscribeOn(Schedulers.io())
                                     .filter(memeModel -> memeModel.getData() != null)
                                     .observeOn(AndroidSchedulers.mainThread())

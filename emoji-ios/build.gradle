@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion as int
@@ -26,4 +27,5 @@ android {
 dependencies {
     compile project(':emoji')
     compile rootProject.ext.supportV4Compat
+    compile rootProject.ext.kotlin
 }

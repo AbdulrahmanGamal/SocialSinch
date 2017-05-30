@@ -18,7 +18,7 @@ public class GiphyServiceTest {
     @Test
     public void searchByKeywordTest() throws Exception {
         TestSubscriber<GiphyModel> testSubscriber = new TestSubscriber<>();
-        DataManager.searchGiphyByKeyword("love", 50, "0", Locale.getDefault().toString()).subscribe(testSubscriber);
+        DataManager.INSTANCE.searchGiphyByKeyword("love", 50, "0", Locale.getDefault().toString()).subscribe(testSubscriber);
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
 //        List<GiphyModel> model = testSubscriber.getOnNextEvents();

@@ -180,14 +180,16 @@
     <orderEntry type="module" module-name="emoji-ios" exported="" />
     <orderEntry type="module" module-name="tenor" exported="" />
     <orderEntry type="module" module-name="meme" exported="" />
-    <orderEntry type="library" exported="" name="okhttp-3.6.0" level="project" />
-    <orderEntry type="library" exported="" name="commons-lang3-3.5" level="project" />
+    <orderEntry type="library" exported="" name="kotlin-stdlib-1.1.2-4" level="project" />
     <orderEntry type="library" exported="" name="retrofit-2.2.0" level="project" />
     <orderEntry type="library" exported="" name="adapter-rxjava-2.2.0" level="project" />
+    <orderEntry type="library" exported="" name="annotations-13.0" level="project" />
     <orderEntry type="library" exported="" name="gson-2.7" level="project" />
     <orderEntry type="library" exported="" name="rxjava-1.2.0" level="project" />
     <orderEntry type="library" exported="" name="converter-gson-2.2.0" level="project" />
     <orderEntry type="library" exported="" name="okio-1.11.0" level="project" />
+    <orderEntry type="library" exported="" name="okhttp-3.6.0" level="project" />
+    <orderEntry type="library" exported="" name="commons-lang3-3.5" level="project" />
     <orderEntry type="library" exported="" name="backendless-3.0.25" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="maven-ant-tasks-2.1.3" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="ant-1.8.0" level="project" />
@@ -209,8 +211,5 @@
     <orderEntry type="library" exported="" scope="TEST" name="asm-analysis-5.0.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="vtd-xml-2.11" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="robolectric-3.0" level="project" />
-    <orderEntry type="library" exported="" name="kotlin-stdlib-1.1.2-4" level="project" />
-    <orderEntry type="library" exported="" name="annotations-13.0" level="project" />
-    <orderEntry type="library" exported="" name="kotlin-stdlib-jre7-1.1.2-4" level="project" />
   </component>
 </module>
