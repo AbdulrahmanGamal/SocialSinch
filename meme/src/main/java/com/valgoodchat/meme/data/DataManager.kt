@@ -12,7 +12,7 @@ import rx.Observable
 object DataManager {
     val trending: Observable<MemeModel>
         get() {
-            val service = ServiceFactory.createRetrofitService(MemeService::class.java, MemeService.SERVICE_ENDPOINT)
+            val service = ServiceFactory.createRetrofitService(MemeService::class.java)
             return service.trending()
         }
 }

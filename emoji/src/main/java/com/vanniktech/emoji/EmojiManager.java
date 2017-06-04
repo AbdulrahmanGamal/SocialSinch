@@ -6,7 +6,7 @@ import com.vanniktech.emoji.emoji.Emoji;
 import com.vanniktech.emoji.emoji.EmojiCategory;
 import com.vanniktech.emoji.emoji.EmojiTree;
 
-import static com.vanniktech.emoji.Utils.checkNotNull;
+import static com.vanniktech.emoji.UtilsKt.checkNotNull;
 
 /**
  * EmojiManager where an EmojiProvider can be installed for further usage.

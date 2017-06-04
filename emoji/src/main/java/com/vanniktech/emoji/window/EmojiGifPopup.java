@@ -15,8 +15,9 @@ import android.widget.EditText;
 import android.widget.PopupWindow;
 
 import com.vanniktech.emoji.EmojiEditText;
-import com.vanniktech.emoji.Utils;
 import com.vanniktech.emoji.custom.EmojiGIFView;
+
+import static com.vanniktech.emoji.UtilsKt.dpToPx;
 
 /**
  * Pop up to display the animated GIfs
@@ -39,7 +40,7 @@ public class EmojiGifPopup {
 
             final int heightDifference = getUsableScreenHeight() - rect.bottom;
 
-            if (heightDifference > Utils.dpToPx(mRootView.getContext(), MIN_KEYBOARD_HEIGHT)) {
+            if (heightDifference > dpToPx(mRootView.getContext(), MIN_KEYBOARD_HEIGHT)) {
                 mPopupWindow.setHeight(heightDifference);
                 mPopupWindow.setWidth(rect.right);
 

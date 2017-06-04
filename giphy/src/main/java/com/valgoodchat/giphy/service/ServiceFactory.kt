@@ -11,6 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object ServiceFactory {
     private val API_KEY = "dc6zaTOxFJmzC"
+    private val SERVICE_ENDPOINT = "https://api.giphy.com/v1/"
     /**
      * Creates a retrofit service from an arbitrary class (clazz)
      * @param clazz Java interface of the retrofit service
@@ -19,11 +20,11 @@ object ServiceFactory {
      * *
      * @return retrofit service with defined endpoint
      */
-    fun <T> createRetrofitService(clazz: Class<T>, endPoint: String): T {
+    fun <T> createRetrofitService(clazz: Class<T>): T {
         val restAdapter = Retrofit.Builder()
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl(endPoint)
+                .baseUrl(SERVICE_ENDPOINT)
                 .client(httpClient)
                 .build()
         return restAdapter.create(clazz)

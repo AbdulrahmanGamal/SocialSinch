@@ -18,8 +18,4 @@ interface GiphyService {
 
     @GET("gifs/trending?")
     fun trending(@Query("limit") limit: String, @Query("offset") offset: String): Observable<GiphyModel>
-
-    companion object {
-        val SERVICE_ENDPOINT = "https://api.giphy.com/v1/"
-    }
 }

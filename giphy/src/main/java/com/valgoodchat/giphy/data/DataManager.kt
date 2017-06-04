@@ -14,13 +14,13 @@ object DataManager {
                              limit: Int,
                              pos: String,
                              locale: String): Observable<GiphyModel> {
-        val service = ServiceFactory.createRetrofitService(GiphyService::class.java, GiphyService.SERVICE_ENDPOINT)
+        val service = ServiceFactory.createRetrofitService(GiphyService::class.java)
 
         return service.searchGif(keyword, pos, limit.toString(), locale)
     }
 
     fun getTrending(limit: Int, pos: String): Observable<GiphyModel> {
-        val service = ServiceFactory.createRetrofitService(GiphyService::class.java, GiphyService.SERVICE_ENDPOINT)
+        val service = ServiceFactory.createRetrofitService(GiphyService::class.java)
 
         return service.trending(limit.toString(), pos)
     }

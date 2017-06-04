@@ -7,11 +7,12 @@ import android.view.animation.AccelerateInterpolator;
 import android.widget.GridView;
 
 import com.vanniktech.emoji.Constants;
-import com.vanniktech.emoji.Utils;
 import com.vanniktech.emoji.gif.EndlessScrollListener;
 
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
+
+import static com.vanniktech.emoji.UtilsKt.getToolbarHeight;
 
 /**
  * Basic class to create a GridView
@@ -32,7 +33,7 @@ public abstract class BasicGridView extends GridView {
         setFocusable(true);
         setTranscriptMode(TRANSCRIPT_MODE_DISABLED);
         setClickable(true);
-        final int toolbarHeight = Utils.getToolbarHeight(getContext());
+        final int toolbarHeight = getToolbarHeight(getContext());
         //subscribe to scrolling events
         mSubscription = EndlessScrollListener.getScrollingDirectionSubject().
                         onBackpressureDrop().

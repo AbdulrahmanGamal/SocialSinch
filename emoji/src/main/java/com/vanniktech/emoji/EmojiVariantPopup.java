@@ -19,7 +19,12 @@ import com.vanniktech.emoji.listeners.OnEmojiClickedListener;
 
 import java.util.List;
 
+import jp.wasabeef.glide.transformations.internal.Utils;
+
 import static android.view.View.MeasureSpec.makeMeasureSpec;
+import static com.vanniktech.emoji.UtilsKt.dpToPx;
+import static com.vanniktech.emoji.UtilsKt.fixPopupLocation;
+import static com.vanniktech.emoji.UtilsKt.locationOnScreen;
 
 public final class EmojiVariantPopup {
 
@@ -46,14 +51,14 @@ public final class EmojiVariantPopup {
 
     content.measure(makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
 
-    final Point location = Utils.locationOnScreen(clickedImage);
+    final Point location = locationOnScreen(clickedImage);
     final Point desiredLocation = new Point(
             location.x - content.getMeasuredWidth() / 2 + clickedImage.getWidth() / 2,
             location.y - content.getMeasuredHeight()
     );
 
     popupWindow.showAtLocation(rootView, Gravity.NO_GRAVITY, desiredLocation.x, desiredLocation.y);
-    Utils.fixPopupLocation(popupWindow, desiredLocation);
+    fixPopupLocation(popupWindow, desiredLocation);
   }
 
  public void dismiss() {
@@ -75,7 +80,7 @@ public final class EmojiVariantPopup {
     for (final Emoji variant : variants) {
       final ImageView emojiImage = (ImageView) inflater.inflate(R.layout.emoji_item, imageContainer, false);
       final ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) emojiImage.getLayoutParams();
-      final int margin = Utils.dpToPx(context, MARGIN);
+      final int margin = dpToPx(context, MARGIN);
 
       // Use the same size for Emojis as in the picker.
       layoutParams.width = width;

@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static com.vanniktech.emoji.Utils.checkNotNull;
+import static com.vanniktech.emoji.UtilsKt.checkNotNull;
 
 public final class EmojiArrayAdapter extends ArrayAdapter<Emoji> {
   @Nullable private final OnEmojiClickedListener listener;

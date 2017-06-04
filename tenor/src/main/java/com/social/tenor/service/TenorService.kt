@@ -20,9 +20,4 @@ interface TenorService {
 
     @GET("trending?")
     fun trending(@Query("limit") offset: String, @Query("pos") pos: String): Observable<TenorModel>
-
-    companion object {
-        val SERVICE_ENDPOINT = "https://api.tenor.co/v1/"
-    }
-
 }

@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.content.res.AppCompatResources;
 import android.text.style.DynamicDrawableSpan;
 
-import static com.vanniktech.emoji.Utils.checkNotNull;
+import static com.vanniktech.emoji.UtilsKt.checkNotNull;
 
 final class EmojiSpan extends DynamicDrawableSpan {
   private final Context context;
@@ -26,7 +26,8 @@ final class EmojiSpan extends DynamicDrawableSpan {
   @Override
   public Drawable getDrawable() {
     if (drawable == null) {
-      drawable = checkNotNull(AppCompatResources.getDrawable(context, resourceId), "emoji drawable == null");
+      drawable = checkNotNull(AppCompatResources.
+                                        getDrawable(context, resourceId), "emoji drawable == null");
       drawable.setBounds(0, 0, size, size);
     }
 

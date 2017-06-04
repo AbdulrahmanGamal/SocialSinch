@@ -12,8 +12,4 @@ import rx.Observable
 interface MemeService {
     @GET("get_memes")
     fun trending(): Observable<MemeModel>
-
-    companion object {
-        val SERVICE_ENDPOINT = "https://api.imgflip.com/"
-    }
 }

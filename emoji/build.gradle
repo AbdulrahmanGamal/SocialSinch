@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion as int
@@ -34,4 +35,5 @@ dependencies {
     compile rootProject.ext.glide
     compile rootProject.ext.glideTransformations
     compile rootProject.ext.sqlbrite
+    compile rootProject.ext.kotlin
 }
